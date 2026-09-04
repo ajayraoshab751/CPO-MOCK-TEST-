@@ -3,208 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO Mock Test Portal</title>
+    <title>CPO Mock Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 700px; margin: auto; }
+        :root { --bg: #f4f7f6; --card: #ffffff; --text: #333333; --accent: #007bff; }
+        body.dark-mode { --bg: #1e1e2e; --card: #2b2b3d; --text: #f1f1f1; --accent: #7289da; }
+        body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; margin: 0; padding: 15px; transition: all 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .three-dots { font-size: 24px; cursor: pointer; border: none; background: none; color: var(--text); }
+        .drawer { position: fixed; top: 0; right: -300px; width: 260px; height: 100%; background: var(--card); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 1000; padding: 20px; overflow-y: auto; }
+        .drawer.open { right: 0; }
+        .drawer-btn { display: block; width: 100%; text-align: left; background: none; border: none; padding: 12px; color: var(--text); font-size: 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .card { background: var(--card); padding: 20px; border-radius: 8px; margin: 15px auto; max-width: 700px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .hidden { display: none; }
-        .btn { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin: 5px 2px; }
-        .btn-warning { background: #ffc107; color: black; }
-        .btn-success { background: #28a745; }
-        .btn-secondary { background: #6c757d; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .stat-box { background: #e9ecef; padding: 12px; border-radius: 5px; text-align: center; }
-        .option { display: block; width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; padding: 10px; margin: 5px 0; border-radius: 4px; }
-        .solution-card { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin-top: 10px; }
-        .trick-card { background: #d4edda; border-left: 4px solid #28a745; padding: 10px; margin-top: 5px; }
+        .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .target-banner { background: #ffc107; color: black; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card" id="authBox">
-    <h2>Student Login / Registration</h2>
-    <input type="text" id="username" placeholder="Username / Email" style="width: 95%; padding: 8px; margin-bottom: 10px;"><br>
-    <input type="password" id="password" placeholder="Password" style="width: 95%; padding: 8px; margin-bottom: 10px;"><br>
-    <button class="btn btn-success" onclick="login()">Login</button>
+<div class="header">
+    <h3>CPO Mock Portal</h3>
+    <button class="three-dots" onclick="toggleDrawer()">⋮</button>
+</div>
+
+<div class="target-banner" id="targetDisplay">Loading Target...</div>
+
+<div class="drawer" id="sideDrawer">
+    <button class="btn" style="float: right;" onclick="toggleDrawer()">✕</button>
+    <h4>Menu Options</h4>
+    <button class="drawer-btn" onclick="showView('profileView')">👤 Profile</button>
+    <button class="drawer-btn" onclick="showView('mockTestView')">📝 Mock Tests (Sectional)</button>
+    <button class="drawer-btn" onclick="showView('performanceView')">📊 Performance & Ranking</button>
+    <button class="drawer-btn" onclick="showView('bankView')">⭐ Saved & Wrong Questions</button>
+    <button class="drawer-btn" onclick="showView('targetView')">🎯 Set Global Target</button>
+    <button class="drawer-btn" onclick="showView('settingsView')">⚙️ Settings</button>
+</div>
+
+<div class="card" id="authView">
+    <h3>Student Auth</h3>
+    <input type="text" id="username" placeholder="Username" style="width:90%; padding:8px; margin:5px;"><br>
+    <input type="password" id="password" placeholder="Password" style="width:90%; padding:8px; margin:5px;"><br>
+    <input type="text" id="fullName" placeholder="Full Name (for register)" style="width:90%; padding:8px; margin:5px;"><br>
+    <button class="btn" onclick="login()">Login</button>
     <button class="btn" onclick="register()">Register</button>
 </div>
 
-<div class="card hidden" id="dashboard">
-    <h2>Welcome, <span id="userDisp"></span>!</h2>
-    <p>Total Attempts Used: <strong id="attemptCount">0</strong> / 20</p>
-    <button class="btn btn-success" onclick="startTest()">Start Mock Test</button>
+<div class="card hidden" id="profileView">
+    <h3>User Profile</h3>
+    <div id="profileDetails">Log in to view profile.</div>
 </div>
 
-<div class="card hidden" id="testEngine">
-    <div style="display: flex; justify-space-between; align-items: center;">
-        <h3 id="qTitle">Question</h3>
-        <div>Timer: <strong id="timer">00:00</strong></div>
-    </div>
-    <p id="qText" style="font-size: 1.1em;"></p>
-    <div id="optionsBox"></div>
-    <div style="margin-top: 15px;">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
-        <button class="btn btn-warning" onclick="markReview()">Mark for Review</button>
-        <button class="btn" onclick="nextQuestion()">Next</button>
-        <button class="btn btn-success" style="float: right;" onclick="submitTest()">Submit Test</button>
+<div class="card hidden" id="mockTestView">
+    <h3>Select Mock Test Section</h3>
+    <button class="btn" onclick="initSectionTest('Maths')">Maths Chapterwise</button>
+    <button class="btn" onclick="initSectionTest('English')">English Chapterwise</button>
+    <button class="btn" onclick="initSectionTest('GK')">GK Chapterwise</button>
+    <button class="btn" onclick="initSectionTest('Reasoning')">Reasoning Chapterwise</button>
+</div>
+
+<div class="card hidden" id="testEngineView">
+    <h4 id="testTitle">Mock Test</h4>
+    <p id="qText"></p>
+    <div id="optionsContainer"></div>
+    <br>
+    <button class="btn" onclick="saveCurrentQuestion()">⭐ Bookmark Question</button>
+    <button class="btn" onclick="submitSectionTest()">Submit Section</button>
+</div>
+
+<div class="card hidden" id="performanceView">
+    <h3>Your Performance Analytics</h3>
+    <div class="grid-2">
+        <div style="background:#e9ecef; padding:10px; border-radius:5px;">Leaderboard Rank: <h2 id="userRank">#N/A</h2></div>
+        <div style="background:#e9ecef; padding:10px; border-radius:5px;">Total Attempts: <h2 id="userAttempts">0</h2></div>
+        <div style="background:#d4edda; padding:10px; border-radius:5px;">Right Answers: <h2 id="userRight">0</h2></div>
+        <div style="background:#f8d7da; padding:10px; border-radius:5px;">Wrong Answers: <h2 id="userWrong">0</h2></div>
     </div>
 </div>
 
-<div class="card hidden" id="resultPage">
-    <h2>Test Summary Performance</h2>
-    <div class="stat-grid">
-        <div class="stat-box">Score: <h3 id="resScore">0</h3></div>
-        <div class="stat-box">Percentage: <h3 id="resPct">0%</h3></div>
-        <div class="stat-box">Time Taken: <h3 id="resTime">0s</h3></div>
-        <div class="stat-box">Attempt #: <h3 id="resAttempt">1</h3></div>
-    </div>
-    <div class="stat-grid">
-        <div class="stat-box" style="color: green;">Correct: <strong id="resCorrect">0</strong></div>
-        <div class="stat-box" style="color: red;">Incorrect: <strong id="resIncorrect">0</strong></div>
-        <div class="stat-box" style="color: gray;">Unattempted: <strong id="resUnattempted">0</strong></div>
-        <div class="stat-box" style="color: orange;">Review: <strong id="resReview">0</strong></div>
-    </div>
-    <button class="btn btn-success" onclick="toggleSolutions()">View Detailed Solutions & Short Tricks</button>
-    <button class="btn" onclick="reattemptTest()">Reattempt Test</button>
+<div class="card hidden" id="bankView">
+    <h3>Saved & Wrong Question Bank</h3>
+    <h4>Saved/Bookmarked Questions</h4>
+    <div id="savedContainer">None</div>
+    <h4>Incorrectly Attempted Questions</h4>
+    <div id="wrongContainer">None</div>
 </div>
 
-<div class="card hidden" id="solutionsPage" style="margin-top: 15px;">
-    <h3>Detailed Solutions & Short Tricks</h3>
-    <div id="solutionsList"></div>
+<div class="card hidden" id="targetView">
+    <h3>Update Announcement Target</h3>
+    <input type="text" id="targetInput" placeholder="Enter target text for all users" style="width:90%; padding:8px;"><br>
+    <button class="btn" onclick="setGlobalTarget()">Publish Target</button>
+</div>
+
+<div class="card hidden" id="settingsView">
+    <h3>App Settings</h3>
+    <button class="btn" onclick="toggleTheme()">Toggle Dark / Light Theme</button>
+    <button class="btn" onclick="location.reload()">🔄 Refresh Portal</button>
+    <br><br>
+    <button class="btn" onclick="shareWebsite()">🔗 Share Website Link</button>
 </div>
 
 <script src="questions.js"></script>
 <script>
-let currentUser = null, currentQ = 0, timerInterval = null, secondsElapsed = 0;
-let userAnswers = {}, reviewMarks = {};
+let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
+
+function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('open'); }
+
+function showView(viewId) {
+    toggleDrawer();
+    ['authView', 'profileView', 'mockTestView', 'testEngineView', 'performanceView', 'bankView', 'targetView', 'settingsView']
+    .forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
+    if(currentUser) loadUserStats();
+}
 
 function login() {
     const u = document.getElementById('username').value;
     const p = document.getElementById('password').value;
-    fetch('/api/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: u, password: p}) })
+    fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p}) })
     .then(r => r.json()).then(d => {
-        if(d.success) { currentUser = u; showDashboard(); } else alert(d.error);
+        if(d.success) {
+            currentUser = d.user;
+            document.getElementById('authView').classList.add('hidden');
+            renderProfile(d.user);
+            loadUserStats();
+            showView('mockTestView');
+        } else alert(d.error);
     });
 }
 
 function register() {
     const u = document.getElementById('username').value;
     const p = document.getElementById('password').value;
-    fetch('/api/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: u, password: p}) })
-    .then(r => r.json()).then(d => {
-        if(d.success) alert('Registration successful! Click Login.'); else alert(d.error);
+    const fn = document.getElementById('fullName').value;
+    fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p, fullName:fn}) })
+    .then(r=>r.json()).then(d=>{ if(d.success) alert('Registered! Please login.'); else alert(d.error); });
+}
+
+function renderProfile(user) {
+    document.getElementById('profileDetails').innerHTML = `
+        <p><strong>Full Name:</strong> ${user.fullName || 'N/A'}</p>
+        <p><strong>Username:</strong> ${user.username}</p>
+        <p><strong>Joined:</strong> ${new Date(user.registeredAt).toLocaleDateString()}</p>
+    `;
+}
+
+function loadUserStats() {
+    fetch('/api/user-stats/' + currentUser.username).then(r => r.json()).then(d => {
+        document.getElementById('userRank').innerText = '#' + d.rank;
+        document.getElementById('userAttempts').innerText = d.totalAttempts;
+        document.getElementById('userRight').innerText = d.totalRight;
+        document.getElementById('userWrong').innerText = d.totalWrong;
+        document.getElementById('targetDisplay').innerText = d.globalTarget;
+        
+        // Render Banks
+        document.getElementById('savedContainer').innerHTML = d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No saved questions.';
+        document.getElementById('wrongContainer').innerHTML = d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No wrong questions.';
     });
 }
 
-function showDashboard() {
-    document.getElementById('authBox').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('userDisp').innerText = currentUser;
-    fetch('/api/attempts/' + currentUser).then(r => r.json()).then(d => {
-        document.getElementById('attemptCount').innerText = d.totalAttempts;
-    });
-}
-
-function startTest() {
-    userAnswers = {}; reviewMarks = {}; currentQ = 0; secondsElapsed = 0;
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('resultPage').classList.add('hidden');
-    document.getElementById('solutionsPage').classList.add('hidden');
-    document.getElementById('testEngine').classList.remove('hidden');
+function initSectionTest(sec) {
+    activeSection = sec;
+    activeQuestions = sectionWiseQuestions[sec] || [];
+    currentAnswers = {};
+    if(activeQuestions.length === 0) return alert('No questions added in this section yet!');
     
-    timerInterval = setInterval(() => {
-        secondsElapsed++;
-        let m = Math.floor(secondsElapsed / 60), s = secondsElapsed % 60;
-        document.getElementById('timer').innerText = `${m < 10 ? '0':''}${m}:${s < 10 ? '0':''}${s}`;
-    }, 1000);
-    
-    renderQuestion();
-}
-
-function renderQuestion() {
-    const q = testQuestions[currentQ];
-    document.getElementById('qTitle').innerText = `Question ${currentQ + 1} of ${testQuestions.length}`;
-    document.getElementById('qText').innerText = q.question;
+    document.getElementById('testTitle').innerText = sec + ' Chapterwise Mock';
+    document.getElementById('mockTestView').classList.add('hidden');
+    document.getElementById('testEngineView').classList.remove('hidden');
     
     let html = '';
-    q.options.forEach((opt, idx) => {
-        let checked = userAnswers[currentQ] === idx ? 'checked' : '';
-        html += `<label class="option"><input type="radio" name="opt" onclick="selectOpt(${idx})" ${checked}> ${opt}</label>`;
+    activeQuestions.forEach((q, idx) => {
+        html += `<p><strong>Q${idx+1}: ${q.question}</strong></p>`;
+        q.options.forEach((opt, oIdx) => {
+            html += `<label><input type="radio" name="q_${idx}" onclick="currentAnswers[${idx}]=${oIdx}"> ${opt}</label><br>`;
+        });
     });
-    document.getElementById('optionsBox').innerHTML = html;
+    document.getElementById('optionsContainer').innerHTML = html;
 }
 
-function selectOpt(idx) { userAnswers[currentQ] = idx; }
-function prevQuestion() { if(currentQ > 0) { currentQ--; renderQuestion(); } }
-function nextQuestion() { if(currentQ < testQuestions.length - 1) { currentQ++; renderQuestion(); } }
-function markReview() { reviewMarks[currentQ] = true; nextQuestion(); }
+function saveCurrentQuestion() {
+    if(activeQuestions.length === 0) return;
+    fetch('/api/save-question', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username: currentUser.username, questionObj: activeQuestions[0] })
+    }).then(r => r.json()).then(() => alert('Question saved to bank!'));
+}
 
-function submitTest() {
-    clearInterval(timerInterval);
-    let correct = 0, incorrect = 0, unattempted = 0, marked = Object.keys(reviewMarks).length;
-    
-    testQuestions.forEach((q, idx) => {
-        if (userAnswers[idx] === undefined) unattempted++;
-        else if (userAnswers[idx] === q.correctAnswer) correct++;
-        else incorrect++;
+function submitSectionTest() {
+    let correct = 0, incorrect = 0, unattempted = 0, wrongQList = [];
+    activeQuestions.forEach((q, idx) => {
+        if(currentAnswers[idx] === undefined) unattempted++;
+        else if(currentAnswers[idx] === q.correctAnswer) correct++;
+        else { incorrect++; wrongQList.push(q); }
     });
-
-    let score = (correct * 2) - (incorrect * 0.5); // Marks: +2 Correct, -0.5 Incorrect
-    let maxMarks = testQuestions.length * 2;
-    let percentage = ((score / maxMarks) * 100).toFixed(2);
-
-    const payload = {
-        username: currentUser, score, percentage, timeTaken: secondsElapsed,
-        correct, incorrect, unattempted, markedForReview: marked
-    };
+    
+    let score = (correct * 2) - (incorrect * 0.5);
+    let percentage = ((score / (activeQuestions.length * 2)) * 100).toFixed(2);
 
     fetch('/api/submit-test', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-    }).then(r => r.json()).then(data => {
-        if(!data.success) { alert(data.error); return; }
-        
-        document.getElementById('testEngine').classList.add('hidden');
-        document.getElementById('resultPage').classList.remove('hidden');
-        
-        document.getElementById('resScore').innerText = score;
-        document.getElementById('resPct').innerText = percentage + '%';
-        document.getElementById('resTime').innerText = secondsElapsed + 's';
-        document.getElementById('resAttempt').innerText = data.attemptNumber;
-        document.getElementById('resCorrect').innerText = correct;
-        document.getElementById('resIncorrect').innerText = incorrect;
-        document.getElementById('resUnattempted').innerText = unattempted;
-        document.getElementById('resReview').innerText = marked;
-        
-        buildSolutions();
+        body: JSON.stringify({
+            username: currentUser.username, section: activeSection, score, percentage,
+            timeTaken: 60, correct, incorrect, unattempted, wrongQList
+        })
+    }).then(r => r.json()).then(d => {
+        if(d.success) {
+            alert(`Test Submitted!\nScore: ${score}\nRight: ${correct}\nWrong: ${incorrect}`);
+            showView('performanceView');
+        } else alert(d.error);
     });
 }
 
-function buildSolutions() {
-    let html = '';
-    testQuestions.forEach((q, idx) => {
-        let userAns = userAnswers[idx] !== undefined ? q.options[userAnswers[idx]] : 'Unattempted';
-        let correctAns = q.options[q.correctAnswer];
-        
-        html += `<div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-            <p><strong>Q${idx + 1}: ${q.question}</strong></p>
-            <p>Your Answer: <span style="color:${userAnswers[idx] === q.correctAnswer ? 'green':'red'}">${userAns}</span> | Correct Answer: <strong>${correctAns}</strong></p>
-            <div class="solution-card"><strong>Detailed Solution:</strong><br>${q.explanation}</div>
-            ${q.shortTrick ? `<div class="trick-card"><strong>Short Trick:</strong><br>${q.shortTrick}</div>` : ''}
-        </div>`;
+function setGlobalTarget() {
+    const target = document.getElementById('targetInput').value;
+    fetch('/api/set-target', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ target })
+    }).then(r => r.json()).then(d => {
+        if(d.success) { alert('Target updated globally!'); loadUserStats(); }
     });
-    document.getElementById('solutionsList').innerHTML = html;
 }
 
-function toggleSolutions() {
-    document.getElementById('solutionsPage').classList.toggle('hidden');
-}
+function toggleTheme() { document.body.classList.toggle('dark-mode'); }
 
-function reattemptTest() {
-    startTest();
+function shareWebsite() {
+    if (navigator.share) {
+        navigator.share({ title: 'CPO Mock Portal', url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Website link copied to clipboard!');
+    }
 }
 </script>
 </body>
 </html>
-

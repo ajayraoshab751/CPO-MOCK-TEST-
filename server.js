@@ -8,81 +8,97 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 const users = [];
-const testResults = []; // Stores attempt history
-let activeHeartbeats = {};
+const testResults = [];
+const savedQuestionsMap = {}; 
+const wrongQuestionsMap = {}; 
+let globalTarget = "Target: Score 160+ in CPO Tier-1 Mock Tests!";
 
-// Clean inactive heartbeats
-setInterval(() => {
-    const now = Date.now();
-    for (const user in activeHeartbeats) {
-        if (now - activeHeartbeats[user] > 30000) delete activeHeartbeats[user];
-    }
-}, 30000);
-
-// Register
+// Registration
 app.post('/api/register', (req, res) => {
     const { fullName, age, gender, place, username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
-    if (users.find(u => u.username === username)) return res.status(400).json({ error: 'User already exists' });
+    if (users.find(u => u.username === username)) return res.status(400).json({ error: 'User exists' });
     
     const newUser = { fullName, age, gender, place, username, password, registeredAt: new Date().toISOString() };
     users.push(newUser);
     res.json({ success: true, user: newUser });
 });
 
-// Login
+// Login & Profile Fetch
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-    res.json({ success: true, username: user.username });
+    res.json({ success: true, user });
 });
 
-// Save Test Submission (Allows max 20 re-attempts)
+// Test Submission
 app.post('/api/submit-test', (req, res) => {
-    const { username, score, percentage, timeTaken, correct, incorrect, unattempted, markedForReview } = req.body;
+    const { username, section, score, percentage, timeTaken, correct, incorrect, unattempted, wrongQList } = req.body;
     
     const userAttempts = testResults.filter(r => r.username === username);
-    if (userAttempts.length >= 20) {
-        return res.status(400).json({ error: 'Attempt limit reached! You have used all 20 attempts.' });
-    }
+    if (userAttempts.length >= 20) return res.status(400).json({ error: 'Max 20 attempts reached!' });
 
     const attemptData = {
-        id: Date.now(),
-        username,
-        attemptNumber: userAttempts.length + 1,
-        score,
-        percentage,
-        timeTaken,
-        correct,
-        incorrect,
-        unattempted,
-        markedForReview,
-        submittedAt: new Date().toISOString()
+        username, section, score, percentage, timeTaken, correct, incorrect, unattempted, submittedAt: new Date().toISOString()
     };
-
     testResults.push(attemptData);
-    res.json({ success: true, attemptNumber: attemptData.attemptNumber, remainingAttempts: 20 - attemptData.attemptNumber });
+
+    // Save Wrong Questions
+    if (!wrongQuestionsMap[username]) wrongQuestionsMap[username] = [];
+    if (wrongQList && wrongQList.length > 0) {
+        wrongQuestionsMap[username].push(...wrongQList);
+    }
+
+    res.json({ success: true, attemptCount: userAttempts.length + 1 });
 });
 
-// Fetch Attempt History
-app.get('/api/attempts/:username', (req, res) => {
-    const userAttempts = testResults.filter(r => r.username === req.params.username);
-    res.json({ attempts: userAttempts, totalAttempts: userAttempts.length, maxAllowed: 20 });
+// Save/Bookmark Question
+app.post('/api/save-question', (req, res) => {
+    const { username, questionObj } = req.body;
+    if (!savedQuestionsMap[username]) savedQuestionsMap[username] = [];
+    savedQuestionsMap[username].push(questionObj);
+    res.json({ success: true });
 });
 
-// Heartbeat
-app.post('/api/heartbeat', (req, res) => {
-    if (req.body.username) activeHeartbeats[req.body.username] = Date.now();
-    res.json({ status: 'ok' });
+// Fetch User Dashboard Stats & Leaderboard
+app.get('/api/user-stats/:username', (req, res) => {
+    const username = req.params.username;
+    const userAttempts = testResults.filter(r => r.username === username);
+    
+    let totalRight = 0, totalWrong = 0;
+    userAttempts.forEach(a => { totalRight += a.correct; totalWrong += a.incorrect; });
+
+    // Leaderboard Ranking Algorithm
+    const userScores = {};
+    testResults.forEach(r => {
+        userScores[r.username] = (userScores[r.username] || 0) + r.score;
+    });
+
+    const sortedUsers = Object.keys(userScores).sort((a, b) => userScores[b] - userScores[a]);
+    const rank = sortedUsers.indexOf(username) !== -1 ? sortedUsers.indexOf(username) + 1 : 'N/A';
+
+    res.json({
+        totalAttempts: userAttempts.length,
+        totalRight,
+        totalWrong,
+        rank,
+        savedQuestions: savedQuestionsMap[username] || [],
+        wrongQuestions: wrongQuestionsMap[username] || [],
+        globalTarget
+    });
 });
 
-// Admin Stats
-app.get('/api/admin/stats', (req, res) => {
-    if (req.query.key !== 'CPOADMIN123') return res.status(403).json({ error: 'Unauthorized' });
-    res.json({ totalRegistered: users.length, currentlyOnline: Object.keys(activeHeartbeats).length, allUsers: users, allResults: testResults });
+// Set Global Target (Admin or Dashboard)
+app.post('/api/set-target', (req, res) => {
+    if (req.body.target) {
+        globalTarget = req.body.target;
+        return res.json({ success: true, target: globalTarget });
+    }
+    res.status(400).json({ error: 'Target required' });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
