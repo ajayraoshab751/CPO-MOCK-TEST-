@@ -13,28 +13,31 @@ const savedQuestionsMap = {};
 const wrongQuestionsMap = {}; 
 let globalTarget = "Target: Score 160+ in CPO Tier-1 Mock Tests!";
 
-// Registration Endpoint
 app.post('/api/register', (req, res) => {
-    const { fullName, age, gender, place, username, password } = req.body;
+    const { fullName, username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
-    if (users.find(u => u.username === username)) return res.status(400).json({ error: 'User exists' });
     
-    const newUser = { fullName, age, gender, place, username, password, registeredAt: new Date().toISOString() };
-    users.push(newUser);
-    res.json({ success: true, user: newUser });
+    let existingUser = users.find(u => u.username === username);
+    if (!existingUser) {
+        existingUser = { fullName: fullName || username, username, password, registeredAt: new Date().toISOString() };
+        users.push(existingUser);
+    }
+    res.json({ success: true, user: existingUser });
 });
 
-// Login Endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
+
+    let user = users.find(u => u.username === username);
+    if (!user) {
+        user = { fullName: username, username, password, registeredAt: new Date().toISOString() };
+        users.push(user);
+    }
     res.json({ success: true, user });
 });
 
-// Doubt Scanner Route (Google AI OCR Engine)
 app.post('/api/ai-scan-doubt', (req, res) => {
-    // Simulating Google AI Image Recognition Analysis
     setTimeout(() => {
         res.json({
             success: true,
@@ -43,7 +46,6 @@ app.post('/api/ai-scan-doubt', (req, res) => {
     }, 1500);
 });
 
-// Test Submission
 app.post('/api/submit-test', (req, res) => {
     const { username, section, score, percentage, timeTaken, correct, incorrect, unattempted, wrongQList } = req.body;
     
@@ -63,7 +65,6 @@ app.post('/api/submit-test', (req, res) => {
     res.json({ success: true, attemptCount: userAttempts.length + 1 });
 });
 
-// Bookmark Question
 app.post('/api/save-question', (req, res) => {
     const { username, questionObj } = req.body;
     if (!savedQuestionsMap[username]) savedQuestionsMap[username] = [];
@@ -71,7 +72,6 @@ app.post('/api/save-question', (req, res) => {
     res.json({ success: true });
 });
 
-// Fetch User Stats
 app.get('/api/user-stats/:username', (req, res) => {
     const username = req.params.username;
     const userAttempts = testResults.filter(r => r.username === username);
@@ -96,7 +96,6 @@ app.get('/api/user-stats/:username', (req, res) => {
     });
 });
 
-// Set Global Target
 app.post('/api/set-target', (req, res) => {
     if (req.body.target) {
         globalTarget = req.body.target;
