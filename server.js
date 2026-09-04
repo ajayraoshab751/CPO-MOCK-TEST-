@@ -1,92 +1,98 @@
 const express = require('express');
-const session = require('express-session');
-const bcrypt = require('bcryptjs');
-const Datastore = require('@seald-io/nedb');
 const path = require('path');
+const Datastore = require('nedb');
 
 const app = express();
-const usersDB = new Datastore({ filename: 'users.db', autoload: true });
-const resultsDB = new Datastore({ filename: 'results.db', autoload: true });
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static('public'));
-app.use(session({
-    secret: 'tab_s9_fe_secret_key_123',
-    resave: false,
-    saveUninitialized: false
-}));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. User Registration
-app.post('/api/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Missing username or password' });
+// Database setup
+const usersDb = new Datastore({ filename: 'users.db', autoload: true });
 
-    usersDB.findOne({ username }, async (err, user) => {
-        if (user) return res.status(400).json({ error: 'Username already exists' });
-        
-        const hashedPassword = await bcrypt.hash(password, 10);
-        usersDB.insert({ username, password: hashedPassword }, (err, newUser) => {
-            req.session.userId = newUser._id;
-            req.session.username = newUser.username;
-            res.json({ success: true, username: newUser.username });
+// Track active users in memory (Active in the last 30 seconds)
+const activeSessions = new Map();
+
+// Heartbeat endpoint to track live online users
+app.post('/api/heartbeat', (req, res) => {
+    const { username } = req.body;
+    if (username) {
+        activeSessions.set(username, Date.now());
+    }
+    res.sendStatus(200);
+});
+
+// Registration API
+app.post('/api/register', (req, res) => {
+    const { fullName, age, gender, place, username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    usersDb.findOne({ username }, (err, user) => {
+        if (user) {
+            return res.status(400).json({ error: "Username already exists" });
+        }
+        const newUser = {
+            fullName,
+            age,
+            gender,
+            place,
+            username,
+            password,
+            registeredAt: new Date().toISOString()
+        };
+        usersDb.insert(newUser, (err, doc) => {
+            res.json({ message: "Registration successful" });
         });
     });
 });
 
-// 2. User Login
+// Login API
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    usersDB.findOne({ username }, async (err, user) => {
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(400).json({ error: 'Invalid username or password' });
+    usersDb.findOne({ username, password }, (err, user) => {
+        if (user) {
+            activeSessions.set(username, Date.now());
+            res.json({ message: "Login successful", user });
+        } else {
+            res.status(401).json({ error: "Invalid credentials" });
         }
-        req.session.userId = user._id;
-        req.session.username = user.username;
-        res.json({ success: true, username: user.username });
     });
 });
 
-// 3. Check Authentication Session
-app.get('/api/me', (req, res) => {
-    if (req.session.userId) {
-        res.json({ loggedIn: true, username: req.session.username });
-    } else {
-        res.json({ loggedIn: false });
+// Admin API to get all registered users & count live active users
+app.get('/api/admin/stats', (req, res) => {
+    const adminKey = req.query.key;
+    if (adminKey !== 'CPOADMIN123') { // Secret key to protect admin data
+        return res.status(403).json({ error: "Access Denied" });
     }
-});
 
-// 4. Logout
-app.post('/api/logout', (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
-});
+    const now = Date.now();
+    let liveCount = 0;
+    const activeUsernames = [];
 
-// 5. Save Test Score
-app.post('/api/save-result', (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
+    // Clean up inactive users (no ping in last 30s)
+    activeSessions.forEach((lastSeen, user) => {
+        if (now - lastSeen < 30000) {
+            liveCount++;
+            activeUsernames.push(user);
+        } else {
+            activeSessions.delete(user);
+        }
+    });
 
-    const resultData = {
-        userId: req.session.userId,
-        testTitle: req.body.testTitle,
-        score: req.body.score,
-        total: req.body.total,
-        date: new Date().toLocaleDateString()
-    };
-
-    resultsDB.insert(resultData, () => {
-        res.json({ success: true });
+    usersDb.find({}, { password: 0 }, (err, docs) => {
+        res.json({
+            totalRegistered: docs.length,
+            currentlyOnline: liveCount,
+            activeUsers: activeUsernames,
+            allUsers: docs
+        });
     });
 });
 
-// 6. Get Saved Test History
-app.get('/api/my-history', (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
-
-    resultsDB.find({ userId: req.session.userId }, (err, docs) => {
-        res.json(docs);
-    });
-});
-
-app.listen(3000, () => {
-    console.log('Server is running at http://localhost:3000');
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
