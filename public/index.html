@@ -6,11 +6,13 @@
   <title>CPO Mock Portal</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
-    .card { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .banner { background: #ffc107; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 20px; }
-    input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    .card { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .banner { background: #ffc107; padding: 12px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 20px; }
+    input, textarea, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
     button:disabled { background: #cccccc; }
+    .logout-btn { background: #dc3545; }
+    .section-title { border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -27,8 +29,20 @@
 
   <div class="card" id="adminCard" style="display:none;">
     <h2>Admin Dashboard</h2>
-    <p>Welcome, Admin! You are successfully logged in.</p>
-    <button onclick="location.reload()">Logout</button>
+    <p>Logged in as <strong>ajayraoshab751@gmail.com</strong></p>
+
+    <h3 class="section-title">1. Broadcast Announcement / Target Image</h3>
+    <input type="text" id="announcementText" placeholder="Enter target headline text...">
+    <input type="file" id="targetImageInput" accept="image/*">
+    <button onclick="alert('Broadcast updated!')">Update Broadcast</button>
+
+    <h3 class="section-title">2. Upload Mock Test</h3>
+    <input type="text" id="mockTitle" placeholder="Mock Test Title (e.g., CPO Mock Test #1)">
+    <input type="file" id="mockFileInput" accept=".html,.json">
+    <button onclick="alert('Mock Test Uploaded!')">Publish Mock Test</button>
+
+    <h3 class="section-title">3. Manage Portal</h3>
+    <button class="logout-btn" onclick="location.reload()">Logout</button>
   </div>
 
   <script>
@@ -49,15 +63,11 @@
         });
 
         const data = await res.json();
-        if (data.success) {
-          if (data.isAdmin) {
-            document.getElementById('loginCard').style.display = 'none';
-            document.getElementById('adminCard').style.display = 'block';
-          } else {
-            alert('Logged in as Student: ' + data.user.name);
-          }
+        if (data.success && data.isAdmin) {
+          document.getElementById('loginCard').style.display = 'none';
+          document.getElementById('adminCard').style.display = 'block';
         } else {
-          alert('Login failed!');
+          alert('Invalid admin credentials.');
         }
       } catch (err) {
         alert('Connection error. Please try again.');
