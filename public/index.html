@@ -3,16 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPO Mock Portal</title>
+  <title>CPO Mock Portal - Advanced Admin</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
-    .card { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card { background: white; padding: 20px; border-radius: 8px; max-width: 700px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .banner { background: #ffc107; padding: 12px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 20px; }
-    input, textarea, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    input, textarea, button, select { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
     button { background: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
     button:disabled { background: #cccccc; }
     .logout-btn { background: #dc3545; }
-    .section-title { border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 20px; }
+    .section-title { border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 25px; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+    th { background-color: #007bff; color: white; }
+    .status-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; color: white; }
+    .completed { background-color: #28a745; }
+    .pending { background-color: #ffc107; color: #333; }
+    .toggle-container { display: flex; align-items: center; justify-content: space-between; background: #e9ecef; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
@@ -28,24 +35,119 @@
   </div>
 
   <div class="card" id="adminCard" style="display:none;">
-    <h2>Admin Dashboard</h2>
-    <p>Logged in as <strong>ajayraoshab751@gmail.com</strong></p>
+    <h2>Admin Management Dashboard</h2>
+    <p>Logged in as: <strong>ajayraoshab751@gmail.com</strong></p>
 
-    <h3 class="section-title">1. Broadcast Announcement / Target Image</h3>
+    <!-- 1. Call Permissions Control -->
+    <h3 class="section-title">1. Student Contact Controls</h3>
+    <div class="toggle-container">
+      <span>Allow Direct Web Calls to Admin:</span>
+      <button style="width: auto; margin:0; padding: 5px 15px;" id="callToggleBtn" onclick="toggleCalling()">Enable Calls</button>
+    </div>
+
+    <!-- 2. Broadcast Announcement -->
+    <h3 class="section-title">2. Broadcast Announcement / Target Image</h3>
     <input type="text" id="announcementText" placeholder="Enter target headline text...">
     <input type="file" id="targetImageInput" accept="image/*">
-    <button onclick="alert('Broadcast updated!')">Update Broadcast</button>
+    <button onclick="alert('Broadcast updated successfully!')">Update Broadcast</button>
 
-    <h3 class="section-title">2. Upload Mock Test</h3>
+    <!-- 3. Upload Mock Test -->
+    <h3 class="section-title">3. Upload Mock Test</h3>
     <input type="text" id="mockTitle" placeholder="Mock Test Title (e.g., CPO Mock Test #1)">
     <input type="file" id="mockFileInput" accept=".html,.json">
     <button onclick="alert('Mock Test Uploaded!')">Publish Mock Test</button>
 
-    <h3 class="section-title">3. Manage Portal</h3>
+    <!-- 4. User Profiles & Challenge Status -->
+    <h3 class="section-title">4. User Profiles & Activity Analytics</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Logins</th>
+          <th>Challenge Status</th>
+          <th>Saved Questions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ajay (ajayraoshab751@gmail.com)</td>
+          <td>12 logins</td>
+          <td><span class="status-badge completed">Completed</span></td>
+          <td>15 Questions</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 5. Leaderboard / Winner Standings -->
+    <h3 class="section-title">5. Mock Test Leaderboard & Ranks</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Student Name</th>
+          <th>Score</th>
+          <th>Time Taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>#1 (Winner)</strong></td>
+          <td>Ajay</td>
+          <td>168/200</td>
+          <td>112 mins</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 6. Student Support Queries -->
+    <h3 class="section-title">6. Student Support Queries (Voice & Screenshot)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Type</th>
+          <th>Content / Attachment</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ajay</td>
+          <td>Voice Note</td>
+          <td><button style="font-size: 12px; padding: 5px;" onclick="alert('Playing voice message...')">▶ Play Voice (0:24)</button></td>
+          <td><button style="font-size: 12px; padding: 5px; background:#28a745;" onclick="alert('Query Resolved')">Resolve</button></td>
+        </tr>
+        <tr>
+          <td>Ajay</td>
+          <td>Captured Image</td>
+          <td><button style="font-size: 12px; padding: 5px;" onclick="alert('Opening screenshot preview...')">View Screenshot</button></td>
+          <td><button style="font-size: 12px; padding: 5px; background:#28a745;" onclick="alert('Query Resolved')">Resolve</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 7. Session Control -->
+    <h3 class="section-title">7. Session Management</h3>
     <button class="logout-btn" onclick="location.reload()">Logout</button>
   </div>
 
   <script>
+    let callsAllowed = false;
+
+    function toggleCalling() {
+      callsAllowed = !callsAllowed;
+      const btn = document.getElementById('callToggleBtn');
+      if (callsAllowed) {
+        btn.innerText = 'Disable Calls';
+        btn.style.background = '#dc3545';
+        alert('Calling status: ENABLED. Students can now place direct calls to you.');
+      } else {
+        btn.innerText = 'Enable Calls';
+        btn.style.background = '#007bff';
+        alert('Calling status: DISABLED. Students cannot initiate calls.');
+      }
+    }
+
     async function handleLogin() {
       const btn = document.getElementById('loginBtn');
       btn.innerText = 'Logging in...';
