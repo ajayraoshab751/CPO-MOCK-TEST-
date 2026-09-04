@@ -1,39 +1,43 @@
 const express = require('express');
-const path = require('path');
 const Datastore = require('nedb');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+// Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-// Database setup
-const usersDb = new Datastore({ filename: 'users.db', autoload: true });
+// Initialize NeDB database
+const db = {};
+db.users = new Datastore({ filename: './database/users.db', autoload: true });
 
-// Track active users in memory (Active in the last 30 seconds)
-const activeSessions = new Map();
+let activeHeartbeats = {};
 
-// Heartbeat endpoint to track live online users
-app.post('/api/heartbeat', (req, res) => {
-    const { username } = req.body;
-    if (username) {
-        activeSessions.set(username, Date.now());
+// Clean inactive heartbeats every 30 seconds
+setInterval(() => {
+    const now = Date.now();
+    for (const user in activeHeartbeats) {
+        if (now - activeHeartbeats[user] > 30000) {
+            delete activeHeartbeats[user];
+        }
     }
-    res.sendStatus(200);
-});
+}, 30000);
 
-// Registration API
+// Registration Endpoint
 app.post('/api/register', (req, res) => {
     const { fullName, age, gender, place, username, password } = req.body;
+    
     if (!username || !password) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return res.status(400).json({ error: 'Username and password required' });
     }
 
-    usersDb.findOne({ username }, (err, user) => {
-        if (user) {
-            return res.status(400).json({ error: "Username already exists" });
+    db.users.findOne({ username }, (err, existingUser) => {
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
         }
+        
         const newUser = {
             fullName,
             age,
@@ -43,54 +47,58 @@ app.post('/api/register', (req, res) => {
             password,
             registeredAt: new Date().toISOString()
         };
-        usersDb.insert(newUser, (err, doc) => {
-            res.json({ message: "Registration successful" });
+
+        db.users.insert(newUser, (err, doc) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.json({ success: true, user: doc });
         });
     });
 });
 
-// Login API
+// Login Endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    usersDb.findOne({ username, password }, (err, user) => {
-        if (user) {
-            activeSessions.set(username, Date.now());
-            res.json({ message: "Login successful", user });
-        } else {
-            res.status(401).json({ error: "Invalid credentials" });
+    db.users.findOne({ username, password }, (err, user) => {
+        if (err || !user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
         }
+        res.json({ success: true, username: user.username });
     });
 });
 
-// Admin API to get all registered users & count live active users
+// Heartbeat Endpoint
+app.post('/api/heartbeat', (req, res) => {
+    const { username } = req.body;
+    if (username) {
+        activeHeartbeats[username] = Date.now();
+    }
+    res.json({ status: 'ok' });
+});
+
+// Admin Stats Endpoint
 app.get('/api/admin/stats', (req, res) => {
     const adminKey = req.query.key;
-    if (adminKey !== 'CPOADMIN123') { // Secret key to protect admin data
-        return res.status(403).json({ error: "Access Denied" });
+    if (adminKey !== 'CPOADMIN123') {
+        return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    const now = Date.now();
-    let liveCount = 0;
-    const activeUsernames = [];
+    db.users.find({}, (err, users) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        
+        const totalRegistered = users.length;
+        const currentlyOnline = Object.keys(activeHeartbeats).length;
 
-    // Clean up inactive users (no ping in last 30s)
-    activeSessions.forEach((lastSeen, user) => {
-        if (now - lastSeen < 30000) {
-            liveCount++;
-            activeUsernames.push(user);
-        } else {
-            activeSessions.delete(user);
-        }
-    });
-
-    usersDb.find({}, { password: 0 }, (err, docs) => {
         res.json({
-            totalRegistered: docs.length,
-            currentlyOnline: liveCount,
-            activeUsers: activeUsernames,
-            allUsers: docs
+            totalRegistered,
+            currentlyOnline,
+            allUsers: users
         });
     });
+});
+
+// Fallback route to serve index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
