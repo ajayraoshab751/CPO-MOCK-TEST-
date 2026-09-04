@@ -8,7 +8,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const MONGO_URI = process.env.MONGO_URI;
-
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB Connected Successfully'))
@@ -16,10 +15,9 @@ if (MONGO_URI) {
 }
 
 app.post('/api/login', (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name } = req.body || {};
   const isAdmin = (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi');
-  
-  return res.json({ 
+  return res.status(200).json({ 
     success: true, 
     isAdmin, 
     user: { email, name: name || 'User', isAdmin } 

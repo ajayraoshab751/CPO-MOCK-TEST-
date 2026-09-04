@@ -1,417 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO Mock Portal</title>
-    <style>
-        :root { --bg: #f4f7f6; --card: #ffffff; --text: #333333; --accent: #007bff; }
-        body.dark-mode { --bg: #1e1e2e; --card: #2b2b3d; --text: #f1f1f1; --accent: #7289da; }
-        body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; margin: 0; padding: 15px; transition: all 0.3s; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .three-dots { font-size: 24px; cursor: pointer; border: none; background: none; color: var(--text); }
-        .drawer { position: fixed; top: 0; right: -300px; width: 260px; height: 100%; background: var(--card); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 1000; padding: 20px; overflow-y: auto; }
-        .drawer.open { right: 0; }
-        .drawer-btn { display: block; width: 100%; text-align: left; background: none; border: none; padding: 12px; color: var(--text); font-size: 15px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .card { background: var(--card); padding: 20px; border-radius: 8px; margin: 15px auto; max-width: 700px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .hidden { display: none; }
-        .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin: 5px; }
-        .btn-danger { background: #dc3545; }
-        .btn-success { background: #28a745; }
-        .target-banner { background: #ffc107; color: black; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
-        .target-img { max-width: 100%; height: auto; border-radius: 6px; margin-top: 8px; display: block; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .chat-box { height: 300px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { max-width: 80%; padding: 10px; border-radius: 10px; font-size: 14px; }
-        .user-msg { background: #dcf8c6; align-self: flex-end; }
-        .ai-msg { background: #e2e2e2; align-self: flex-start; }
-        .chat-img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
-        .chat-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .camera-btn { background: #28a745; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; margin-top: 15px; max-height: 350px; overflow-y: auto; }
-        .day-box { border: 1px solid #ccc; border-radius: 5px; padding: 5px; text-align: center; font-size: 12px; background: var(--card); }
-        .day-box select { width: 100%; margin-top: 4px; font-size: 11px; }
-        .lock-banner { background: #dc3545; color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPO Mock Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
+    .card { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .banner { background: #ffc107; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 20px; }
+    input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    button:disabled { background: #cccccc; }
+  </style>
 </head>
 <body>
 
-<div class="header">
-    <h3>CPO Mock Portal</h3>
-    <button class="three-dots" onclick="toggleDrawer()">⋮</button>
-</div>
+  <div class="banner">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
 
-<div class="target-banner" id="targetContainer">
-    <div id="targetDisplay">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
-    <img id="targetImgDisplay" class="target-img hidden" src="" alt="Admin Target Image">
-</div>
+  <div class="card" id="loginCard">
+    <h2>Student Auth</h2>
+    <input type="email" id="email" placeholder="Email" value="ajayraoshab751@gmail.com">
+    <input type="password" id="password" placeholder="Password" value="sunitadevi">
+    <input type="text" id="name" placeholder="Name" value="Ajay">
+    <button id="loginBtn" onclick="handleLogin()">Login / Start</button>
+  </div>
 
-<div class="lock-banner hidden" id="lockBanner">
-    🚨 ACCOUNT LOCKED: You were absent for more than 7 days! <br>
-    To unlock access to the portal, you must complete <span id="requiredMocksCount">2</span> mock tests with at least 50% score.
-</div>
+  <div class="card" id="adminCard" style="display:none;">
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, Admin! You are successfully logged in.</p>
+    <button onclick="location.reload()">Logout</button>
+  </div>
 
-<div class="drawer" id="sideDrawer">
-    <button class="btn" style="float: right;" onclick="toggleDrawer()">✕</button>
-    <h4>Menu Options</h4>
-    <button class="drawer-btn" onclick="showView('profileView')">👤 Profile</button>
-    <button class="drawer-btn" onclick="showView('mockTestView')">📝 Mock Tests (Sectional)</button>
-    <button class="drawer-btn" onclick="showView('challengeView')">🏆 Challenge System</button>
-    <button class="drawer-btn" onclick="showView('captureImageView')">📷 Capture Image</button>
-    <button class="drawer-btn" onclick="showView('doubtGroupView')">💬 Doubt Group (AI Scanner)</button>
-    <button class="drawer-btn" onclick="showView('performanceView')">📊 Performance & Ranking</button>
-    <button class="drawer-btn" onclick="showView('bankView')">⭐ Saved & Wrong Questions</button>
-    <button class="drawer-btn" style="color:#007bff; font-weight:bold;" onclick="showView('adminView')">🔑 Admin Control Panel</button>
-    <button class="drawer-btn" onclick="showView('settingsView')">⚙️ Settings</button>
-    <button class="drawer-btn" style="color: red; font-weight: bold;" onclick="logout()">🚪 Logout</button>
-</div>
+  <script>
+    async function handleLogin() {
+      const btn = document.getElementById('loginBtn');
+      btn.innerText = 'Logging in...';
+      btn.disabled = true;
 
-<div class="card" id="authView">
-    <h3>Student Auth</h3>
-    <input type="text" id="username" placeholder="Username / Email" style="width:90%; padding:8px; margin:5px;"><br>
-    <input type="password" id="password" placeholder="Password" style="width:90%; padding:8px; margin:5px;"><br>
-    <input type="text" id="fullName" placeholder="Full Name (optional)" style="width:90%; padding:8px; margin:5px;"><br>
-    <button class="btn" id="loginBtn" onclick="handleAuth()">Login / Start</button>
-</div>
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const name = document.getElementById('name').value;
 
-<div class="card hidden" id="profileView">
-    <h3>User Profile</h3>
-    <div id="profileDetails">Log in to view profile.</div>
-</div>
-
-<div class="card hidden" id="challengeView">
-    <h3>🏆 Study Attendance Challenge</h3>
-    <p>Select a challenge duration to track daily attendance:</p>
-    <button class="btn" onclick="startChallenge(100)">100 Days Challenge</button>
-    <button class="btn" onclick="startChallenge(60)">60 Days Challenge</button>
-    <button class="btn" onclick="startChallenge(30)">30 Days Challenge</button>
-    <hr>
-    <div id="challengeDetails">
-        <h4>No Active Challenge</h4>
-    </div>
-    <div class="day-grid" id="dayGrid"></div>
-</div>
-
-<div class="card hidden" id="mockTestView">
-    <h3>Select Mock Test Section</h3>
-    <button class="btn" onclick="initSectionTest('Maths')">Maths Chapterwise</button>
-    <button class="btn" onclick="initSectionTest('English')">English Chapterwise</button>
-    <button class="btn" onclick="initSectionTest('GK')">GK Chapterwise</button>
-    <button class="btn" onclick="initSectionTest('Reasoning')">Reasoning Chapterwise</button>
-</div>
-
-<div class="card hidden" id="testEngineView">
-    <h4 id="testTitle">Mock Test</h4>
-    <div id="optionsContainer"></div>
-    <br>
-    <button class="btn" onclick="submitSectionTest()">Submit Section</button>
-</div>
-
-<div class="card hidden" id="captureImageView">
-    <h3>📷 Personal Image Vault</h3>
-    <div class="chat-box" id="vaultChatBox"></div>
-    <div class="chat-controls">
-        <input type="file" id="vaultCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleVaultUpload(event)">
-        <button class="camera-btn" onclick="document.getElementById('vaultCameraInput').click()">📷</button>
-        <span style="font-size: 13px; color: gray;">Tap camera to snap and save image</span>
-    </div>
-</div>
-
-<div class="card hidden" id="doubtGroupView">
-    <h3>💬 Doubt Group (Google AI Scan)</h3>
-    <div class="chat-box" id="doubtChatBox">
-        <div class="chat-msg ai-msg">Welcome to Doubt Group! Snap or upload any question picture to get an instant AI solution.</div>
-    </div>
-    <div class="chat-controls">
-        <input type="file" id="doubtCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleDoubtUpload(event)">
-        <button class="camera-btn" onclick="document.getElementById('doubtCameraInput').click()">📷</button>
-        <span style="font-size: 13px; color: gray;">Snap question image for AI scanning</span>
-    </div>
-</div>
-
-<div class="card hidden" id="adminView">
-    <h3>🔑 Admin Control Panel</h3>
-    
-    <div id="adminAuthBox">
-        <p>Admin Login Required:</p>
-        <input type="email" id="adminEmail" placeholder="Admin Email" style="padding:8px; width:85%; margin-bottom:8px;"><br>
-        <input type="password" id="adminPass" placeholder="Admin Password" style="padding:8px; width:85%; margin-bottom:8px;"><br>
-        <button class="btn btn-success" onclick="verifyAdmin()">Login as Admin</button>
-    </div>
-
-    <div id="adminPanelBox" class="hidden">
-        <p style="color: green; font-weight: bold;">✔ Verified Admin: ajayraoshab751@gmail.com</p>
-        <hr>
-        
-        <h4>📢 1. Broadcast Target & Announcement Image</h4>
-        <input type="text" id="targetTextInput" placeholder="Enter Target Banner Text..." style="width:90%; padding:8px; margin-bottom:8px;"><br>
-        <label>Upload Announcement/Target Image:</label><br>
-        <input type="file" id="targetImageInput" accept="image/*" style="margin:8px 0;"><br>
-        <button class="btn btn-success" onclick="broadcastTarget()">📢 Broadcast to All Students</button>
-
-        <hr>
-        <h4>📝 2. Upload HTML File to Auto-Create Mock</h4>
-        <label>Select Target Section:</label><br>
-        <select id="targetSectionSelect" style="padding: 8px; width: 90%; margin: 8px 0;">
-            <option value="Maths">Maths Chapterwise</option>
-            <option value="English">English Chapterwise</option>
-            <option value="GK">GK Chapterwise</option>
-            <option value="Reasoning">Reasoning Chapterwise</option>
-        </select><br>
-
-        <label>Choose HTML Mock File (.html):</label><br>
-        <input type="file" id="htmlMockFile" accept=".html,.htm" style="margin: 8px 0;"><br>
-        <button class="btn btn-success" onclick="processUploadedHTMLMock()">⚡ Convert & Publish Mock Permanently</button>
-    </div>
-</div>
-
-<div class="card hidden" id="performanceView">
-    <h3>Your Performance Analytics</h3>
-    <div class="grid-2">
-        <div style="background:#e9ecef; padding:10px; border-radius:5px;">Leaderboard Rank: <h2 id="userRank">#1</h2></div>
-        <div style="background:#e9ecef; padding:10px; border-radius:5px;">Total Attempts: <h2 id="userAttempts">0</h2></div>
-        <div style="background:#d4edda; padding:10px; border-radius:5px;">Right Answers: <h2 id="userRight">0</h2></div>
-        <div style="background:#f8d7da; padding:10px; border-radius:5px;">Wrong Answers: <h2 id="userWrong">0</h2></div>
-    </div>
-</div>
-
-<div class="card hidden" id="bankView">
-    <h3>Saved & Wrong Question Bank</h3>
-    <h4>Saved/Bookmarked Questions</h4>
-    <div id="savedContainer">None</div>
-    <h4>Incorrectly Attempted Questions</h4>
-    <div id="wrongContainer">None</div>
-</div>
-
-<div class="card hidden" id="settingsView">
-    <h3>App Settings</h3>
-    <button class="btn" onclick="toggleTheme()">Toggle Dark / Light Theme</button>
-    <button class="btn" onclick="location.reload()">🔄 Refresh Portal</button>
-    <br><br>
-    <button class="btn btn-danger" onclick="logout()">🚪 Logout Account</button>
-</div>
-
-<script src="questions.js"></script>
-<script>
-let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
-let userChallenge = null, isLocked = false, requiredPassedMocks = 2;
-let currentTargetImageBase64 = "";
-
-window.onload = function() {
-    try {
-        const savedUser = localStorage.getItem('cpo_user');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            if (currentUser && currentUser.username) {
-                document.getElementById('authView').classList.add('hidden');
-                renderProfile(currentUser);
-                checkChallengeLockStatus();
-                showView('mockTestView');
-            }
-        }
-        fetchLiveTarget();
-        loadCustomQuestions();
-    } catch(e) { console.log(e); }
-};
-
-function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('open'); }
-
-function showView(viewId) {
-    if (isLocked && viewId !== 'mockTestView' && viewId !== 'testEngineView') {
-        alert(`Account locked due to missing >7 days of attendance! Pass ${requiredPassedMocks} mock test(s) with >= 50% score to unlock.`);
-        return;
-    }
-
-    if (document.getElementById('sideDrawer').classList.contains('open')) {
-        toggleDrawer();
-    }
-    ['authView', 'profileView', 'challengeView', 'mockTestView', 'testEngineView', 'captureImageView', 'doubtGroupView', 'adminView', 'performanceView', 'bankView', 'settingsView']
-    .forEach(id => document.getElementById(id).classList.add('hidden'));
-    
-    document.getElementById(viewId).classList.remove('hidden');
-}
-
-// Guaranteed Zero-Freeze Synchronous Auth
-function handleAuth() {
-    const u = document.getElementById('username').value.trim();
-    const p = document.getElementById('password').value.trim();
-    const fn = document.getElementById('fullName').value.trim() || u;
-    
-    if(!u) return alert('Please enter a username or email');
-
-    currentUser = { username: u, fullName: fn };
-    localStorage.setItem('cpo_user', JSON.stringify(currentUser));
-
-    // Instant UI switch with zero network dependency
-    document.getElementById('authView').classList.add('hidden');
-    renderProfile(currentUser);
-    checkChallengeLockStatus();
-    showView('mockTestView');
-}
-
-function verifyAdmin() {
-    const email = document.getElementById('adminEmail').value.trim();
-    const pass = document.getElementById('adminPass').value.trim();
-
-    if (email === 'ajayraoshab751@gmail.com' && pass === 'sunitadevi') {
-        document.getElementById('adminAuthBox').classList.add('hidden');
-        document.getElementById('adminPanelBox').classList.remove('hidden');
-    } else {
-        alert('Access Denied! Incorrect Admin Email or Password.');
-    }
-}
-
-function broadcastTarget() {
-    const targetText = document.getElementById('targetTextInput').value.trim();
-    const imgFile = document.getElementById('targetImageInput').files[0];
-
-    const sendBroadcast = (imgBase64) => {
-        fetch('/api/admin/update-target', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: 'ajayraoshab751@gmail.com',
-                password: 'sunitadevi',
-                targetText: targetText,
-                imageUrl: imgBase64
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert('📢 Target and Image Broadcasted to all students successfully!');
-                fetchLiveTarget();
-            } else {
-                alert('Failed to broadcast: ' + data.error);
-            }
-        })
-        .catch(err => alert('Target updated locally in current session!'));
-    };
-
-    if (imgFile) {
-        const reader = new FileReader();
-        reader.onload = (e) => sendBroadcast(e.target.result);
-        reader.readAsDataURL(imgFile);
-    } else {
-        sendBroadcast(currentTargetImageBase64);
-    }
-}
-
-function fetchLiveTarget() {
-    fetch('/api/target')
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.targetData) {
-                if (data.targetData.text) document.getElementById('targetDisplay').innerText = data.targetData.text;
-                if (data.targetData.imageUrl) {
-                    const imgEl = document.getElementById('targetImgDisplay');
-                    imgEl.src = data.targetData.imageUrl;
-                    imgEl.classList.remove('hidden');
-                    currentTargetImageBase64 = data.targetData.imageUrl;
-                }
-            }
-        }).catch(e => console.log('Bypassed offline target sync'));
-}
-
-function processUploadedHTMLMock() {
-    const fileInput = document.getElementById('htmlMockFile');
-    const targetSec = document.getElementById('targetSectionSelect').value;
-    
-    if (!fileInput.files.length) return alert('Please choose an HTML file first!');
-
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        const htmlContent = e.target.result;
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
-
-        const qCards = doc.querySelectorAll('.q-card, .question-card, .question-block, div');
-        const extractedQuestions = [];
-
-        qCards.forEach(card => {
-            const qText = card.querySelector('.question, .question-text, p')?.innerText || '';
-            const optionElements = card.querySelectorAll('.option, li, .opt-item');
-            const options = Array.from(optionElements).map(opt => opt.innerText.trim());
-            const correctIdx = parseInt(card.getAttribute('data-correct') || '0');
-
-            if (qText && options.length > 0) {
-                extractedQuestions.push({ question: qText, options: options, correctAnswer: correctIdx });
-            }
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name })
         });
 
-        if (extractedQuestions.length === 0) {
-            return alert('No questions detected! Ensure your HTML contains class names like .q-card, .question, and .option.');
+        const data = await res.json();
+        if (data.success) {
+          if (data.isAdmin) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('adminCard').style.display = 'block';
+          } else {
+            alert('Logged in as Student: ' + data.user.name);
+          }
+        } else {
+          alert('Login failed!');
         }
-
-        // Store locally permanently
-        let storedCustom = JSON.parse(localStorage.getItem('perm_questions') || '{}');
-        if (!storedCustom[targetSec]) storedCustom[targetSec] = [];
-        storedCustom[targetSec].push(...extractedQuestions);
-        localStorage.setItem('perm_questions', JSON.stringify(storedCustom));
-
-        if (typeof sectionWiseQuestions === 'undefined') window.sectionWiseQuestions = {};
-        if (!sectionWiseQuestions[targetSec]) sectionWiseQuestions[targetSec] = [];
-        sectionWiseQuestions[targetSec].push(...extractedQuestions);
-
-        // Store to backend permanently
-        fetch('/api/admin/add-questions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: 'ajayraoshab751@gmail.com',
-                password: 'sunitadevi',
-                section: targetSec,
-                questions: extractedQuestions
-            })
-        }).catch(e => console.log('Questions backed up locally'));
-
-        alert(`🎉 ${extractedQuestions.length} questions added permanently to ${targetSec}! Data will not be lost.`);
-        showView('mockTestView');
-    };
-
-    reader.readAsText(file);
-}
-
-function loadCustomQuestions() {
-    let storedCustom = JSON.parse(localStorage.getItem('perm_questions') || '{}');
-    if (typeof sectionWiseQuestions === 'undefined') window.sectionWiseQuestions = {};
-    
-    Object.keys(storedCustom).forEach(sec => {
-        if (!sectionWiseQuestions[sec]) sectionWiseQuestions[sec] = [];
-        sectionWiseQuestions[sec].push(...storedCustom[sec]);
-    });
-
-    fetch('/api/questions')
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.questions) {
-                Object.keys(data.questions).forEach(sec => {
-                    if (!sectionWiseQuestions[sec]) sectionWiseQuestions[sec] = [];
-                    sectionWiseQuestions[sec].push(...data.questions[sec]);
-                });
-            }
-        }).catch(e => console.log('Offline dynamic load'));
-}
-
-function logout() {
-    localStorage.removeItem('cpo_user');
-    currentUser = null;
-    alert('Logged out successfully.');
-    location.reload();
-}
-
-function renderProfile(user) {
-    document.getElementById('profileDetails').innerHTML = `
-        <p><strong>Full Name:</strong> ${user.fullName || 'N/A'}</p>
-        <p><strong>Username:</strong> ${user.username}</p>
-        <p><strong>Joined:</strong> ${new Date().toLocaleDateString()}</p>
-    `;
-}
-
-function startChallenge(days) {
-  
-        
+      } catch (err) {
+        alert('Connection error. Please try again.');
+      } finally {
+        btn.innerText = 'Login / Start';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
