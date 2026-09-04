@@ -12,9 +12,10 @@
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #ddd; }
         .brand { font-weight: 700; font-size: 18px; color: #1e3c72; }
 
-        .auth-container { max-width: 400px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .auth-container input, .code-box input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-blue { background: #1a73e8; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; }
+        .auth-container { max-width: 400px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .auth-container input, .auth-container select, .code-box input { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn-blue { background: #1a73e8; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .toggle-btn { background: none; border: none; color: #1a73e8; text-decoration: underline; cursor: pointer; width: 100%; margin-top: 12px; font-size: 13px; }
 
         .container { max-width: 800px; margin: 20px auto; padding: 16px; }
         .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
@@ -37,20 +38,38 @@
         <div id="userDisplay" style="font-size: 13px;"></div>
     </div>
 
-    <!-- Login / Register Section -->
-    <div id="authSection" class="auth-container">
-        <h3 style="margin-bottom:12px;">Login / Register</h3>
-        <input type="text" id="userInput" placeholder="Email or Username">
-        <input type="password" id="passInput" placeholder="Password">
+    <!-- Registration Form -->
+    <div id="registerSection" class="auth-container">
+        <h3 style="margin-bottom:12px;">Student Registration</h3>
+        <input type="text" id="regFullName" placeholder="Full Name">
+        <input type="number" id="regAge" placeholder="Age">
+        <select id="regGender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+        <input type="text" id="regPlace" placeholder="Place / City">
+        <input type="text" id="regUser" placeholder="Username / Email">
+        <input type="password" id="regPass" placeholder="Password">
+        <button class="btn-blue" onclick="register()">Register Account</button>
+        <button class="toggle-btn" onclick="showLoginForm()">Already have an account? Login</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginSection" class="auth-container hidden">
+        <h3 style="margin-bottom:12px;">Login</h3>
+        <input type="text" id="loginUser" placeholder="Username / Email">
+        <input type="password" id="loginPass" placeholder="Password">
         <button class="btn-blue" onclick="login()">Login</button>
-        <button class="btn-blue" style="background:#555;" onclick="register()">Register Account</button>
+        <button class="toggle-btn" onclick="showRegisterForm()">New user? Register here</button>
     </div>
 
     <!-- Main Dashboard -->
     <div id="mainDashboard" class="container hidden">
         <div id="lockContainer" class="code-box">
             <h4>🔒 Enter Access Code</h4>
-            <p style="font-size: 12px; color: #666; margin-top: 4px;">Enter your passcode to unlock all tests.</p>
+            <p style="font-size: 12px; color: #666; margin-top: 4px;">Enter passcode to unlock tests.</p>
             <input type="text" id="accessCodeInput" placeholder="Enter Access Code (e.g. CPOAIR1)">
             <button class="btn-blue" onclick="verifyAccessCode()">Unlock Tests</button>
         </div>
@@ -108,27 +127,46 @@
 
         let currentUser = null, activeTest = null, currentQIndex = 0, userAnswers = {};
 
+        function showLoginForm() {
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.remove('hidden');
+        }
+
         async function register() {
-            const username = document.getElementById('userInput').value.trim();
-            const password = document.getElementById('passInput').value.trim();
+            const fullName = document.getElementById('regFullName').value.trim();
+            const age = document.getElementById('regAge').value.trim();
+            const gender = document.getElementById('regGender').value;
+            const place = document.getElementById('regPlace').value.trim();
+            const username = document.getElementById('regUser').value.trim();
+            const password = document.getElementById('regPass').value.trim();
             
-            if(!username || !password) {
-                alert("Please fill in both fields.");
+            if(!fullName || !age || !gender || !place || !username || !password) {
+                alert("Please fill in all registration fields.");
                 return;
             }
 
             const res = await fetch('/api/register', { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ username, password }) 
+                body: JSON.stringify({ fullName, age, gender, place, username, password }) 
             });
-            const data = await res.json(); 
-            alert(data.message || data.error);
+            const data = await res.json();
+            if(res.ok) {
+                alert("Registration successful! Please log in.");
+                showLoginForm();
+            } else {
+                alert(data.error || "Registration failed.");
+            }
         }
 
         async function login() {
-            const username = document.getElementById('userInput').value.trim();
-            const password = document.getElementById('passInput').value.trim();
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value.trim();
             
             const res = await fetch('/api/login', { 
                 method: 'POST', 
@@ -145,7 +183,8 @@
         }
 
         function showDashboard() {
-            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
             document.getElementById('userDisplay').innerText = currentUser;
             renderTestList();
@@ -212,4 +251,5 @@
     </script>
 </body>
 </html>
+
  
