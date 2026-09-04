@@ -28,7 +28,7 @@
     <button class="three-dots" onclick="toggleDrawer()">⋮</button>
 </div>
 
-<div class="target-banner" id="targetDisplay">Loading Target...</div>
+<div class="target-banner" id="targetDisplay">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
 
 <div class="drawer" id="sideDrawer">
     <button class="btn" style="float: right;" onclick="toggleDrawer()">✕</button>
@@ -42,20 +42,23 @@
     <button class="drawer-btn" style="color: red; font-weight: bold;" onclick="logout()">🚪 Logout</button>
 </div>
 
+<!-- Auth View -->
 <div class="card" id="authView">
     <h3>Student Auth</h3>
     <input type="text" id="username" placeholder="Username" style="width:90%; padding:8px; margin:5px;"><br>
     <input type="password" id="password" placeholder="Password" style="width:90%; padding:8px; margin:5px;"><br>
     <input type="text" id="fullName" placeholder="Full Name (for register)" style="width:90%; padding:8px; margin:5px;"><br>
-    <button class="btn" onclick="login()">Login</button>
-    <button class="btn" onclick="register()">Register</button>
+    <button class="btn" id="loginBtn" onclick="login()">Login</button>
+    <button class="btn" id="regBtn" onclick="register()">Register</button>
 </div>
 
+<!-- Profile View -->
 <div class="card hidden" id="profileView">
     <h3>User Profile</h3>
     <div id="profileDetails">Log in to view profile.</div>
 </div>
 
+<!-- Mock Test Sectional Selection -->
 <div class="card hidden" id="mockTestView">
     <h3>Select Mock Test Section</h3>
     <button class="btn" onclick="initSectionTest('Maths')">Maths Chapterwise</button>
@@ -64,6 +67,7 @@
     <button class="btn" onclick="initSectionTest('Reasoning')">Reasoning Chapterwise</button>
 </div>
 
+<!-- Test Engine View -->
 <div class="card hidden" id="testEngineView">
     <h4 id="testTitle">Mock Test</h4>
     <p id="qText"></p>
@@ -73,6 +77,7 @@
     <button class="btn" onclick="submitSectionTest()">Submit Section</button>
 </div>
 
+<!-- Performance & Ranking View -->
 <div class="card hidden" id="performanceView">
     <h3>Your Performance Analytics</h3>
     <div class="grid-2">
@@ -83,6 +88,7 @@
     </div>
 </div>
 
+<!-- Question Bank View -->
 <div class="card hidden" id="bankView">
     <h3>Saved & Wrong Question Bank</h3>
     <h4>Saved/Bookmarked Questions</h4>
@@ -91,12 +97,14 @@
     <div id="wrongContainer">None</div>
 </div>
 
+<!-- Target Setting View -->
 <div class="card hidden" id="targetView">
     <h3>Update Announcement Target</h3>
     <input type="text" id="targetInput" placeholder="Enter target text for all users" style="width:90%; padding:8px;"><br>
     <button class="btn" onclick="setGlobalTarget()">Publish Target</button>
 </div>
 
+<!-- Settings View -->
 <div class="card hidden" id="settingsView">
     <h3>App Settings</h3>
     <button class="btn" onclick="toggleTheme()">Toggle Dark / Light Theme</button>
@@ -111,16 +119,19 @@
 <script>
 let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
 
-// Auto Auto-Login Check on Page Refresh
 window.onload = function() {
-    const savedUser = localStorage.getItem('cpo_user');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        document.getElementById('authView').classList.add('hidden');
-        renderProfile(currentUser);
-        loadUserStats();
-        showView('mockTestView');
-    }
+    try {
+        const savedUser = localStorage.getItem('cpo_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            if (currentUser && currentUser.username) {
+                document.getElementById('authView').classList.add('hidden');
+                renderProfile(currentUser);
+                loadUserStats();
+                showView('mockTestView');
+            }
+        }
+    } catch(e) { console.log(e); }
 };
 
 function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('open'); }
@@ -133,64 +144,92 @@ function showView(viewId) {
     .forEach(id => document.getElementById(id).classList.add('hidden'));
     
     document.getElementById(viewId).classList.remove('hidden');
-    if(currentUser) loadUserStats();
+    if (currentUser && currentUser.username) loadUserStats();
 }
 
 function login() {
-    const u = document.getElementById('username').value;
-    const p = document.getElementById('password').value;
-    fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p}) })
-    .then(r => r.json()).then(d => {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if(!u || !p) return alert('Please enter username and password');
+
+    fetch('/api/login', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({ username: u, password: p }) 
+    })
+    .then(r => r.json())
+    .then(d => {
         if(d.success) {
-            currentUser = d.user;
-            localStorage.setItem('cpo_user', JSON.stringify(d.user)); // Save Session
+            currentUser = d.user || { username: u, fullName: u };
+            localStorage.setItem('cpo_user', JSON.stringify(currentUser));
             document.getElementById('authView').classList.add('hidden');
-            renderProfile(d.user);
+            renderProfile(currentUser);
             loadUserStats();
             showView('mockTestView');
-        } else alert(d.error);
-    });
-}
-
-function logout() {
-    localStorage.removeItem('cpo_user'); // Clear Session
-    currentUser = null;
-    alert('Logged out successfully.');
-    location.reload();
+        } else {
+            alert(d.error || 'Login failed');
+        }
+    })
+    .catch(err => alert('Network error during login: ' + err.message));
 }
 
 function register() {
-    const u = document.getElementById('username').value;
-    const p = document.getElementById('password').value;
-    const fn = document.getElementById('fullName').value;
-    fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p, fullName:fn}) })
-    .then(r=>r.json()).then(d=>{ if(d.success) alert('Registered! Please login.'); else alert(d.error); });
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const fn = document.getElementById('fullName').value.trim();
+    if(!u || !p) return alert('Please enter username and password');
+
+    fetch('/api/register', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({ username: u, password: p, fullName: fn }) 
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success) {
+            alert('Registration successful! Click Login to enter.');
+        } else {
+            alert(d.error || 'Registration failed');
+        }
+    })
+    .catch(err => alert('Network error during registration: ' + err.message));
+}
+
+function logout() {
+    localStorage.removeItem('cpo_user');
+    currentUser = null;
+    alert('Logged out successfully.');
+    location.reload();
 }
 
 function renderProfile(user) {
     document.getElementById('profileDetails').innerHTML = `
         <p><strong>Full Name:</strong> ${user.fullName || 'N/A'}</p>
         <p><strong>Username:</strong> ${user.username}</p>
-        <p><strong>Joined:</strong> ${new Date(user.registeredAt).toLocaleDateString()}</p>
+        <p><strong>Joined:</strong> ${user.registeredAt ? new Date(user.registeredAt).toLocaleDateString() : 'Today'}</p>
     `;
 }
 
 function loadUserStats() {
-    fetch('/api/user-stats/' + currentUser.username).then(r => r.json()).then(d => {
-        document.getElementById('userRank').innerText = '#' + d.rank;
-        document.getElementById('userAttempts').innerText = d.totalAttempts;
-        document.getElementById('userRight').innerText = d.totalRight;
-        document.getElementById('userWrong').innerText = d.totalWrong;
-        document.getElementById('targetDisplay').innerText = d.globalTarget;
+    if(!currentUser || !currentUser.username) return;
+    fetch('/api/user-stats/' + currentUser.username)
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById('userRank').innerText = '#' + (d.rank || 'N/A');
+        document.getElementById('userAttempts').innerText = d.totalAttempts || 0;
+        document.getElementById('userRight').innerText = d.totalRight || 0;
+        document.getElementById('userWrong').innerText = d.totalWrong || 0;
+        if(d.globalTarget) document.getElementById('targetDisplay').innerText = d.globalTarget;
         
-        document.getElementById('savedContainer').innerHTML = d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No saved questions.';
-        document.getElementById('wrongContainer').innerHTML = d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No wrong questions.';
-    });
+        document.getElementById('savedContainer').innerHTML = (d.savedQuestions && d.savedQuestions.length) ? d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No saved questions.';
+        document.getElementById('wrongContainer').innerHTML = (d.wrongQuestions && d.wrongQuestions.length) ? d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No wrong questions.';
+    })
+    .catch(err => console.log(err));
 }
 
 function initSectionTest(sec) {
     activeSection = sec;
-    activeQuestions = sectionWiseQuestions[sec] || [];
+    activeQuestions = (typeof sectionWiseQuestions !== 'undefined' && sectionWiseQuestions[sec]) ? sectionWiseQuestions[sec] : [];
     currentAnswers = {};
     if(activeQuestions.length === 0) return alert('No questions added in this section yet!');
     
@@ -228,4 +267,43 @@ function submitSectionTest() {
     let score = (correct * 2) - (incorrect * 0.5);
     let percentage = ((score / (activeQuestions.length * 2)) * 100).toFixed(2);
 
-    fetch('/api
+    fetch('/api/submit-test', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username: currentUser.username, section: activeSection, score, percentage,
+            timeTaken: 60, correct, incorrect, unattempted, wrongQList
+        })
+    }).then(r => r.json()).then(d => {
+        if(d.success) {
+            alert(`Test Submitted!\nScore: ${score}\nRight: ${correct}\nWrong: ${incorrect}`);
+            showView('performanceView');
+        } else alert(d.error);
+    });
+}
+
+function setGlobalTarget() {
+    const target = document.getElementById('targetInput').value;
+    fetch('/api/set-target', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ target })
+    }).then(r => r.json()).then(d => {
+        if(d.success) { alert('Target updated globally!'); loadUserStats(); }
+    });
+}
+
+function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+
+function shareWebsite() {
+    if (navigator.share) {
+        navigator.share({ title: 'CPO Mock Portal', url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Website link copied to clipboard!');
+    }
+}
+</script>
+</body>
+</html>
+
