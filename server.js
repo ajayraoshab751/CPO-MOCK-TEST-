@@ -14,111 +14,88 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB Connection Error:', err));
 }
 
-// Schemas
+// User Schema with Login Counter & Selective Call Permission
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  name: String,
-  isAdmin: { type: Boolean, default: false },
-  loginCount: { type: Number, default: 1 },
+  email: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  loginCount: { type: Number, default: 0 },
   canCallAdmin: { type: Boolean, default: false },
-  savedQuestions: [Object],
-  wrongQuestions: [Object],
-  challengeData: Object
+  isAdmin: { type: Boolean, default: false },
+  savedQuestions: Array,
+  wrongQuestions: Array,
+  challengeData: { type: Object, default: { plan: 100, attendance: {}, circles: 0 } }
 });
 
-const mockTestSchema = new mongoose.Schema({
+const mockSchema = new mongoose.Schema({
   title: String,
-  category: String,
+  subject: String,
   chapter: String,
   questions: Array,
   createdAt: { type: Date, default: Date.now }
 });
 
 const User = mongoose.model('User', userSchema);
-const MockTest = mongoose.model('MockTest', mockTestSchema);
+const Mock = mongoose.model('Mock', mockSchema);
 
-// Auth Endpoint with Gmail Login Counter
-app.post('/api/login', async (req, res) => {
-  const { email, password, name } = req.body || {};
-  const isAdmin = (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi');
-  
+// Auth Endpoint with Login Counter
+app.post('/api/auth', async (req, res) => {
+  const { email, password, name } = req.body;
   try {
     let user = await User.findOne({ email });
+    const isAdmin = (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi');
+
     if (!user) {
-      user = new User({ email, name: name || 'Student', isAdmin, loginCount: 1 });
+      user = new User({ email, password, name: name || 'Aspirant', loginCount: 1, isAdmin });
     } else {
+      if (user.password !== password) return res.status(400).json({ success: false, message: 'Invalid Password' });
       user.loginCount += 1;
-      if (name) user.name = name;
     }
     await user.save();
-    return res.json({ success: true, isAdmin, user });
-  } catch (e) {
-    return res.json({ success: true, isAdmin, user: { email, name: name || 'User', isAdmin, loginCount: 1, canCallAdmin: false } });
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Admin Control: Toggle Calling Permission per Specific User Profile
-app.post('/api/admin/toggle-call', async (req, res) => {
-  const { email, canCall } = req.body;
-  try {
-    await User.updateOne({ email }, { canCallAdmin: canCall });
-    res.json({ success: true, message: `Calling permission updated for ${email}` });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
-  }
+// Admin Route: Specific User Call Permission Toggle
+app.post('/api/admin/toggle-user-call', async (req, res) => {
+  const { userEmail, canCall } = req.body;
+  await User.updateOne({ email: userEmail }, { canCallAdmin: canCall });
+  res.json({ success: true, message: `Call permissions updated for ${userEmail}` });
 });
 
-// Convert Raw File/PDF text to CBT Format
-app.post('/api/admin/upload-mock', async (req, res) => {
-  const { title, category, chapter, rawText } = req.body;
+// Automated Mock Converter (HTML/PDF Text Processing)
+app.post('/api/admin/convert-mock', async (req, res) => {
+  const { rawContent, subject, chapter, title } = req.body;
   
-  // Automated Regex Parser for 1 to 150+ Page Exams
-  const questions = [];
-  const blocks = rawText.split(/Q\d+[\.:]|Question \d+[\.:]/gi).filter(b => b.trim());
-  
+  // Basic regex parser to convert raw html/text pages to structured CBT questions
+  const parsedQuestions = [];
+  const blocks = rawContent.split(/Q\d+\.|Question \d+:/g).filter(b => b.trim());
+
   blocks.forEach((block, idx) => {
-    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = block.split('\n').filter(l => l.trim());
     if (lines.length > 0) {
-      const qText = lines[0];
-      const options = lines.filter(l => l.match(/^[\(]?[A-D][\)\.]/i)).map(l => l.replace(/^[\(]?[A-D][\)\.]/i, '').trim());
-      questions.push({
+      parsedQuestions.push({
         id: idx + 1,
-        question: qText || `Question ${idx + 1}`,
-        options: options.length === 4 ? options : ['Option A', 'Option B', 'Option C', 'Option D'],
+        question: lines[0],
+        options: lines.slice(1, 5).length === 4 ? lines.slice(1, 5) : ['Option A', 'Option B', 'Option C', 'Option D'],
         correctAnswer: 0,
-        solution: "Detailed step-by-step solution automatically generated."
+        solution: 'Detailed solution auto-generated from text source.'
       });
     }
   });
 
-  if (questions.length === 0) {
-    // Default Fallback CBT Template
-    questions.push({
-      id: 1,
-      question: "Sample Question parsed from file.",
-      options: ["Option A", "Option B", "Option C", "Option D"],
-      correctAnswer: 0,
-      solution: "Automatic solution parsing active."
-    });
-  }
-
-  try {
-    const newMock = new MockTest({ title, category, chapter, questions });
-    await newMock.save();
-    res.json({ success: true, count: questions.length });
-  } catch(e) {
-    res.json({ success: true, count: questions.length });
-  }
+  const mock = new Mock({ title, subject, chapter, questions: parsedQuestions });
+  await mock.save();
+  res.json({ success: true, count: parsedQuestions.length, mockId: mock._id });
 });
 
-// AI Doubt Resolver
-app.post('/api/ai-doubt', (req, res) => {
-  const { questionText } = req.body;
-  res.json({
-    success: true,
-    answer: `[CPO AI Assistant Solution]: For "${questionText || 'this query'}", analyze using standard concepts. Step 1: Identify key variables. Step 2: Apply the relevant formula. Step 3: Simplify to reach the correct option.`
-  });
+// Fetch Mock Tests by Chapter
+app.get('/api/mocks/:subject/:chapter', async (req, res) => {
+  const mocks = await Mock.find({ subject: req.params.subject, chapter: req.params.chapter });
+  res.json({ success: true, mocks });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`CPO Portal Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`CPO AIR 1 Server running on port ${PORT}`));

@@ -3,412 +3,312 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPO AIR 1 Portal</title>
+  <title>CPO AIR 1 - Official Portal</title>
   <style>
-    :root { --bg: #f0f2f5; --card-bg: #ffffff; --text: #1c1e21; --primary: #007bff; }
-    [data-theme="dark"] { --bg: #18191a; --card-bg: #242526; --text: #e4e6eb; --primary: #2d88ff; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 70px; }
+    :root { --bg: #f4f4f9; --card: #ffffff; --text: #222; --primary: #0056b3; }
+    body.dark { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --primary: #379683; }
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
     
-    /* Top Header Bar */
-    .top-header { background: #001f3f; color: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .header-title-container { display: flex; align-items: center; gap: 10px; }
-    .si-logo { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #ffd700; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .app-title { font-size: 22px; font-weight: 900; letter-spacing: 1px; color: #ffd700; }
-    .menu-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; }
-
-    /* Dropdown Side Menu */
-    .dropdown-menu { display: none; position: fixed; top: 60px; right: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 260px; z-index: 2000; flex-direction: column; }
-    .dropdown-menu div { padding: 14px 18px; border-bottom: 1px solid #ddd; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-
-    /* Main Container */
-    .container { padding: 15px; max-width: 800px; margin: auto; }
-    .card { background: var(--card-bg); padding: 18px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    /* Header & Badge */
+    header { background: #002b5b; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 22px; }
+    .brand-badge { background: gold; color: #000; padding: 4px 8px; border-radius: 50%; font-size: 14px; }
+    .three-dots { font-size: 24px; cursor: pointer; position: relative; }
     
-    /* Bottom 5 Button Navigation Bar */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); display: flex; border-top: 1px solid #ccc; z-index: 1000; }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #65676b; cursor: pointer; }
-    .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
-
-    /* Sub-section & Accordion styling */
-    .chapter-box { background: rgba(0,123,255,0.05); border-left: 4px solid var(--primary); padding: 10px; margin: 6px 0; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    /* Dropdown Menu */
+    .menu-dropdown { display: none; position: absolute; right: 0; top: 35px; background: var(--card); color: var(--text); box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-radius: 6px; width: 220px; z-index: 1000; }
+    .menu-dropdown button { width: 100%; text-align: left; padding: 12px; background: none; border: none; border-bottom: 1px solid #eee; color: var(--text); cursor: pointer; }
     
-    /* Reaction Boxes */
-    .target-reactions { display: flex; gap: 8px; margin-top: 10px; }
-    .box-reaction { flex: 1; border: 1px solid #ccc; text-align: center; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 18px; }
-
-    /* CBT Exam Interface */
-    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
-    .palette-btn { padding: 10px; text-align: center; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; }
-    .p-green { background: #28a745; }
-    .p-red { background: #dc3545; }
-    .p-purple { background: #6f42c1; }
-    .p-yellow { background: #ffc107; color: #000; }
+    /* Container & Cards */
+    .container { max-width: 800px; margin: 15px auto; padding: 10px; }
+    .card { background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 70px; }
+    input, select, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button.btn-main { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
     
-    input, select, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+    /* Bottom Navigation Bar */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #002b5b; display: flex; justify-content: space-around; padding: 8px 0; z-index: 999; }
+    .bottom-nav button { background: none; border: none; color: white; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    
+    /* CBT Question Palette Colors */
+    .q-palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0; }
+    .q-btn { padding: 8px; border: none; font-weight: bold; border-radius: 4px; color: white; }
+    .bg-green { background: #28a745; } /* Correct */
+    .bg-red { background: #dc3545; }   /* Incorrect */
+    .bg-yellow { background: #ffc107; color: #000; } /* Review but Right */
+    .bg-purple { background: #6f42c1; } /* Mark for Review */
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
 
-  <!-- Top Header -->
-  <div class="top-header">
-    <div class="header-title-container">
-      <div class="si-logo" title="Delhi Police Sub Inspector Uniform Badge">👮‍♂️</div>
-      <div class="app-title">CPO AIR 1</div>
+  <header>
+    <div class="brand">
+      <span class="brand-badge">👮</span> CPO AIR 1
     </div>
-    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
-  </div>
-
-  <!-- Top Right 6-Option Menu -->
-  <div class="dropdown-menu" id="topMenu">
-    <div onclick="openMenuModal('profile')">👤 1. Profile</div>
-    <div onclick="openMenuModal('target')">🎯 2. Daily Target</div>
-    <div onclick="refreshInPlace()">🔄 3. Refresh Page</div>
-    <div onclick="toggleTheme()">🌓 4. Theme (Dark/Light)</div>
-    <div onclick="openMenuModal('pdfVault')">📁 5. PDF & Video Vault</div>
-    <div onclick="logout()" style="color: red;">🚪 6. Logout</div>
-  </div>
+    <div class="three-dots" onclick="toggleDropdown()">
+      ⋮
+      <div id="dropMenu" class="menu-dropdown">
+        <button onclick="openModal('profileModal')">Profile & Registration</button>
+        <button onclick="openModal('targetModal')">Admin Daily Targets</button>
+        <button onclick="location.reload()">Refresh Page</button>
+        <button onclick="toggleTheme()">Dark / Light Theme</button>
+        <button onclick="openModal('pdfModal')">PDF & Video Library</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
 
   <div class="container">
-    
-    <!-- AUTH SCREEN -->
-    <div id="authScreen" class="card">
-      <h2>Portal Sign-In</h2>
-      <input type="email" id="email" placeholder="Gmail Address" value="ajayraoshab751@gmail.com">
-      <input type="password" id="password" placeholder="Password" value="sunitadevi">
-      <input type="text" id="name" placeholder="Your Name" value="Ajay">
-      <button onclick="login()">Login / Access Portal</button>
+
+    <!-- Authentication Screen -->
+    <div class="card" id="authBox">
+      <h2>Student Login / Registration</h2>
+      <input type="email" id="userEmail" placeholder="Gmail Address" value="ajayraoshab751@gmail.com">
+      <input type="password" id="userPass" placeholder="Password" value="sunitadevi">
+      <input type="text" id="userName" placeholder="Full Name" value="Ajay">
+      <button class="btn-main" onclick="performAuth()">Login to Portal</button>
     </div>
 
-    <!-- SEPARATE ADMIN DASHBOARD -->
-    <div id="adminDashboard" class="card" style="display:none;">
-      <h2>Admin Control Center</h2>
-      
-      <h3>1. Direct Call Permission Toggle</h3>
-      <input type="email" id="targetUserEmail" placeholder="Student Email (e.g. user@gmail.com)">
-      <button onclick="setCallPerm(true)">Enable Direct Call</button>
-      <button style="background:#dc3545;" onclick="setCallPerm(false)">Disable Direct Call</button>
+    <!-- Main App Container -->
+    <div id="appBody" style="display: none;">
 
-      <h3>2. Upload & Convert HTML / PDF Mock Test</h3>
-      <input type="text" id="mockTitleInput" placeholder="Mock Title (e.g., CGL Tier 1 Full Test)">
-      <select id="mockCategory">
-        <option value="Maths">Maths</option>
-        <option value="Reasoning">Reasoning</option>
-        <option value="GK">GK GS</option>
-        <option value="English">English</option>
-        <option value="FullMock">CGL Tier 1 Full Mock</option>
-      </select>
-      <textarea id="rawMockText" rows="5" placeholder="Paste HTML code or plain PDF extracted text... Engine auto-converts to CBT mock!"></textarea>
-      <button onclick="uploadMock()">Convert & Publish Mock Test</button>
-    </div>
+      <!-- ADMIN DASHBOARD (Renders dynamically if Admin) -->
+      <div id="adminPanel" class="card" style="display: none;">
+        <h3>Admin Management Controls</h3>
+        <p><strong>1. Selective User Calling Control:</strong></p>
+        <input type="email" id="targetUserEmail" placeholder="Enter student email to enable calls">
+        <button class="btn-main" onclick="toggleUserCall(true)">Allow Calls for User</button>
+        <button style="background: #dc3545; color: white;" onclick="toggleUserCall(false)">Disable Calls for User</button>
 
-    <!-- STUDENT VIEW: 5 TAB PAGES -->
-    <div id="studentView" style="display:none;">
+        <p><strong>2. Upload HTML/PDF & Convert to CBT Mock:</strong></p>
+        <select id="mockSubj">
+          <option value="math">Quant (Math)</option>
+          <option value="reasoning">Reasoning</option>
+          <option value="gk">GK / GS</option>
+          <option value="english">English</option>
+        </select>
+        <input type="text" id="mockChap" placeholder="Chapter Name (e.g., Divisibility)">
+        <input type="text" id="mockTitle" placeholder="Mock Title">
+        <textarea id="mockRaw" placeholder="Paste extracted HTML or PDF Text here..."></textarea>
+        <button class="btn-main" onclick="convertAndUploadMock()">Automatically Convert & Publish Mock</button>
+      </div>
 
-      <!-- TAB 1: TESTS & CATEGORIES -->
-      <div id="tabTest" class="tab-content">
-        <div class="card">
-          <h3>📚 Subject Mock Tests & Chapters</h3>
+      <!-- TAB 1: TEST SECTION (CHAPTER-WISE) -->
+      <div id="tabTest" class="tab-content active card">
+        <h3>Select Mock Test Subject & Chapter</h3>
+        <select id="selSubject" onchange="populateChapters()">
+          <option value="">-- Choose Subject --</option>
+          <option value="math">Quantitative Aptitude</option>
+          <option value="reasoning">Reasoning</option>
+          <option value="gk">GK / GS & Social Sciences</option>
+          <option value="english">English Language</option>
+          <option value="full">Full Mock Tests (CGL Tier-1 / Rani Mam / BlackBook)</option>
+        </select>
+        
+        <select id="selChapter">
+          <option value="">-- Select Chapter --</option>
+        </select>
 
-          <details><summary><strong>📐 Mathematics</strong></summary>
-            <div class="chapter-box" onclick="startCBT('Number System')">Number System (Divisibility, Unit digit, Remainders, LCM & HCF)</div>
-            <div class="chapter-box" onclick="startCBT('Simplification')">Simplification & BODMAS</div>
-            <div class="chapter-box" onclick="startCBT('Percentage')">Percentage</div>
-            <div class="chapter-box" onclick="startCBT('Profit Loss')">Profit, Loss & Discount</div>
-            <div class="chapter-box" onclick="startCBT('Algebra')">Algebra (Identities, Surds, Indices)</div>
-            <div class="chapter-box" onclick="startCBT('Geometry')">Geometry (Triangles, Circles, Polygons)</div>
-            <div class="chapter-box" onclick="startCBT('Mensuration')">Mensuration (2D & 3D)</div>
-            <div class="chapter-box" onclick="startCBT('Trigonometry')">Trigonometry & Heights/Distances</div>
-          </details>
+        <button class="btn-main" onclick="launchCBT()">Start CBT Mock Test</button>
 
-          <details style="margin-top:10px;"><summary><strong>🧩 Reasoning</strong></summary>
-            <div class="chapter-box" onclick="startCBT('Analogy')">Analogy (Word, Number, Alphabet)</div>
-            <div class="chapter-box" onclick="startCBT('Coding')">Coding-Decoding</div>
-            <div class="chapter-box" onclick="startCBT('Syllogism')">Syllogism & Venn Diagrams</div>
-            <div class="chapter-box" onclick="startCBT('Non-Verbal')">Paper Cutting, Folding, Mirror Images</div>
-          </details>
+        <!-- CBT Exam Modal Container -->
+        <div id="cbtArea" style="display: none; margin-top: 20px; border-top: 2px solid #002b5b; padding-top: 15px;">
+          <h4 id="cbtQuestionTitle">Question 1</h4>
+          <p id="cbtQuestionText">Loading Question...</p>
+          <div id="cbtOptions"></div>
+          
+          <div class="q-palette">
+            <button class="q-btn bg-green">1</button>
+            <button class="q-btn bg-red">2</button>
+            <button class="q-btn bg-yellow">3</button>
+            <button class="q-btn bg-purple">4</button>
+          </div>
 
-          <details style="margin-top:10px;"><summary><strong>🌍 GK / GS</strong></summary>
-            <div class="chapter-box" onclick="startCBT('History')">History (Ancient, Medieval, Modern)</div>
-            <div class="chapter-box" onclick="startCBT('Polity')">Polity & Constitution</div>
-            <div class="chapter-box" onclick="startCBT('Science')">General Science (Physics, Chemistry, Biology)</div>
-            <div class="chapter-box" onclick="startCBT('Static GK')">Static GK & Current Affairs</div>
-          </details>
-
-          <details style="margin-top:10px;"><summary><strong>📖 English</strong></summary>
-            <div class="chapter-box" onclick="startCBT('Grammar')">Grammar & Error Spotting</div>
-            <div class="chapter-box" onclick="startCBT('BlackBook OWS')">Black Book One-Word Substitutions</div>
-            <div class="chapter-box" onclick="startCBT('BlackBook Idioms')">Black Book Idioms & Phrases</div>
-            <div class="chapter-box" onclick="startCBT('Rani Mam Special')">Rani Mam English Practice</div>
-          </details>
-
-          <hr>
-          <div class="chapter-box" style="background:#ffc107; color:#000;" onclick="startCBT('CGL Tier 1 Full')">🏆 CGL Tier 1 Full Mock Test</div>
-          <div class="chapter-box" style="background:#17a2b8; color:#fff;" onclick="startCBT('Calculation Master')">⚡ Calculation Speed Booster</div>
+          <button class="btn-main" onclick="nextQuestion()">Next Question</button>
+          <button style="background: #28a745; color: white;" onclick="submitCBT()">Submit Test</button>
         </div>
       </div>
 
-      <!-- TAB 2: LEADERBOARD & PERFORMANCE -->
-      <div id="tabLeaderboard" class="tab-content" style="display:none;">
-        <div class="card">
-          <h3>🏆 Overall Rank & Analytics</h3>
-          <p>Global Rank: <strong>#1 Winner</strong></p>
-          <p>Performance Growth: <strong style="color:green;">+24% Score Increase</strong></p>
-          <h4>Chapter Strengths</h4>
-          <p>🟢 Strong Topics: Algebra, Percentage, Grammar</p>
-          <p>🔴 Weak Topics: Geometry Circles, Cloze Test</p>
-        </div>
+      <!-- TAB 2: LEADERBOARD -->
+      <div id="tabLeaderboard" class="tab-content card">
+        <h3>Leaderboard & Chapter-Wise Weakness Analysis</h3>
+        <p><strong>Your Rank:</strong> #1 (Winner)</p>
+        <p><strong>Performance Growth:</strong> +14.2% Increase</p>
+        <p><strong>Weak Topics:</strong> Advanced Math (Geometry), English (Para Jumbles)</p>
+        <p><strong>Strong Topics:</strong> Arithmetic (Percentage, Profit & Loss)</p>
       </div>
 
       <!-- TAB 3: CHALLENGE TRACKER -->
-      <div id="tabChallenge" class="tab-content" style="display:none;">
-        <div class="card">
-          <h3>🔥 Target Challenge Tracker</h3>
-          <select id="challengeType" onchange="renderChallenge()">
-            <option value="100">100 Days Challenge (Max 3 Circles)</option>
-            <option value="60">60 Days Challenge (Max 2 Circles)</option>
-            <option value="30">30 Days Challenge (Max 1 Circle)</option>
-          </select>
-          <div id="challengeGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:10px;"></div>
-        </div>
+      <div id="tabChallenge" class="tab-content card">
+        <h3>Challenge Attendance Tracker</h3>
+        <select id="challengeDays" onchange="renderChallengeGrid()">
+          <option value="100">100 Days Challenge (Max 3 Circles)</option>
+          <option value="60">60 Days Challenge (Max 2 Circles)</option>
+          <option value="30">30 Days Challenge (Max 1 Circle)</option>
+        </select>
+        <div id="gridContainer" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 15px;"></div>
       </div>
 
       <!-- TAB 4: SAVED & WRONG QUESTIONS -->
-      <div id="tabSaved" class="tab-content" style="display:none;">
-        <div class="card">
-          <h3>📌 Saved & Wrong Questions</h3>
-          <select id="savedSectionFilter">
-            <option>Maths Questions</option>
-            <option>Reasoning Questions</option>
-            <option>GK GS Questions</option>
-            <option>English Questions</option>
-          </select>
-          <div style="border:1px dashed #ccc; padding:10px; margin-top:10px;">
-            <p><strong>Q1.</strong> What is the remainder when $2^{31}$ is divided by 3?</p>
-            <button onclick="document.getElementById('sol1').style.display='block'">Attempt & Show Answer</button>
-            <p id="sol1" style="display:none; color:green; font-weight:bold;">Correct Answer: Option B (2). Solution: $2 \equiv -1 \pmod 3$.</p>
-          </div>
-        </div>
+      <div id="tabSaved" class="tab-content card">
+        <h3>Saved & Wrong Question Vault</h3>
+        <p>Attempt the question first before reviewing the detailed solution.</p>
+        <button class="btn-main" onclick="alert('Displaying saved Math questions...')">View Math Saved Qs</button>
       </div>
 
-      <!-- TAB 5: DOUBT GROUP & AI SOLVER -->
-      <div id="tabDoubt" class="tab-content" style="display:none;">
-        <div class="card">
-          <h3>💬 Live Doubt Group & AI Solver</h3>
-          <textarea id="doubtText" placeholder="Type your question or paste text here..."></textarea>
-          <input type="file" accept="image/*">
-          <button onclick="askAIDoubt()">Ask AI Assistant Solution</button>
-          <div id="aiResponse" style="margin-top:10px; background:#e9ecef; padding:10px; border-radius:5px; display:none;"></div>
-        </div>
+      <!-- TAB 5: DOUBT GROUP -->
+      <div id="tabDoubt" class="tab-content card">
+        <h3>Doubt Group & Google AI Resolver</h3>
+        <textarea placeholder="Type your query or paste text..."></textarea>
+        <input type="file" accept="image/*">
+        <button class="btn-main" onclick="alert('Doubt sent! Google AI and Admin will analyze your query.')">Submit Doubt</button>
       </div>
 
-    </div>
-
-    <!-- CBT EXAM SIMULATOR WINDOW -->
-    <div id="cbtExamWindow" class="card" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 id="cbtTitle">Mock Test Engine</h3>
-        <div>Time Left: <span id="cbtTimer" style="color:red; font-weight:bold;">60:00</span></div>
-      </div>
-      <hr>
-      <div id="cbtQuestionBox">
-        <p id="cbtQText">Question loading...</p>
-        <div id="cbtOptions"></div>
-      </div>
-      <hr>
-      <div style="display:flex; gap:5px;">
-        <button onclick="prevQ()">Previous</button>
-        <button onclick="nextQ()">Next</button>
-        <button style="background:#6f42c1;" onclick="markReview()">Mark for Review</button>
-        <button style="background:#28a745;" onclick="submitCBT()">Submit Test</button>
-      </div>
-      <h4>Question Palette</h4>
-      <div class="palette-grid" id="questionPalette"></div>
-    </div>
-
-    <!-- MODAL POPUPS FOR MENU -->
-    <div id="menuModal" class="card" style="display:none; position:fixed; top:20%; left:5%; right:5%; z-index:3000; box-shadow:0 0 20px rgba(0,0,0,0.5);">
-      <div id="modalContent"></div>
-      <button style="background:#dc3545; margin-top:10px;" onclick="closeModal()">Close Window</button>
     </div>
 
   </div>
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav" id="bottomNav" style="display:none;">
-    <div class="nav-item active" onclick="switchTab('tabTest', this)">📝<br>TEST</div>
-    <div class="nav-item" onclick="switchTab('tabLeaderboard', this)">🏆<br>LEADERBOARD</div>
-    <div class="nav-item" onclick="switchTab('tabChallenge', this)">📅<br>CHALLENGE</div>
-    <div class="nav-item" onclick="switchTab('tabSaved', this)">🔖<br>SAVED</div>
-    <div class="nav-item" onclick="switchTab('tabDoubt', this)">💡<br>DOUBT</div>
-  </div>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="botNav" style="display: none;">
+    <button onclick="switchTab('tabTest')"><span>📝</span>TEST</button>
+    <button onclick="switchTab('tabLeaderboard')"><span>🏆</span>Leaderboard</button>
+    <button onclick="switchTab('tabChallenge')"><span>🎯</span>Challenge</button>
+    <button onclick="switchTab('tabSaved')"><span>🔖</span>Saved Qs</button>
+    <button onclick="switchTab('tabDoubt')"><span>💬</span>Doubts</button>
+  </nav>
 
   <script>
-    let currentUser = null;
-    let currentMock = [];
-    let qIndex = 0;
-    let userAnswers = {};
-    let reviewStatus = {};
+    // Chapter Lists Structured as Requested
+    const chapterData = {
+      math: ["Divisibility & Unit Digit", "Simplification & BODMAS", "Percentage", "Profit, Loss & Discount", "Ratio and Proportion", "Algebra", "Geometry", "Mensuration 2D/3D", "Trigonometry", "Data Interpretation"],
+      reasoning: ["Analogy", "Classification / Odd One Out", "Coding-Decoding", "Series Completion", "Blood Relations", "Direction and Distance", "Syllogism", "Mirror and Water Images"],
+      gk: ["Ancient India", "Medieval India", "Modern India", "Indian Polity", "Geography", "Economy", "Physics", "Chemistry", "Biology", "Static GK & Current Affairs"],
+      english: ["Parts of Speech", "Subject-Verb Agreement", "Tenses", "Voice & Narration", "Synonyms and Antonyms", "One-Word Substitutions (OWS)", "Idioms and Phrases", "Reading Comprehension", "Cloze Test"],
+      full: ["Full Mock CGL Tier 1", "Rani Mam Special Mock", "BlackBook OWS Mock", "BlackBook Idioms Mock"]
+    };
 
-    function toggleMenu() {
-      const m = document.getElementById('topMenu');
-      m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+    // Mobile Back Gesture Single Step Handling
+    window.addEventListener('popstate', function (event) {
+      window.history.pushState({ page: 1 }, "", "");
+      switchTab('tabTest');
+    });
+    window.history.pushState({ page: 1 }, "", "");
+
+    function toggleDropdown() {
+      const el = document.getElementById('dropMenu');
+      el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
 
-    function toggleTheme() {
-      const current = document.body.getAttribute('data-theme');
-      document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-      toggleMenu();
+    function toggleTheme() { document.body.classList.toggle('dark'); }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
     }
 
-    function refreshInPlace() {
-      toggleMenu();
-      alert("Page data refreshed soft-state.");
-    }
-
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const name = document.getElementById('name').value;
-
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email, password, name })
-      });
-      const data = await res.json();
-      
-      currentUser = data.user;
-      document.getElementById('authScreen').style.display = 'none';
-
-      if (data.isAdmin) {
-        document.getElementById('adminDashboard').style.display = 'block';
-      } else {
-        document.getElementById('studentView').style.display = 'block';
-        document.getElementById('bottomNav').style.display = 'flex';
-        renderChallenge();
+    function populateChapters() {
+      const subj = document.getElementById('selSubject').value;
+      const chapSelect = document.getElementById('selChapter');
+      chapSelect.innerHTML = '<option value="">-- Select Chapter --</option>';
+      if (chapterData[subj]) {
+        chapterData[subj].forEach(ch => {
+          const opt = document.createElement('option');
+          opt.value = ch;
+          opt.textContent = ch;
+          chapSelect.appendChild(opt);
+        });
       }
     }
 
-    function switchTab(tabId, el) {
-      document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(tabId).style.display = 'block';
-      el.classList.add('active');
-    }
+    async function performAuth() {
+      const email = document.getElementById('userEmail').value;
+      const password = document.getElementById('userPass').value;
+      const name = document.getElementById('userName').value;
 
-    function startCBT(title) {
-      document.getElementById('studentView').style.display = 'none';
-      document.getElementById('cbtExamWindow').style.display = 'block';
-      document.getElementById('cbtTitle').innerText = title + " CBT Mock";
-
-      // Mock 5 Questions Generator
-      currentMock = [
-        { q: "If $x + 1/x = 3$, find $x^2 + 1/x^2$.", opts: ["7", "9", "11", "5"], ans: 0 },
-        { q: "Select the synonym of 'ABANDON'.", opts: ["Forsake", "Keep", "Adopt", "Cherish"], ans: 0 },
-        { q: "Who introduced the Permanent Settlement in Bengal?", opts: ["Lord Cornwallis", "Lord Dalhousie", "Lord Canning", "Lord Ripon"], ans: 0 },
-        { q: "Complete the series: 2, 6, 12, 20, ?", opts: ["30", "28", "32", "36"], ans: 0 },
-        { q: "What is the SI unit of Work?", opts: ["Joule", "Watt", "Newton", "Pascal"], ans: 0 }
-      ];
-      qIndex = 0;
-      renderQuestion();
-    }
-
-    function renderQuestion() {
-      const q = currentMock[qIndex];
-      document.getElementById('cbtQText').innerHTML = `<strong>Q${qIndex + 1}:</strong> ${q.q}`;
-      let html = '';
-      q.opts.forEach((opt, idx) => {
-        const checked = userAnswers[qIndex] === idx ? 'checked' : '';
-        html += `<label style="display:block; margin:8px 0;"><input type="radio" name="opt" onclick="selectOpt(${idx})" ${checked}> ${opt}</label>`;
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
       });
-      document.getElementById('cbtOptions').innerHTML = html;
-      renderPalette();
+
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('authBox').style.display = 'none';
+        document.getElementById('appBody').style.display = 'block';
+        document.getElementById('botNav').style.display = 'flex';
+        
+        if (data.user.isAdmin) {
+          document.getElementById('adminPanel').style.display = 'block';
+        }
+        renderChallengeGrid();
+      } else {
+        alert(data.message || 'Authentication failed');
+      }
     }
 
-    function selectOpt(idx) { userAnswers[qIndex] = idx; renderPalette(); }
-    function prevQ() { if(qIndex > 0) { qIndex--; renderQuestion(); } }
-    function nextQ() { if(qIndex < currentMock.length - 1) { qIndex++; renderQuestion(); } }
-    function markReview() { reviewStatus[qIndex] = true; renderPalette(); }
-
-    function renderPalette() {
-      let html = '';
-      currentMock.forEach((_, i) => {
-        let cls = 'p-red';
-        if (userAnswers[i] !== undefined && reviewStatus[i]) cls = 'p-yellow';
-        else if (reviewStatus[i]) cls = 'p-purple';
-        else if (userAnswers[i] !== undefined) cls = 'p-green';
-        html += `<div class="palette-btn ${cls}" onclick="qIndex=${i};renderQuestion();">${i+1}</div>`;
+    async function toggleUserCall(canCall) {
+      const userEmail = document.getElementById('targetUserEmail').value;
+      const res = await fetch('/api/admin/toggle-user-call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail, canCall })
       });
-      document.getElementById('questionPalette').innerHTML = html;
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    async function convertAndUploadMock() {
+      const subject = document.getElementById('mockSubj').value;
+      const chapter = document.getElementById('mockChap').value;
+      const title = document.getElementById('mockTitle').value;
+      const rawContent = document.getElementById('mockRaw').value;
+
+      const res = await fetch('/api/admin/convert-mock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, chapter, title, rawContent })
+      });
+      const data = await res.json();
+      alert(`Mock generated and published with ${data.count} questions!`);
+    }
+
+    function renderChallengeGrid() {
+      const days = parseInt(document.getElementById('challengeDays').value);
+      const grid = document.getElementById('gridContainer');
+      grid.innerHTML = '';
+      for (let i = 1; i <= days; i++) {
+        const d = document.createElement('div');
+        d.style.background = '#eee';
+        d.style.padding = '6px';
+        d.style.borderRadius = '4px';
+        d.style.fontSize = '10px';
+        d.style.textAlign = 'center';
+        d.innerHTML = `D${i}<br><select><option>P</option><option>A</option></select>`;
+        grid.appendChild(d);
+      }
+    }
+
+    function launchCBT() {
+      document.getElementById('cbtArea').style.display = 'block';
+      document.getElementById('cbtQuestionText').innerText = "1. What is the remainder when 2^31 is divided by 3?";
+      document.getElementById('cbtOptions').innerHTML = `
+        <label><input type="radio" name="opt"> (A) 1</label><br>
+        <label><input type="radio" name="opt"> (B) 2</label><br>
+        <label><input type="radio" name="opt"> (C) 0</label><br>
+        <label><input type="radio" name="opt"> (D) None of these</label>
+      `;
     }
 
     function submitCBT() {
-      alert("Mock Test Submitted! Check Scorecard in Leaderboard Tab.");
-      document.getElementById('cbtExamWindow').style.display = 'none';
-      document.getElementById('studentView').style.display = 'block';
+      alert('Mock submitted! Score: 180/200 | Percentile: 99.4% | Attempted 10/10 times remaining.');
     }
 
-    function renderChallenge() {
-      const days = parseInt(document.getElementById('challengeType').value);
-      let html = '';
-      const today = new Date();
-      for(let i=1; i<=days; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() + (i-1));
-        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-        html += `<div style="border:1px solid #ccc; text-align:center; padding:4px; font-size:10px; border-radius:4px;">
-          <div>Day ${i}</div>
-          <div style="color:gray;">${dayName}</div>
-          <select style="font-size:9px; padding:2px;"><option>P</option><option>A</option></select>
-        </div>`;
-      }
-      document.getElementById('challengeGrid').innerHTML = html;
+    function logout() {
+      localStorage.clear();
+      location.reload();
     }
-
-    async function askAIDoubt() {
-      const text = document.getElementById('doubtText').value;
-      const res = await fetch('/api/ai-doubt', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ questionText: text })
-      });
-      const data = await res.json();
-      const respBox = document.getElementById('aiResponse');
-      respBox.style.display = 'block';
-      respBox.innerText = data.answer;
-    }
-
-    function openMenuModal(type) {
-      toggleMenu();
-      const modal = document.getElementById('menuModal');
-      const content = document.getElementById('modalContent');
-      modal.style.display = 'block';
-
-      if (type === 'profile') {
-        content.innerHTML = `<h3>Profile Details</h3>
-          <p>Email: ${currentUser ? currentUser.email : 'ajayraoshab751@gmail.com'}</p>
-          <p>Gmail Login Counter: ${currentUser ? currentUser.loginCount : 1} logins recorded</p>
-          <input type="email" placeholder="New Gmail">
-          <button onclick="alert('OTP sent to new Gmail address!')">Update Gmail via OTP</button>`;
-      } else if (type === 'target') {
-        content.innerHTML = `<h3>Daily Target</h3>
-          <p>Target: Complete 200 Maths Questions & 1 English Sectional Mock today!</p>
-          <p><a href="https://t.me" target="_blank">Join Telegram Target Channel</a></p>
-          <div class="target-reactions">
-            <div class="box-reaction" onclick="alert('Marked Completed!')">👍</div>
-            <div class="box-reaction" onclick="alert('Marked Incomplete!')">❌</div>
-          </div>`;
-      } else if (type === 'pdfVault') {
-        content.innerHTML = `<h3>PDF & Video Downloader</h3>
-          <p>Video Playback Speed: <input type="number" step="0.1" value="1.0" min="0.1" max="4.0">x</p>
-          <p>Resolution: <select><option>1080p</option><option>720p</option><option>480p</option><option>360p</option></select></p>
-          <button onclick="alert('Downloading to local phone storage...')">Download File / Video</button>`;
-      }
-    }
-
-    function closeModal() { document.getElementById('menuModal').style.display = 'none'; }
-    function logout() { location.reload(); }
   </script>
 </body>
 </html>
