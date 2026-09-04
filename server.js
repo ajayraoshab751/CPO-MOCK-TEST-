@@ -15,10 +15,10 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB Connection Error:', err));
 }
 
-// User Schema
+// User Schema (Password made optional)
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
+  password: { type: String, default: '' },
   name: { type: String, default: 'Aspirant' },
   loginCount: { type: Number, default: 0 },
   otp: { type: String, default: '' },
@@ -28,30 +28,27 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Nodemailer SMTP Transporter (Uses Admin Gmail)
+// Nodemailer SMTP Transporter
 const transporter = nodemailer.buildTransport({
   service: 'gmail',
   auth: {
     user: process.env.GMAIL_USER || 'ajayraoshab751@gmail.com',
-    pass: process.env.GMAIL_PASS || '' // Set Google App Password in environment variables
+    pass: process.env.GMAIL_PASS || ''
   }
 });
 
-// Auth Login / Register
+// Auth Login / Register (Password check removed)
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password, name } = req.body || {};
-  if (!email || !password) return res.json({ success: false, message: 'Email and password required' });
+  const { email, name } = req.body || {};
+  if (!email) return res.json({ success: false, message: 'Email is required' });
 
-  const isAdmin = (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi');
+  const isAdmin = (email === 'ajayraoshab751@gmail.com');
 
   try {
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ email, password, name: name || 'Aspirant', loginCount: 1, isAdmin });
+      user = new User({ email, name: name || 'Aspirant', loginCount: 1, isAdmin });
     } else {
-      if (user.password !== password) {
-        return res.json({ success: false, message: 'Invalid Credentials!' });
-      }
       user.loginCount += 1;
     }
     await user.save();
@@ -61,7 +58,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Real OTP Generation & Email Dispatch
+// OTP Generation
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   try {
@@ -72,37 +69,20 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     user.otp = generatedOtp;
     await user.save();
 
-    // Send email using SMTP Transporter if App Password configured
     if (process.env.GMAIL_PASS) {
       await transporter.sendMail({
         from: '"CPO AIR 1 Portal" <ajayraoshab751@gmail.com>',
         to: email,
-        subject: 'Your Password Reset OTP - CPO AIR 1',
-        text: `Your One-Time Password (OTP) for password reset is: ${generatedOtp}`
+        subject: 'Your OTP - CPO AIR 1',
+        text: `Your One-Time Password (OTP) is: ${generatedOtp}`
       });
       return res.json({ success: true, message: 'OTP sent directly to your Gmail inbox!' });
     } else {
-      // Fallback display if SMTP credentials are missing on Render environment
-      return res.json({ success: true, message: `OTP Generated: ${generatedOtp}. (To receive live emails directly in inbox, add GMAIL_PASS App Password to Render environment variables).`, otpDemo: generatedOtp });
+      return res.json({ success: true, message: `OTP Generated: ${generatedOtp}.`, otpDemo: generatedOtp });
     }
   } catch (err) {
     return res.json({ success: false, message: err.message });
   }
-});
-
-// Reset Password Endpoint
-app.post('/api/auth/reset-password', async (req, res) => {
-  const { email, otp, newPassword } = req.body;
-  const user = await User.findOne({ email });
-
-  if (!user || user.otp !== otp) {
-    return res.json({ success: false, message: 'Invalid OTP!' });
-  }
-
-  user.password = newPassword;
-  user.otp = '';
-  await user.save();
-  res.json({ success: true, message: 'Password updated successfully! You can now login.' });
 });
 
 app.get('/api/admin/users', async (req, res) => {
