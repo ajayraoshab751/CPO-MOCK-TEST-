@@ -22,15 +22,15 @@
 </head>
 <body>
 
-    <!-- Admin Access Lock -->
+    <!-- Admin Passcode Lock -->
     <div id="adminAuthScreen" class="auth-card">
         <h2>🔒 Admin Access</h2>
-        <p style="font-size: 13px; color: #666; margin-top: 6px;">Enter secret admin password to proceed.</p>
+        <p style="font-size: 13px; color: #666; margin-top: 6px;">Enter secret admin passcode to proceed.</p>
         <input type="password" id="adminSecretInput" placeholder="Enter Secret Code">
         <button class="btn-blue" onclick="verifyAdminKey()">Access Dashboard</button>
     </div>
 
-    <!-- Admin Content Panel -->
+    <!-- Protected Admin Panel -->
     <div id="adminDashboard" class="hidden">
         <h2>📊 Admin Control Panel</h2>
         
@@ -72,14 +72,13 @@
                 document.getElementById('adminAuthScreen').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 loadAdminStats();
-                setInterval(loadAdminStats, 10000); // Refresh stats every 10 seconds
+                setInterval(loadAdminStats, 10000); // Auto refresh stats every 10 seconds
             } else {
                 alert("Incorrect Secret Code! Access Denied.");
             }
         }
 
         async function loadAdminStats() {
-            // Using backend secret key CPOADMIN123 internally
             const res = await fetch(`/api/admin/stats?key=CPOADMIN123`);
             if (!res.ok) return;
             
@@ -102,5 +101,6 @@
     </script>
 </body>
 </html>
+
 
 
