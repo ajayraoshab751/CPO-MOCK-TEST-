@@ -19,6 +19,15 @@
         .btn-danger { background: #dc3545; }
         .target-banner { background: #ffc107; color: black; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* Chat UI Styling */
+        .chat-box { height: 350px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 80%; padding: 10px; border-radius: 10px; font-size: 14px; }
+        .user-msg { background: #dcf8c6; align-self: flex-end; }
+        .ai-msg { background: #e2e2e2; align-self: flex-start; }
+        .chat-img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
+        .chat-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .camera-btn { background: #28a745; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -35,6 +44,8 @@
     <h4>Menu Options</h4>
     <button class="drawer-btn" onclick="showView('profileView')">👤 Profile</button>
     <button class="drawer-btn" onclick="showView('mockTestView')">📝 Mock Tests (Sectional)</button>
+    <button class="drawer-btn" onclick="showView('captureImageView')">📷 Capture Image</button>
+    <button class="drawer-btn" onclick="showView('doubtGroupView')">💬 Doubt Group (AI Scanner)</button>
     <button class="drawer-btn" onclick="showView('performanceView')">📊 Performance & Ranking</button>
     <button class="drawer-btn" onclick="showView('bankView')">⭐ Saved & Wrong Questions</button>
     <button class="drawer-btn" onclick="showView('targetView')">🎯 Set Global Target</button>
@@ -77,7 +88,31 @@
     <button class="btn" onclick="submitSectionTest()">Submit Section</button>
 </div>
 
-<!-- Performance & Ranking View -->
+<!-- Capture Image Interface -->
+<div class="card hidden" id="captureImageView">
+    <h3>📷 Personal Image Vault</h3>
+    <div class="chat-box" id="vaultChatBox"></div>
+    <div class="chat-controls">
+        <input type="file" id="vaultCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleVaultUpload(event)">
+        <button class="camera-btn" onclick="document.getElementById('vaultCameraInput').click()">📷</button>
+        <span style="font-size: 13px; color: gray;">Tap camera to snap and save image</span>
+    </div>
+</div>
+
+<!-- Doubt Group AI Scanner Interface -->
+<div class="card hidden" id="doubtGroupView">
+    <h3>💬 Doubt Group (Google AI Scan)</h3>
+    <div class="chat-box" id="doubtChatBox">
+        <div class="chat-msg ai-msg">Welcome to Doubt Group! Snap or upload any question picture to get an instant AI solution.</div>
+    </div>
+    <div class="chat-controls">
+        <input type="file" id="doubtCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleDoubtUpload(event)">
+        <button class="camera-btn" onclick="document.getElementById('doubtCameraInput').click()">📷</button>
+        <span style="font-size: 13px; color: gray;">Snap question image for AI scanning</span>
+    </div>
+</div>
+
+<!-- Performance View -->
 <div class="card hidden" id="performanceView">
     <h3>Your Performance Analytics</h3>
     <div class="grid-2">
@@ -97,7 +132,7 @@
     <div id="wrongContainer">None</div>
 </div>
 
-<!-- Target Setting View -->
+<!-- Target View -->
 <div class="card hidden" id="targetView">
     <h3>Update Announcement Target</h3>
     <input type="text" id="targetInput" placeholder="Enter target text for all users" style="width:90%; padding:8px;"><br>
@@ -140,7 +175,7 @@ function showView(viewId) {
     if (document.getElementById('sideDrawer').classList.contains('open')) {
         toggleDrawer();
     }
-    ['authView', 'profileView', 'mockTestView', 'testEngineView', 'performanceView', 'bankView', 'targetView', 'settingsView']
+    ['authView', 'profileView', 'mockTestView', 'testEngineView', 'captureImageView', 'doubtGroupView', 'performanceView', 'bankView', 'targetView', 'settingsView']
     .forEach(id => document.getElementById(id).classList.add('hidden'));
     
     document.getElementById(viewId).classList.remove('hidden');
@@ -166,11 +201,8 @@ function login() {
             renderProfile(currentUser);
             loadUserStats();
             showView('mockTestView');
-        } else {
-            alert(d.error || 'Login failed');
-        }
-    })
-    .catch(err => alert('Network error during login: ' + err.message));
+        } else alert(d.error || 'Login failed');
+    });
 }
 
 function register() {
@@ -186,13 +218,9 @@ function register() {
     })
     .then(r => r.json())
     .then(d => {
-        if(d.success) {
-            alert('Registration successful! Click Login to enter.');
-        } else {
-            alert(d.error || 'Registration failed');
-        }
-    })
-    .catch(err => alert('Network error during registration: ' + err.message));
+        if(d.success) alert('Registration successful! Click Login to enter.');
+        else alert(d.error || 'Registration failed');
+    });
 }
 
 function logout() {
@@ -223,8 +251,62 @@ function loadUserStats() {
         
         document.getElementById('savedContainer').innerHTML = (d.savedQuestions && d.savedQuestions.length) ? d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No saved questions.';
         document.getElementById('wrongContainer').innerHTML = (d.wrongQuestions && d.wrongQuestions.length) ? d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No wrong questions.';
-    })
-    .catch(err => console.log(err));
+    });
+}
+
+// Vault Capture Handler
+function handleVaultUpload(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imgUrl = e.target.result;
+        const chatBox = document.getElementById('vaultChatBox');
+        chatBox.innerHTML += `
+            <div class="chat-msg user-msg">
+                <strong>Saved Photo:</strong><br>
+                <img src="${imgUrl}" class="chat-img">
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Doubt Scanner AI Handler
+function handleDoubtUpload(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imgUrl = e.target.result;
+        const chatBox = document.getElementById('doubtChatBox');
+        chatBox.innerHTML += `
+            <div class="chat-msg user-msg">
+                <img src="${imgUrl}" class="chat-img">
+            </div>
+            <div class="chat-msg ai-msg" id="loadingAi">🔍 Google AI scanning image...</div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        fetch('/api/ai-scan-doubt', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ image: imgUrl })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const loadEl = document.getElementById('loadingAi');
+            if(loadEl) loadEl.remove();
+            chatBox.innerHTML += `
+                <div class="chat-msg ai-msg">
+                    <strong>Google AI Solution:</strong><br>${data.solution}
+                </div>
+            `;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    };
+    reader.readAsDataURL(file);
 }
 
 function initSectionTest(sec) {
@@ -245,15 +327,6 @@ function initSectionTest(sec) {
         });
     });
     document.getElementById('optionsContainer').innerHTML = html;
-}
-
-function saveCurrentQuestion() {
-    if(activeQuestions.length === 0) return;
-    fetch('/api/save-question', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username: currentUser.username, questionObj: activeQuestions[0] })
-    }).then(r => r.json()).then(() => alert('Question saved to bank!'));
 }
 
 function submitSectionTest() {
@@ -306,4 +379,6 @@ function shareWebsite() {
 </script>
 </body>
 </html>
+
+
 

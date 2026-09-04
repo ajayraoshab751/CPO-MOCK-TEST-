@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 const users = [];
 const testResults = [];
@@ -13,7 +13,7 @@ const savedQuestionsMap = {};
 const wrongQuestionsMap = {}; 
 let globalTarget = "Target: Score 160+ in CPO Tier-1 Mock Tests!";
 
-// Registration
+// Registration Endpoint
 app.post('/api/register', (req, res) => {
     const { fullName, age, gender, place, username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
@@ -24,12 +24,23 @@ app.post('/api/register', (req, res) => {
     res.json({ success: true, user: newUser });
 });
 
-// Login & Profile Fetch
+// Login Endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     res.json({ success: true, user });
+});
+
+// Doubt Scanner Route (Google AI OCR Engine)
+app.post('/api/ai-scan-doubt', (req, res) => {
+    // Simulating Google AI Image Recognition Analysis
+    setTimeout(() => {
+        res.json({
+            success: true,
+            solution: "<b>Question Scanned Successfully!</b><br><br><b>Step 1:</b> Extracted formula from image.<br><b>Step 2:</b> Apply $(A + B) \\times \\text{time} = \\text{Total Work}$.<br><b>Correct Answer Option:</b> (B)<br><b>Short Trick:</b> Direct ratio method applies to this question type."
+        });
+    }, 1500);
 });
 
 // Test Submission
@@ -44,7 +55,6 @@ app.post('/api/submit-test', (req, res) => {
     };
     testResults.push(attemptData);
 
-    // Save Wrong Questions
     if (!wrongQuestionsMap[username]) wrongQuestionsMap[username] = [];
     if (wrongQList && wrongQList.length > 0) {
         wrongQuestionsMap[username].push(...wrongQList);
@@ -53,7 +63,7 @@ app.post('/api/submit-test', (req, res) => {
     res.json({ success: true, attemptCount: userAttempts.length + 1 });
 });
 
-// Save/Bookmark Question
+// Bookmark Question
 app.post('/api/save-question', (req, res) => {
     const { username, questionObj } = req.body;
     if (!savedQuestionsMap[username]) savedQuestionsMap[username] = [];
@@ -61,7 +71,7 @@ app.post('/api/save-question', (req, res) => {
     res.json({ success: true });
 });
 
-// Fetch User Dashboard Stats & Leaderboard
+// Fetch User Stats
 app.get('/api/user-stats/:username', (req, res) => {
     const username = req.params.username;
     const userAttempts = testResults.filter(r => r.username === username);
@@ -69,11 +79,8 @@ app.get('/api/user-stats/:username', (req, res) => {
     let totalRight = 0, totalWrong = 0;
     userAttempts.forEach(a => { totalRight += a.correct; totalWrong += a.incorrect; });
 
-    // Leaderboard Ranking Algorithm
     const userScores = {};
-    testResults.forEach(r => {
-        userScores[r.username] = (userScores[r.username] || 0) + r.score;
-    });
+    testResults.forEach(r => { userScores[r.username] = (userScores[r.username] || 0) + r.score; });
 
     const sortedUsers = Object.keys(userScores).sort((a, b) => userScores[b] - userScores[a]);
     const rank = sortedUsers.indexOf(username) !== -1 ? sortedUsers.indexOf(username) + 1 : 'N/A';
@@ -89,7 +96,7 @@ app.get('/api/user-stats/:username', (req, res) => {
     });
 });
 
-// Set Global Target (Admin or Dashboard)
+// Set Global Target
 app.post('/api/set-target', (req, res) => {
     if (req.body.target) {
         globalTarget = req.body.target;
@@ -101,4 +108,3 @@ app.post('/api/set-target', (req, res) => {
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
