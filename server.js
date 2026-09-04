@@ -1,5 +1,4 @@
 const express = require('express');
-const Datastore = require('nedb');
 const path = require('path');
 
 const app = express();
@@ -8,10 +7,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// In-Memory NeDB setup (prevents file system write errors on Render)
-const db = {};
-db.users = new Datastore();
-
+// Simple In-Memory Database Arrays
+const users = [];
 let activeHeartbeats = {};
 
 // Clean inactive heartbeats every 30 seconds
@@ -32,39 +29,34 @@ app.post('/api/register', (req, res) => {
         return res.status(400).json({ error: 'Username and password required' });
     }
 
-    db.users.findOne({ username }, (err, existingUser) => {
-        if (err) return res.status(500).json({ error: 'Database check error' });
-        
-        if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
-        }
-        
-        const newUser = {
-            fullName,
-            age,
-            gender,
-            place,
-            username,
-            password,
-            registeredAt: new Date().toISOString()
-        };
+    const existingUser = users.find(u => u.username === username);
+    if (existingUser) {
+        return res.status(400).json({ error: 'User already exists' });
+    }
+    
+    const newUser = {
+        fullName,
+        age,
+        gender,
+        place,
+        username,
+        password,
+        registeredAt: new Date().toISOString()
+    };
 
-        db.users.insert(newUser, (insertErr, doc) => {
-            if (insertErr) return res.status(500).json({ error: 'Database insert error' });
-            res.json({ success: true, user: doc });
-        });
-    });
+    users.push(newUser);
+    res.json({ success: true, user: newUser });
 });
 
 // Login Endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    db.users.findOne({ username, password }, (err, user) => {
-        if (err || !user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        res.json({ success: true, username: user.username });
-    });
+    const user = users.find(u => u.username === username && u.password === password);
+    
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    res.json({ success: true, username: user.username });
 });
 
 // Heartbeat Endpoint
@@ -83,17 +75,10 @@ app.get('/api/admin/stats', (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    db.users.find({}, (err, users) => {
-        if (err) return res.status(500).json({ error: 'Database error' });
-        
-        const totalRegistered = users.length;
-        const currentlyOnline = Object.keys(activeHeartbeats).length;
-
-        res.json({
-            totalRegistered,
-            currentlyOnline,
-            allUsers: users
-        });
+    res.json({
+        totalRegistered: users.length,
+        currentlyOnline: Object.keys(activeHeartbeats).length,
+        allUsers: users
     });
 });
 
@@ -105,4 +90,5 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
 
