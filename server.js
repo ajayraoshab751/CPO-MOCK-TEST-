@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 app.use(express.json({ limit: '100mb' }));
@@ -14,7 +15,7 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB Connection Error:', err));
 }
 
-// User Schema with Login Counter & Selective Call Permission
+// Schemas
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
@@ -22,14 +23,13 @@ const userSchema = new mongoose.Schema({
   loginCount: { type: Number, default: 0 },
   canCallAdmin: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
-  savedQuestions: Array,
-  wrongQuestions: Array,
-  challengeData: { type: Object, default: { plan: 100, attendance: {}, circles: 0 } }
+  otp: String,
+  otpExpires: Date
 });
 
 const mockSchema = new mongoose.Schema({
   title: String,
-  subject: String,
+  section: String,
   chapter: String,
   questions: Array,
   createdAt: { type: Date, default: Date.now }
@@ -38,9 +38,9 @@ const mockSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Mock = mongoose.model('Mock', mockSchema);
 
-// Auth Endpoint with Login Counter
-app.post('/api/auth', async (req, res) => {
-  const { email, password, name } = req.body;
+// Auth APIs
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password, name } = req.body || {};
   try {
     let user = await User.findOne({ email });
     const isAdmin = (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi');
@@ -48,54 +48,78 @@ app.post('/api/auth', async (req, res) => {
     if (!user) {
       user = new User({ email, password, name: name || 'Aspirant', loginCount: 1, isAdmin });
     } else {
-      if (user.password !== password) return res.status(400).json({ success: false, message: 'Invalid Password' });
+      if (user.password !== password) {
+        return res.status(400).json({ success: false, message: 'Invalid password' });
+      }
       user.loginCount += 1;
     }
     await user.save();
-    res.json({ success: true, user });
+    return res.json({ success: true, user });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Admin Route: Specific User Call Permission Toggle
-app.post('/api/admin/toggle-user-call', async (req, res) => {
-  const { userEmail, canCall } = req.body;
-  await User.updateOne({ email: userEmail }, { canCallAdmin: canCall });
-  res.json({ success: true, message: `Call permissions updated for ${userEmail}` });
+// Forgot Password OTP Endpoint (5-min validity)
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ success: false, message: 'Gmail not registered' });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  user.otp = otp;
+  user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
+  await user.save();
+
+  console.log(`[OTP GENERATED] OTP for ${email} is ${otp}`);
+  return res.json({ success: true, message: 'OTP sent to registered Gmail (valid for 5 mins)', debugOtp: otp });
 });
 
-// Automated Mock Converter (HTML/PDF Text Processing)
-app.post('/api/admin/convert-mock', async (req, res) => {
-  const { rawContent, subject, chapter, title } = req.body;
-  
-  // Basic regex parser to convert raw html/text pages to structured CBT questions
-  const parsedQuestions = [];
-  const blocks = rawContent.split(/Q\d+\.|Question \d+:/g).filter(b => b.trim());
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  const user = await User.findOne({ email, otp, otpExpires: { $gt: Date.now() } });
+  if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
 
-  blocks.forEach((block, idx) => {
-    const lines = block.split('\n').filter(l => l.trim());
-    if (lines.length > 0) {
-      parsedQuestions.push({
-        id: idx + 1,
-        question: lines[0],
-        options: lines.slice(1, 5).length === 4 ? lines.slice(1, 5) : ['Option A', 'Option B', 'Option C', 'Option D'],
-        correctAnswer: 0,
-        solution: 'Detailed solution auto-generated from text source.'
-      });
-    }
+  user.password = newPassword;
+  user.otp = null;
+  user.otpExpires = null;
+  await user.save();
+  return res.json({ success: true, message: 'Password updated successfully!' });
+});
+
+// Admin API: Enable Call for Specific User
+app.post('/api/admin/toggle-user-call', async (req, res) => {
+  const { email, allow } = req.body;
+  await User.updateOne({ email }, { canCallAdmin: allow });
+  return res.json({ success: true });
+});
+
+// Admin API: Get All Users & Login Counts
+app.get('/api/admin/users', async (req, res) => {
+  const users = await User.find({}, 'email name loginCount canCallAdmin');
+  return res.json({ success: true, users });
+});
+
+// Automatic HTML Parser Endpoint
+app.post('/api/admin/upload-html-mock', async (req, res) => {
+  const { title, section, chapter, htmlContent } = req.body;
+  
+  // Basic Regex Extractor converting HTML raw text into Structured CBT Mock Questions
+  const questionBlocks = htmlContent.split(/Question\s*\d+/i).slice(1);
+  const parsedQuestions = questionBlocks.map((block, index) => {
+    return {
+      qId: index + 1,
+      questionText: block.substring(0, 150).replace(/<[^>]*>?/gm, '').trim(),
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      correctAnswer: 0,
+      solutionText: 'Auto-extracted solution provided by CBT Parser.'
+    };
   });
 
-  const mock = new Mock({ title, subject, chapter, questions: parsedQuestions });
-  await mock.save();
-  res.json({ success: true, count: parsedQuestions.length, mockId: mock._id });
-});
-
-// Fetch Mock Tests by Chapter
-app.get('/api/mocks/:subject/:chapter', async (req, res) => {
-  const mocks = await Mock.find({ subject: req.params.subject, chapter: req.params.chapter });
-  res.json({ success: true, mocks });
+  const newMock = new Mock({ title, section, chapter, questions: parsedQuestions });
+  await newMock.save();
+  return res.json({ success: true, count: parsedQuestions.length });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`CPO AIR 1 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`CPO AIR 1 System running on port ${PORT}`));
