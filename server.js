@@ -5,13 +5,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Initialize NeDB database
+// In-Memory NeDB setup (prevents file system write errors on Render)
 const db = {};
-db.users = new Datastore({ filename: './database/users.db', autoload: true });
+db.users = new Datastore();
 
 let activeHeartbeats = {};
 
@@ -34,6 +33,8 @@ app.post('/api/register', (req, res) => {
     }
 
     db.users.findOne({ username }, (err, existingUser) => {
+        if (err) return res.status(500).json({ error: 'Database check error' });
+        
         if (existingUser) {
             return res.status(400).json({ error: 'User already exists' });
         }
@@ -48,8 +49,8 @@ app.post('/api/register', (req, res) => {
             registeredAt: new Date().toISOString()
         };
 
-        db.users.insert(newUser, (err, doc) => {
-            if (err) return res.status(500).json({ error: 'Database error' });
+        db.users.insert(newUser, (insertErr, doc) => {
+            if (insertErr) return res.status(500).json({ error: 'Database insert error' });
             res.json({ success: true, user: doc });
         });
     });
@@ -104,3 +105,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
