@@ -3,365 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPO AIR 1 - Official Portal</title>
+  <title>CPO AIR 1 - Mock Test Portal</title>
   <style>
-    :root { --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21; --accent: #0d6efd; }
-    body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #e4e6eb; --accent: #379683; }
-    body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); -webkit-user-select: none; }
+    :root { --bg: #f4f4f9; --text: #333; --card: #ffffff; --primary: #007bff; }
+    body.dark { --bg: #121212; --text: #e0e0e0; --card: #1e1e1e; --primary: #379683; }
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    header { background: #1b262c; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-container { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 22px; }
+    .police-badge { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffd700; background: #002b49; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .menu-dots { font-size: 24px; cursor: pointer; position: relative; }
+    .dropdown { display: none; position: absolute; right: 0; top: 35px; background: var(--card); color: var(--text); box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-radius: 5px; width: 220px; z-index: 1000; }
+    .dropdown button { width: 100%; text-align: left; background: none; border: none; padding: 12px; cursor: pointer; color: var(--text); border-bottom: 1px solid #ddd; }
     
-    /* Header Bar */
-    header { background: #1a233a; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-    .branding { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: 1px; color: #ffc107; }
-    .police-logo { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #ffc107; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #000; text-align: center; font-weight: bold; }
-    .three-dots { font-size: 24px; cursor: pointer; padding: 0 8px; }
+    .container { max-width: 800px; margin: 15px auto; padding: 10px; }
+    .card { background: var(--card); padding: 18px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+    input, select, textarea, button { width: 100%; padding: 10px; margin: 6px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button.btn-main { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
     
-    /* Dropdown Menu */
-    .dropdown { display: none; position: absolute; right: 10px; top: 50px; background: var(--card); color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 220px; z-index: 2000; }
-    .dropdown div { padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 14px; font-weight: 500; }
-    .dropdown div:hover { background: rgba(0,0,0,0.05); }
-
-    .main-wrapper { padding: 15px; margin-bottom: 75px; }
-    .card { background: var(--card); padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 15px; }
-    input, select, textarea, button { width: 100%; padding: 11px; margin: 6px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
-    button.btn-primary { background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1b262c; display: flex; justify-content: space-around; padding: 8px 0; z-index: 999; }
+    .bottom-nav button { background: none; border: none; color: white; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    .tab-content { display: none; margin-bottom: 60px; }
+    .tab-content.active { display: block; }
     
-    /* Bottom Navigation */
-    .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a233a; display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; }
-    .nav-item { color: #a0aec0; text-align: center; font-size: 11px; text-decoration: none; cursor: pointer; flex: 1; }
-    .nav-item.active { color: #ffc107; font-weight: bold; }
-    .nav-item span { font-size: 18px; display: block; margin-bottom: 2px; }
-
-    /* Palette Color Scheme */
-    .palette-btn { width: 35px; height: 35px; border: none; border-radius: 4px; font-weight: bold; margin: 3px; color: white; }
-    .green { background: #28a745; }
-    .red { background: #dc3545; }
-    .yellow { background: #ffc107; color: black; }
-    .purple { background: #6f42c1; }
-
-    .view-section { display: none; }
-    .view-section.active { display: block; }
+    .grid-challenge { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; font-size: 11px; text-align: center; }
+    .grid-challenge div { background: #e9ecef; padding: 6px 2px; border-radius: 3px; }
+    
+    /* Question Palette Colors */
+    .palette-btn { width: 30px; height: 30px; margin: 2px; border: none; font-weight: bold; color: white; border-radius: 3px; }
+    .q-green { background-color: #28a745; }
+    .q-red { background-color: #dc3545; }
+    .q-yellow { background-color: #ffc107; color: black; }
+    .q-purple { background-color: #6f42c1; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="branding">
-      <div class="police-logo">DP SI</div>
+    <div class="logo-container">
+      <div class="police-badge">👮‍♂️</div>
       <span>CPO AIR 1</span>
     </div>
-    <div class="three-dots" onclick="toggleDropdown()">&#8942;</div>
-    <div class="dropdown" id="topDropdown">
-      <div onclick="showPage('profileView')">1. Profile Settings</div>
-      <div onclick="showPage('targetView')">2. Daily Targets</div>
-      <div onclick="refreshApp()">3. Refresh Site</div>
-      <div onclick="toggleTheme()">4. Toggle Dark/Light</div>
-      <div onclick="showPage('pdfVaultView')">5. PDF & Video Vault</div>
-      <div onclick="logout()">6. Logout</div>
+    <div class="menu-dots" onclick="toggleDropdown()">
+      &#8942;
+      <div id="menuDropdown" class="dropdown">
+        <button onclick="openModal('profileModal')">1. Profile & Registration</button>
+        <button onclick="openModal('targetModal')">2. Target & Links</button>
+        <button onclick="location.reload()">3. Refresh Site</button>
+        <button onclick="toggleTheme()">4. Dark / Light Theme</button>
+        <button onclick="openModal('mediaModal')">5. PDFs & Video Player</button>
+        <button onclick="logout()">6. Logout</button>
+      </div>
     </div>
   </header>
 
-  <div class="main-wrapper">
+  <div class="container">
 
-    <!-- Auth / Login View -->
-    <div id="authCard" class="card">
+    <!-- Auth Card -->
+    <div class="card" id="authBox">
       <h2>Aspirant Portal Login</h2>
-      <input type="email" id="loginEmail" placeholder="Gmail Address" value="ajayraoshab751@gmail.com">
-      <input type="password" id="loginPassword" placeholder="Password" value="sunitadevi">
-      <input type="text" id="loginName" placeholder="Full Name" value="Ajay">
-      <button class="btn-primary" onclick="performLogin()">Login / Register</button>
-      <p style="text-align: right; font-size: 12px; color: var(--accent); cursor: pointer;" onclick="showForgotPassword()">Forgot Password?</p>
+      <input type="email" id="email" placeholder="Gmail Address" value="ajayraoshab751@gmail.com">
+      <input type="password" id="password" placeholder="Password" value="sunitadevi">
+      <input type="text" id="name" placeholder="Full Name" value="Ajay">
+      <button class="btn-main" onclick="handleAuth()">Login / Register</button>
     </div>
 
-    <!-- Admin Panel View -->
-    <div id="adminView" class="view-section">
-      <div class="card">
-        <h2>Admin Portal Control</h2>
-        
-        <h3>1. Specific Student Call Permissions</h3>
-        <select id="userCallList"></select>
-        <button class="btn-primary" onclick="toggleCallPermission(true)">Allow Call to Selected User</button>
-        <button class="btn-primary" style="background:#dc3545;" onclick="toggleCallPermission(false)">Revoke Call Permission</button>
+    <!-- Student App View -->
+    <div id="studentApp" style="display:none;">
 
-        <h3>2. Convert HTML/PDF File into CBT Mock</h3>
-        <input type="text" id="mockUploadTitle" placeholder="Mock Title (e.g. CPO Math Sectional #1)">
-        <select id="mockSubject">
-          <option value="math">Quantitative Aptitude</option>
-          <option value="reasoning">Reasoning</option>
-          <option value="gk">GK / GS</option>
-          <option value="english">English Language</option>
-        </select>
-        <input type="file" id="mockFile" accept=".html,.pdf,.txt">
-        <button class="btn-primary" onclick="uploadAndParseMock()">Convert & Publish CBT Mock</button>
-      </div>
-    </div>
+      <!-- Tab 1: TEST -->
+      <div id="testTab" class="tab-content active">
+        <div class="card">
+          <h3>Interactive CBT Mock Tests</h3>
+          <label>Select Subject:</label>
+          <select id="subjectSelect" onchange="populateChapters()">
+            <option value="">-- Choose Subject --</option>
+            <option value="math">Quantitative Aptitude</option>
+            <option value="reasoning">Reasoning</option>
+            <option value="gk">GK / GS & Current Affairs</option>
+            <option value="english">English Language</option>
+            <option value="full">Full Mock Test (CGL Tier-1 / Special)</option>
+          </select>
 
-    <!-- 1st Tab: TEST SECTION -->
-    <div id="testView" class="view-section active">
-      <div class="card">
-        <h2>Select Exam Section & Chapter</h2>
-        <select id="subjectDropdown" onchange="populateChapters()">
-          <option value="">-- Select Subject --</option>
-          <option value="math">Quantitative Aptitude</option>
-          <option value="reasoning">Reasoning</option>
-          <option value="gk">GK / GS & Current Affairs</option>
-          <option value="english">English Language</option>
-        </select>
+          <label>Select Chapter / Special Section:</label>
+          <select id="chapterSelect">
+            <option value="">-- Select Chapter --</option>
+          </select>
 
-        <select id="chapterDropdown">
-          <option value="">-- Choose Chapter --</option>
-        </select>
-
-        <button class="btn-primary" onclick="launchMockTest()">Start CBT Mock Test</button>
-      </div>
-    </div>
-
-    <!-- 2nd Tab: LEADERBOARD -->
-    <div id="leaderboardView" class="view-section">
-      <div class="card">
-        <h2>Live Leaderboard & Detailed Analytics</h2>
-        <p><strong>Your Current Rank:</strong> #1 (Winner)</p>
-        <p><strong>Performance Improvement:</strong> +22.5% this week</p>
-        <p><strong>Strong Section:</strong> Simplification, BODMAS, Algebra</p>
-        <p><strong>Weak Section:</strong> Geometry (Triangles & Circles)</p>
-      </div>
-    </div>
-
-    <!-- 3rd Tab: CHALLENGE TRACKER -->
-    <div id="challengeView" class="view-section">
-      <div class="card">
-        <h2>Challenge Attendance Tracker</h2>
-        <select id="challengeDays" onchange="renderChallengeGrid()">
-          <option value="100">100 Days Challenge (Max 3 Circles)</option>
-          <option value="60">60 Days Challenge (Max 2 Circles)</option>
-          <option value="30">30 Days Challenge (Max 1 Circle)</option>
-        </select>
-        <div id="challengeGrid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:6px; margin-top:10px;"></div>
-      </div>
-    </div>
-
-    <!-- 4th Tab: SAVED / WRONG QUESTIONS -->
-    <div id="savedView" class="view-section">
-      <div class="card">
-        <h2>Saved & Attempted Wrong Questions</h2>
-        <p><em>Questions are hidden by default. Click 'Attempt First' to reveal solutions.</em></p>
-        <button class="btn-primary" onclick="alert('Displaying saved bookmarks...')">Attempt First & View Answer</button>
-      </div>
-    </div>
-
-    <!-- 5th Tab: DOUBT GROUP -->
-    <div id="doubtView" class="view-section">
-      <div class="card">
-        <h2>Doubt Group & Google AI Assistant</h2>
-        <textarea placeholder="Write your question or paste prompt..."></textarea>
-        <input type="file" accept="image/*">
-        <button class="btn-primary" onclick="alert('Doubt submitted! Google AI is analyzing your solution...')">Send Question to AI & Admin</button>
-      </div>
-    </div>
-
-    <!-- Top Dropdown Views -->
-    <div id="profileView" class="view-section">
-      <div class="card">
-        <h2>Profile & Password Management</h2>
-        <p>Gmail: <span id="profEmail">ajayraoshab751@gmail.com</span></p>
-        <button class="btn-primary" onclick="showForgotPassword()">Change Password via Gmail OTP</button>
-      </div>
-    </div>
-
-    <div id="targetView" class="view-section">
-      <div class="card">
-        <h2>Daily Admin Target Post</h2>
-        <p>Target: Complete 200 Questions of CPO Math & Reasoning</p>
-        <div style="display:flex; gap:10px;">
-          <button class="btn-primary" onclick="alert('Marked Completed!')">👍 Completed</button>
-          <button class="btn-primary" style="background:#dc3545;" onclick="alert('Marked Incomplete!')">❌ Not Completed</button>
+          <button class="btn-main" onclick="startMock()">Start CBT Mock Test</button>
         </div>
       </div>
+
+      <!-- Tab 2: LEADERBOARD -->
+      <div id="leaderboardTab" class="tab-content">
+        <div class="card">
+          <h3>Leaderboard & Analytics</h3>
+          <p><strong>Your Rank:</strong> #1 (Winner)</p>
+          <p><strong>Performance Improvement:</strong> +15.2%</p>
+          <p><strong>Strongest Subject:</strong> Quantitative Aptitude</p>
+          <p><strong>Weakest Area:</strong> Geometry (Triangles)</p>
+        </div>
+      </div>
+
+      <!-- Tab 3: CHALLENGE -->
+      <div id="challengeTab" class="tab-content">
+        <div class="card">
+          <h3>Challenge Tracker</h3>
+          <select id="challengePlan" onchange="renderGrid()">
+            <option value="100">100 Days Challenge (Max 3 Circles)</option>
+            <option value="60">60 Days Challenge (Max 2 Circles)</option>
+            <option value="30">30 Days Challenge (Max 1 Circle)</option>
+          </select>
+          <div id="challengeContainer" class="grid-challenge" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <!-- Tab 4: SAVED & WRONG QUESTIONS -->
+      <div id="savedTab" class="tab-content">
+        <div class="card">
+          <h3>Saved & Incorrect Questions</h3>
+          <p>Attempt questions first before revealing the correct answer.</p>
+          <button class="btn-main" onclick="alert('Displaying saved Math questions...')">View Saved Math Questions</button>
+        </div>
+      </div>
+
+      <!-- Tab 5: DOUBT GROUP -->
+      <div id="doubtTab" class="tab-content">
+        <div class="card">
+          <h3>Doubt Resolution Group</h3>
+          <textarea placeholder="Type your doubt here..."></textarea>
+          <input type="file" accept="image/*">
+          <button class="btn-main" onclick="alert('Doubt sent to Google AI & Admin')">Submit Doubt</button>
+        </div>
+      </div>
+
     </div>
 
-    <div id="pdfVaultView" class="view-section">
+    <!-- Admin App View -->
+    <div id="adminApp" style="display:none;">
       <div class="card">
-        <h2>PDF & Video Vault</h2>
-        <p>Set Video Speed (1x - 4x): <input type="number" value="1.3" step="0.1" min="1" max="4" style="width:80px;"></p>
-        <p>Resolution: 
-          <select style="width:120px;">
-            <option>1080p</option><option>720p</option><option>480p</option><option>360p</option>
-          </select>
-        </p>
-        <button class="btn-primary" onclick="alert('Downloading content...')">Download File</button>
+        <h2>Admin Control Center</h2>
+
+        <h3>1. Specific User Call Controls & Login Tracker</h3>
+        <div id="userList">Loading registered aspirants...</div>
+
+        <h3>2. Upload & Auto-Convert Mock Test (HTML / PDF)</h3>
+        <input type="text" placeholder="Mock Test Title">
+        <input type="file" accept=".html,.pdf">
+        <button class="btn-main" onclick="alert('File automatically converted to CBT Mock Test format!')">Process & Publish Mock</button>
+
+        <h3>3. Specific Call Toggle</h3>
+        <button class="btn-main" style="background:#28a745;" id="callStatusBtn" onclick="toggleCallBtn()">Enable Direct Calls for Allowed Users</button>
       </div>
     </div>
 
   </div>
 
-  <!-- Bottom Navigation Bar -->
-  <div class="bottom-bar" id="bottomNav" style="display:none;">
-    <div class="nav-item active" onclick="setActiveNav(this, 'testView')"><span>📝</span>TEST</div>
-    <div class="nav-item" onclick="setActiveNav(this, 'leaderboardView')"><span>🏆</span>Leaderboard</div>
-    <div class="nav-item" onclick="setActiveNav(this, 'challengeView')"><span>🎯</span>Challenge</div>
-    <div class="nav-item" onclick="setActiveNav(this, 'savedView')"><span>🔖</span>Saved Qs</div>
-    <div class="nav-item" onclick="setActiveNav(this, 'doubtView')"><span>💬</span>Doubt</div>
+  <!-- Bottom Nav for Students -->
+  <nav class="bottom-nav" id="studentNav" style="display:none;">
+    <button onclick="showTab('testTab')"><span>📝</span>TEST</button>
+    <button onclick="showTab('leaderboardTab')"><span>🏆</span>Leaderboard</button>
+    <button onclick="showTab('challengeTab')"><span>🎯</span>Challenge</button>
+    <button onclick="showTab('savedTab')"><span>🔖</span>Saved Qs</button>
+    <button onclick="showTab('doubtTab')"><span>💬</span>Doubts</button>
+  </nav>
+
+  <!-- Modals -->
+  <div id="profileModal" class="card" style="display:none; position:fixed; top:20%; left:10%; right:10%; z-index:2000;">
+    <h3>Profile & Gmail OTP</h3>
+    <input type="email" id="pEmail" readonly>
+    <input type="text" id="pName">
+    <button class="btn-main" onclick="alert('OTP sent to Gmail for verification')">Update Email via OTP</button>
+    <button onclick="closeModal('profileModal')">Close</button>
+  </div>
+
+  <div id="targetModal" class="card" style="display:none; position:fixed; top:20%; left:10%; right:10%; z-index:2000;">
+    <h3>Daily Admin Targets</h3>
+    <p>Target: Score 160+ in CPO Mock Tests</p>
+    <div>
+      <label><input type="radio" name="t1"> Completed (👍)</label>
+      <label><input type="radio" name="t1"> Pending (❌)</label>
+    </div>
+    <button onclick="closeModal('targetModal')">Close</button>
+  </div>
+
+  <div id="mediaModal" class="card" style="display:none; position:fixed; top:15%; left:5%; right:5%; z-index:2000; max-height:80vh; overflow-y:auto;">
+    <h3>PDF & Video Vault</h3>
+    <p>Custom Playback Speed (1x - 4x):</p>
+    <input type="number" value="1.3" step="0.1" min="1" max="4">
+    <p>Select Quality:</p>
+    <select><option>360p</option><option>720p</option><option>1080p</option></select>
+    <button class="btn-main" onclick="alert('Downloading File...')">Download PDF / Video</button>
+    <button onclick="closeModal('mediaModal')">Close</button>
   </div>
 
   <script>
-    // Chapter List Dataset
-    const chapterData = {
-      math: [
-        "Divisibility, Unit digit, Remainders, LCM & HCF", "Simplification & BODMAS", "Percentage",
-        "Profit, Loss & Discount", "Ratio and Proportion", "Averages and Partnership",
-        "Mixture and Alligation", "Simple and Compound Interest", "Time and Work / Pipes and Cisterns",
-        "Time, Speed and Distance / Boats and Streams", "Algebra", "Geometry", "Mensuration", "Trigonometry", "Data Interpretation", "Statistics and Probability"
-      ],
-      reasoning: [
-        "Analogy", "Classification / Odd One Out", "Coding-Decoding", "Series Completion", "Missing Number / Matrix",
-        "Blood Relations", "Direction and Distance", "Order and Ranking", "Syllogism", "Venn Diagrams", "Clock and Calendar",
-        "Dice and Cube", "Mathematical Operations", "Statement and Conclusions", "Mirror and Water Images", "Paper Cutting and Folding"
-      ],
-      gk: [
-        "History: Ancient, Medieval & Modern India", "Indian Polity & Constitution", "Geography: Indian & World",
-        "Economy: Basic Concepts & Budget", "General Science: Physics, Chemistry & Biology", "Static GK & Current Affairs"
-      ],
-      english: [
-        "Parts of Speech & Subject-Verb Agreement", "Tenses & Conditionals", "Voice Change & Narration",
-        "Synonyms & Antonyms", "One-Word Substitutions (OWS)", "Idioms & Phrases", "Reading Comprehension & Cloze Test"
-      ]
+    const chapters = {
+      math: ["Number System", "Simplification & BODMAS", "Percentage", "Profit, Loss & Discount", "Ratio & Proportion", "Averages & Partnership", "Mixture & Alligation", "Simple & Compound Interest", "Time & Work", "Time, Speed & Distance", "Algebra", "Geometry", "Mensuration", "Trigonometry", "Data Interpretation", "Statistics & Probability"],
+      reasoning: ["Analogy", "Classification", "Coding-Decoding", "Series Completion", "Missing Number", "Blood Relations", "Direction & Distance", "Order & Ranking", "Syllogism", "Venn Diagrams", "Clock & Calendar", "Dice & Cube", "Mathematical Operations", "Statement & Conclusions", "Mirror & Water Images", "Paper Cutting", "Embedded Figures"],
+      gk: ["Ancient India", "Medieval India", "Modern India", "Indian Polity", "Geography", "Economy", "Physics", "Chemistry", "Biology", "Static GK", "Current Affairs"],
+      english: ["Parts of Speech", "Subject-Verb Agreement", "Tenses", "Voice Change", "Narration", "Articles", "Synonyms & Antonyms", "One-Word Substitutions", "Idioms & Phrases", "Spelling Errors", "Cloze Test", "Para Jumbles"],
+      full: ["Full Mock Test CGL Tier 1", "Rani Mam Special Mock", "Black Book OWS Test", "Black Book Idioms Test", "Calculation Speed Test", "Current Affairs Monthly"]
     };
 
-    // Mobile Back Button Handler (Prevents leaving site on back tap)
-    window.addEventListener('popstate', function (event) {
-      history.pushState({ page: 1 }, null, "");
-      showPage('testView');
-    });
-    history.pushState({ page: 1 }, null, "");
-
     function toggleDropdown() {
-      const el = document.getElementById('topDropdown');
-      el.style.display = el.style.display === 'block' ? 'none' : 'block';
+      const d = document.getElementById('menuDropdown');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      toggleDropdown();
+    function openModal(id) { document.getElementById(id).style.display = 'block'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function toggleTheme() { document.body.classList.toggle('dark'); }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
     }
 
-    function refreshApp() {
-      toggleDropdown();
-      showPage('testView');
-    }
+    async function handleAuth() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const name = document.getElementById('name').value;
 
-    function setActiveNav(element, targetView) {
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-      showPage(targetView);
-    }
-
-    function showPage(viewId) {
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-      if (document.getElementById('topDropdown').style.display === 'block') toggleDropdown();
-    }
-
-    async function performLogin() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const name = document.getElementById('loginName').value;
-
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name })
       });
+
       const data = await res.json();
-
       if (data.success) {
-        document.getElementById('authCard').style.display = 'none';
-        document.getElementById('bottomNav').style.display = 'flex';
-        showPage('testView');
-
-        if (data.user.isAdmin) {
-          showPage('adminView');
-          fetchUsersForAdmin();
+        document.getElementById('authBox').style.display = 'none';
+        if (data.isAdmin) {
+          document.getElementById('adminApp').style.display = 'block';
+          loadAdminData();
+        } else {
+          document.getElementById('studentApp').style.display = 'block';
+          document.getElementById('studentNav').style.display = 'flex';
+          document.getElementById('pEmail').value = data.user.email;
+          document.getElementById('pName').value = data.user.name;
+          renderGrid();
         }
       } else {
-        alert('Authentication failed: ' + data.message);
+        alert('Authentication failed.');
       }
     }
 
     function populateChapters() {
-      const subj = document.getElementById('subjectDropdown').value;
-      const chapDropdown = document.getElementById('chapterDropdown');
-      chapDropdown.innerHTML = '<option value="">-- Choose Chapter --</option>';
-
-      if (chapterData[subj]) {
-        chapterData[subj].forEach(chap => {
+      const subj = document.getElementById('subjectSelect').value;
+      const chapSel = document.getElementById('chapterSelect');
+      chapSel.innerHTML = '<option value="">-- Select Chapter --</option>';
+      if (chapters[subj]) {
+        chapters[subj].forEach(c => {
           const opt = document.createElement('option');
-          opt.value = chap;
-          opt.textContent = chap;
-          chapDropdown.appendChild(opt);
+          opt.value = c; opt.textContent = c;
+          chapSel.appendChild(opt);
         });
       }
     }
 
-    function renderChallengeGrid() {
-      const total = parseInt(document.getElementById('challengeDays').value);
-      const container = document.getElementById('challengeGrid');
+    function renderGrid() {
+      const days = parseInt(document.getElementById('challengePlan').value);
+      const container = document.getElementById('challengeContainer');
       container.innerHTML = '';
-      for (let i = 1; i <= total; i++) {
-        container.innerHTML += `<div style="background:#e9ecef; padding:5px; text-align:center; font-size:11px; border-radius:4px; color:#000;">D${i}<br><select style="padding:1px; font-size:10px;"><option>P</option><option>A</option></select></div>`;
+      for (let i = 1; i <= days; i++) {
+        const d = document.createElement('div');
+        d.innerHTML = `D${i}<br><select style="padding:0; font-size:9px;"><option>-</option><option>P</option><option>A</option></select>`;
+        container.appendChild(d);
       }
     }
 
-    async function fetchUsersForAdmin() {
+    async function loadAdminData() {
       const res = await fetch('/api/admin/users');
       const data = await res.json();
-      const sel = document.getElementById('userCallList');
-      sel.innerHTML = '';
-      data.users.forEach(u => {
-        sel.innerHTML += `<option value="${u.email}">${u.name} (${u.email}) - Logins: ${u.loginCount}</option>`;
-      });
+      const list = document.getElementById('userList');
+      if (data.users) {
+        list.innerHTML = data.users.map(u => `
+          <div style="border-bottom: 1px solid #ccc; padding: 8px 0;">
+            <p style="margin:2px 0;"><strong>${u.name}</strong> (${u.email})</p>
+            <p style="margin:2px 0; font-size: 12px;">Logins: ${u.loginCount} | Call Allowed: ${u.canCallAdmin ? 'YES' : 'NO'}</p>
+            <button style="width:auto; padding:4px 8px; font-size:12px;" onclick="toggleUserCall('${u.email}', ${!u.canCallAdmin})">
+              ${u.canCallAdmin ? 'Disable Call' : 'Enable Specific Call'}
+            </button>
+          </div>
+        `).join('');
+      }
     }
 
-    async function toggleCallPermission(allow) {
-      const email = document.getElementById('userCallList').value;
+    async function toggleUserCall(email, allow) {
       await fetch('/api/admin/toggle-user-call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, allow })
       });
-      alert(`Call permission set to ${allow} for ${email}`);
+      loadAdminData();
     }
 
-    function showForgotPassword() {
-      const email = prompt('Enter registered Gmail for Password Reset OTP:');
-      if (email) {
-        fetch('/api/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        }).then(r => r.json()).then(data => {
-          if (data.success) {
-            const otp = prompt('Enter 6-Digit OTP sent to Gmail (Valid for 5 mins):');
-            const newPassword = prompt('Enter New Password:');
-            fetch('/api/auth/reset-password', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, otp, newPassword })
-            }).then(r => r.json()).then(res => alert(res.message));
-          } else {
-            alert(data.message);
-          }
-        });
-      }
-    }
-
-    function launchMockTest() {
-      alert('Launching CBT Exam Interface! Allowed attempts: 10/10. Data auto-resumes if accidentally closed.');
+    function startMock() {
+      alert('Launching CBT Exam Interface... Attempt limit: 10 max. Automatic resume enabled.');
     }
 
     function logout() {
       location.reload();
     }
-
-    renderChallengeGrid();
   </script>
 </body>
 </html>
