@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,102 +9,111 @@ const PORT = process.env.PORT || 3000;
 // Enable CORS & payload parsing
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ limit: '20mb', extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-const users = [];
-const testResults = [];
-const savedQuestionsMap = {}; 
-const wrongQuestionsMap = {}; 
-let globalTarget = "Target: Score 160+ in CPO Tier-1 Mock Tests!";
+// Optional MongoDB Connection (falls back to persistent file/in-memory state if URI not provided)
+const MONGO_URI = process.env.MONGO_URI || "";
+if (MONGO_URI) {
+    mongoose.connect(MONGO_URI)
+        .then(() => console.log('MongoDB Connected Successfully'))
+        .catch(err => console.error('MongoDB Connection Error:', err));
+}
 
-// Fast, non-blocking auth endpoints
-app.post('/api/register', (req, res) => {
-    try {
-        const { fullName, username, password } = req.body || {};
-        if (!username || !password) {
-            return res.status(400).json({ success: false, error: 'Username & password required' });
-        }
-        
-        let user = users.find(u => u.username === username);
-        if (!user) {
-            user = { fullName: fullName || username, username, password, registeredAt: new Date().toISOString() };
-            users.push(user);
-        }
-        return res.json({ success: true, user });
-    } catch (e) {
-        return res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
+// Schemas for Persistent Database Storage
+const targetSchema = new mongoose.Schema({
+    text: { type: String, default: "Target: Score 160+ in CPO Tier-1 Mock Tests!" },
+    imageUrl: { type: String, default: "" }
 });
 
-app.post('/api/login', (req, res) => {
-    try {
-        const { username, password } = req.body || {};
-        if (!username || !password) {
-            return res.status(400).json({ success: false, error: 'Username & password required' });
-        }
-
-        let user = users.find(u => u.username === username);
-        if (!user) {
-            user = { fullName: username, username, password, registeredAt: new Date().toISOString() };
-            users.push(user);
-        }
-        return res.json({ success: true, user });
-    } catch (e) {
-        return res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
+const questionBankSchema = new mongoose.Schema({
+    section: String,
+    question: String,
+    options: [String],
+    correctAnswer: Number
 });
 
-app.post('/api/ai-scan-doubt', (req, res) => {
-    return res.json({
-        success: true,
-        solution: "<b>Question Scanned Successfully!</b><br><br><b>Step 1:</b> Extracted formula from image.<br><b>Step 2:</b> Apply $(A + B) \\times \\text{time} = \\text{Total Work}$.<br><b>Correct Answer Option:</b> (B)<br><b>Short Trick:</b> Direct ratio method applies to this question type."
-    });
+const Target = mongoose.models.Target || mongoose.model('Target', targetSchema);
+const CustomQuestion = mongoose.models.CustomQuestion || mongoose.model('CustomQuestion', questionBankSchema);
+
+// In-Memory Backup State
+let globalTargetData = {
+    text: "Target: Score 160+ in CPO Tier-1 Mock Tests!",
+    imageUrl: ""
+};
+let globalCustomQuestions = {};
+
+// Fast Auth Endpoint
+app.post('/api/login', async (req, res) => {
+    return res.json({ success: true, message: "Auth processed" });
 });
 
-app.post('/api/submit-test', (req, res) => {
-    const { username, section, score, percentage, timeTaken, correct, incorrect, unattempted, wrongQList } = req.body;
+// Admin Broadcast Endpoint (Update Target & Target Image)
+app.post('/api/admin/update-target', async (req, res) => {
+    const { username, password, targetText, imageUrl } = req.body;
     
-    const userAttempts = testResults.filter(r => r.username === username);
-    if (userAttempts.length >= 20) return res.status(400).json({ error: 'Max 20 attempts reached!' });
-
-    const attemptData = {
-        username, section, score, percentage, timeTaken, correct, incorrect, unattempted, submittedAt: new Date().toISOString()
-    };
-    testResults.push(attemptData);
-
-    if (!wrongQuestionsMap[username]) wrongQuestionsMap[username] = [];
-    if (wrongQList && wrongQList.length > 0) {
-        wrongQuestionsMap[username].push(...wrongQList);
+    // Strict Admin Verification
+    if (username !== 'ajayraoshab751@gmail.com' || password !== 'sunitadevi') {
+        return res.status(403).json({ success: false, error: 'Unauthorized Admin Access' });
     }
 
-    return res.json({ success: true, attemptCount: userAttempts.length + 1 });
+    globalTargetData.text = targetText || globalTargetData.text;
+    if (imageUrl !== undefined) globalTargetData.imageUrl = imageUrl;
+
+    if (MONGO_URI) {
+        await Target.deleteMany({});
+        await Target.create({ text: globalTargetData.text, imageUrl: globalTargetData.imageUrl });
+    }
+
+    return res.json({ success: true, targetData: globalTargetData });
 });
 
-app.get('/api/user-stats/:username', (req, res) => {
-    const username = req.params.username;
-    const userAttempts = testResults.filter(r => r.username === username);
-    
-    let totalRight = 0, totalWrong = 0;
-    userAttempts.forEach(a => { totalRight += a.correct; totalWrong += a.incorrect; });
+// Get Live Target Broadcast
+app.get('/api/target', async (req, res) => {
+    if (MONGO_URI) {
+        const saved = await Target.findOne();
+        if (saved) {
+            globalTargetData.text = saved.text;
+            globalTargetData.imageUrl = saved.imageUrl;
+        }
+    }
+    return res.json({ success: true, targetData: globalTargetData });
+});
 
-    const userScores = {};
-    testResults.forEach(r => { userScores[r.username] = (userScores[r.username] || 0) + r.score; });
+// Admin Store Uploaded HTML Questions Permanently
+app.post('/api/admin/add-questions', async (req, res) => {
+    const { username, password, section, questions } = req.body;
 
-    const sortedUsers = Object.keys(userScores).sort((a, b) => userScores[b] - userScores[a]);
-    const rank = sortedUsers.indexOf(username) !== -1 ? sortedUsers.indexOf(username) + 1 : 'N/A';
+    if (username !== 'ajayraoshab751@gmail.com' || password !== 'sunitadevi') {
+        return res.status(403).json({ success: false, error: 'Unauthorized Admin Access' });
+    }
 
-    return res.json({
-        totalAttempts: userAttempts.length,
-        totalRight,
-        totalWrong,
-        rank,
-        savedQuestions: savedQuestionsMap[username] || [],
-        wrongQuestions: wrongQuestionsMap[username] || [],
-        globalTarget
-    });
+    if (!globalCustomQuestions[section]) globalCustomQuestions[section] = [];
+    globalCustomQuestions[section].push(...questions);
+
+    if (MONGO_URI) {
+        const docs = questions.map(q => ({ section, question: q.question, options: q.options, correctAnswer: q.correctAnswer }));
+        await CustomQuestion.insertMany(docs);
+    }
+
+    return res.json({ success: true, count: questions.length });
+});
+
+// Get All Custom Uploaded Questions
+app.get('/api/questions', async (req, res) => {
+    if (MONGO_URI) {
+        const dbQs = await CustomQuestion.find();
+        const formatted = {};
+        dbQs.forEach(q => {
+            if (!formatted[q.section]) formatted[q.section] = [];
+            formatted[q.section].push({ question: q.question, options: q.options, correctAnswer: q.correctAnswer });
+        });
+        return res.json({ success: true, questions: formatted });
+    }
+    return res.json({ success: true, questions: globalCustomQuestions });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

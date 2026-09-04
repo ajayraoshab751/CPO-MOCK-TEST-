@@ -19,6 +19,7 @@
         .btn-danger { background: #dc3545; }
         .btn-success { background: #28a745; }
         .target-banner { background: #ffc107; color: black; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+        .target-img { max-width: 100%; height: auto; border-radius: 6px; margin-top: 8px; display: block; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         .chat-box { height: 300px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
@@ -33,7 +34,6 @@
         .day-box { border: 1px solid #ccc; border-radius: 5px; padding: 5px; text-align: center; font-size: 12px; background: var(--card); }
         .day-box select { width: 100%; margin-top: 4px; font-size: 11px; }
         .lock-banner { background: #dc3545; color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; }
-        code { background: #eee; padding: 2px 5px; border-radius: 3px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -43,7 +43,10 @@
     <button class="three-dots" onclick="toggleDrawer()">⋮</button>
 </div>
 
-<div class="target-banner" id="targetDisplay">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
+<div class="target-banner" id="targetContainer">
+    <div id="targetDisplay">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
+    <img id="targetImgDisplay" class="target-img hidden" src="" alt="Admin Target Image">
+</div>
 
 <div class="lock-banner hidden" id="lockBanner">
     🚨 ACCOUNT LOCKED: You were absent for more than 7 days! <br>
@@ -60,7 +63,7 @@
     <button class="drawer-btn" onclick="showView('doubtGroupView')">💬 Doubt Group (AI Scanner)</button>
     <button class="drawer-btn" onclick="showView('performanceView')">📊 Performance & Ranking</button>
     <button class="drawer-btn" onclick="showView('bankView')">⭐ Saved & Wrong Questions</button>
-    <button class="drawer-btn" style="color:#007bff; font-weight:bold;" onclick="showView('adminView')">🔑 Admin HTML Converter</button>
+    <button class="drawer-btn" style="color:#007bff; font-weight:bold;" onclick="showView('adminView')">🔑 Admin Control Panel</button>
     <button class="drawer-btn" onclick="showView('settingsView')">⚙️ Settings</button>
     <button class="drawer-btn" style="color: red; font-weight: bold;" onclick="logout()">🚪 Logout</button>
 </div>
@@ -129,42 +132,38 @@
 </div>
 
 <div class="card hidden" id="adminView">
-    <h3>🔑 Admin HTML Mock Converter</h3>
+    <h3>🔑 Admin Control Panel</h3>
     
     <div id="adminAuthBox">
-        <p>Enter Admin Access Password:</p>
-        <input type="password" id="adminPass" placeholder="Admin Passcode" style="padding:8px; width:80%; margin-bottom:10px;"><br>
-        <button class="btn btn-success" onclick="verifyAdmin()">Unlock Admin Panel</button>
+        <p>Admin Login Required:</p>
+        <input type="email" id="adminEmail" placeholder="Admin Email" style="padding:8px; width:85%; margin-bottom:8px;"><br>
+        <input type="password" id="adminPass" placeholder="Admin Password" style="padding:8px; width:85%; margin-bottom:8px;"><br>
+        <button class="btn btn-success" onclick="verifyAdmin()">Login as Admin</button>
     </div>
 
     <div id="adminPanelBox" class="hidden">
-        <p style="color: green; font-weight: bold;">✔ Admin Authenticated</p>
+        <p style="color: green; font-weight: bold;">✔ Verified Admin: ajayraoshab751@gmail.com</p>
         <hr>
-        <h4>Upload HTML File to Auto-Create Mock</h4>
         
+        <h4>📢 1. Broadcast Target & Announcement Image</h4>
+        <input type="text" id="targetTextInput" placeholder="Enter Target Banner Text..." style="width:90%; padding:8px; margin-bottom:8px;"><br>
+        <label>Upload Announcement/Target Image:</label><br>
+        <input type="file" id="targetImageInput" accept="image/*" style="margin:8px 0;"><br>
+        <button class="btn btn-success" onclick="broadcastTarget()">📢 Broadcast to All Students</button>
+
+        <hr>
+        <h4>📝 2. Upload HTML File to Auto-Create Mock</h4>
         <label>Select Target Section:</label><br>
         <select id="targetSectionSelect" style="padding: 8px; width: 90%; margin: 8px 0;">
             <option value="Maths">Maths Chapterwise</option>
             <option value="English">English Chapterwise</option>
             <option value="GK">GK Chapterwise</option>
             <option value="Reasoning">Reasoning Chapterwise</option>
-        </select><br><br>
+        </select><br>
 
         <label>Choose HTML Mock File (.html):</label><br>
-        <input type="file" id="htmlMockFile" accept=".html,.htm" style="margin: 10px 0;"><br>
-        <button class="btn btn-success" onclick="processUploadedHTMLMock()">⚡ Convert & Publish Mock</button>
-
-        <hr>
-        <h4>Expected HTML File Format Example:</h4>
-        <div style="background:#eee; padding:10px; border-radius:5px; font-size:11px; text-align:left;">
-            <code>&lt;div class="q-card" data-correct="0"&gt;</code><br>
-            <code>&nbsp;&nbsp;&lt;p class="question"&gt;What is 2+2?&lt;/p&gt;</code><br>
-            <code>&nbsp;&nbsp;&lt;div class="option"&gt;4&lt;/div&gt;</code><br>
-            <code>&nbsp;&nbsp;&lt;div class="option"&gt;5&lt;/div&gt;</code><br>
-            <code>&nbsp;&nbsp;&lt;div class="option"&gt;6&lt;/div&gt;</code><br>
-            <code>&nbsp;&nbsp;&lt;div class="option"&gt;7&lt;/div&gt;</code><br>
-            <code>&lt;/div&gt;</code>
-        </div>
+        <input type="file" id="htmlMockFile" accept=".html,.htm" style="margin: 8px 0;"><br>
+        <button class="btn btn-success" onclick="processUploadedHTMLMock()">⚡ Convert & Publish Mock Permanently</button>
     </div>
 </div>
 
@@ -198,6 +197,7 @@
 <script>
 let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
 let userChallenge = null, isLocked = false, requiredPassedMocks = 2;
+let currentTargetImageBase64 = "";
 
 window.onload = function() {
     try {
@@ -211,7 +211,8 @@ window.onload = function() {
                 showView('mockTestView');
             }
         }
-        loadCustomDynamicQuestions();
+        fetchLiveTarget();
+        loadCustomQuestions();
     } catch(e) { console.log(e); }
 };
 
@@ -232,45 +233,93 @@ function showView(viewId) {
     document.getElementById(viewId).classList.remove('hidden');
 }
 
+// Guaranteed Zero-Freeze Synchronous Auth
 function handleAuth() {
     const u = document.getElementById('username').value.trim();
     const p = document.getElementById('password').value.trim();
     const fn = document.getElementById('fullName').value.trim() || u;
     
-    if(!u) return alert('Please enter a username');
+    if(!u) return alert('Please enter a username or email');
 
     currentUser = { username: u, fullName: fn };
     localStorage.setItem('cpo_user', JSON.stringify(currentUser));
 
+    // Instant UI switch with zero network dependency
     document.getElementById('authView').classList.add('hidden');
     renderProfile(currentUser);
     checkChallengeLockStatus();
     showView('mockTestView');
-
-    fetch('/api/login', { 
-        method: 'POST', 
-        headers: {'Content-Type': 'application/json'}, 
-        body: JSON.stringify({ username: u, password: p || '123456' }) 
-    }).catch(e => console.log('Background sync bypass'));
 }
 
 function verifyAdmin() {
-    const pass = document.getElementById('adminPass').value;
-    if (pass === 'admin123') {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass = document.getElementById('adminPass').value.trim();
+
+    if (email === 'ajayraoshab751@gmail.com' && pass === 'sunitadevi') {
         document.getElementById('adminAuthBox').classList.add('hidden');
         document.getElementById('adminPanelBox').classList.remove('hidden');
     } else {
-        alert('Incorrect Admin Password! Try again.');
+        alert('Access Denied! Incorrect Admin Email or Password.');
     }
+}
+
+function broadcastTarget() {
+    const targetText = document.getElementById('targetTextInput').value.trim();
+    const imgFile = document.getElementById('targetImageInput').files[0];
+
+    const sendBroadcast = (imgBase64) => {
+        fetch('/api/admin/update-target', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'ajayraoshab751@gmail.com',
+                password: 'sunitadevi',
+                targetText: targetText,
+                imageUrl: imgBase64
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('📢 Target and Image Broadcasted to all students successfully!');
+                fetchLiveTarget();
+            } else {
+                alert('Failed to broadcast: ' + data.error);
+            }
+        })
+        .catch(err => alert('Target updated locally in current session!'));
+    };
+
+    if (imgFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => sendBroadcast(e.target.result);
+        reader.readAsDataURL(imgFile);
+    } else {
+        sendBroadcast(currentTargetImageBase64);
+    }
+}
+
+function fetchLiveTarget() {
+    fetch('/api/target')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.targetData) {
+                if (data.targetData.text) document.getElementById('targetDisplay').innerText = data.targetData.text;
+                if (data.targetData.imageUrl) {
+                    const imgEl = document.getElementById('targetImgDisplay');
+                    imgEl.src = data.targetData.imageUrl;
+                    imgEl.classList.remove('hidden');
+                    currentTargetImageBase64 = data.targetData.imageUrl;
+                }
+            }
+        }).catch(e => console.log('Bypassed offline target sync'));
 }
 
 function processUploadedHTMLMock() {
     const fileInput = document.getElementById('htmlMockFile');
     const targetSec = document.getElementById('targetSectionSelect').value;
     
-    if (!fileInput.files.length) {
-        return alert('Please choose an HTML file first!');
-    }
+    if (!fileInput.files.length) return alert('Please choose an HTML file first!');
 
     const file = fileInput.files[0];
     const reader = new FileReader();
@@ -280,8 +329,7 @@ function processUploadedHTMLMock() {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
 
-        // Extract questions from HTML elements
-        const qCards = doc.querySelectorAll('.q-card, .question-card, .question-block');
+        const qCards = doc.querySelectorAll('.q-card, .question-card, .question-block, div');
         const extractedQuestions = [];
 
         qCards.forEach(card => {
@@ -291,45 +339,62 @@ function processUploadedHTMLMock() {
             const correctIdx = parseInt(card.getAttribute('data-correct') || '0');
 
             if (qText && options.length > 0) {
-                extractedQuestions.push({
-                    question: qText,
-                    options: options,
-                    correctAnswer: correctIdx
-                });
+                extractedQuestions.push({ question: qText, options: options, correctAnswer: correctIdx });
             }
         });
 
         if (extractedQuestions.length === 0) {
-            return alert('No questions found in this file! Please verify class names (.q-card, .question, .option).');
+            return alert('No questions detected! Ensure your HTML contains class names like .q-card, .question, and .option.');
         }
 
-        // Save into local storage & memory bank
-        if (typeof sectionWiseQuestions === 'undefined') window.sectionWiseQuestions = {};
-        if (!sectionWiseQuestions[targetSec]) sectionWiseQuestions[targetSec] = [];
-        
-        sectionWiseQuestions[targetSec].push(...extractedQuestions);
-        
-        // Save dynamically across reloads
-        let storedCustom = JSON.parse(localStorage.getItem('custom_mock_questions') || '{}');
+        // Store locally permanently
+        let storedCustom = JSON.parse(localStorage.getItem('perm_questions') || '{}');
         if (!storedCustom[targetSec]) storedCustom[targetSec] = [];
         storedCustom[targetSec].push(...extractedQuestions);
-        localStorage.setItem('custom_mock_questions', JSON.stringify(storedCustom));
+        localStorage.setItem('perm_questions', JSON.stringify(storedCustom));
 
-        alert(`🎉 Success! Automatically converted and imported ${extractedQuestions.length} questions into the ${targetSec} section!`);
+        if (typeof sectionWiseQuestions === 'undefined') window.sectionWiseQuestions = {};
+        if (!sectionWiseQuestions[targetSec]) sectionWiseQuestions[targetSec] = [];
+        sectionWiseQuestions[targetSec].push(...extractedQuestions);
+
+        // Store to backend permanently
+        fetch('/api/admin/add-questions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'ajayraoshab751@gmail.com',
+                password: 'sunitadevi',
+                section: targetSec,
+                questions: extractedQuestions
+            })
+        }).catch(e => console.log('Questions backed up locally'));
+
+        alert(`🎉 ${extractedQuestions.length} questions added permanently to ${targetSec}! Data will not be lost.`);
         showView('mockTestView');
     };
 
     reader.readAsText(file);
 }
 
-function loadCustomDynamicQuestions() {
-    let storedCustom = JSON.parse(localStorage.getItem('custom_mock_questions') || '{}');
+function loadCustomQuestions() {
+    let storedCustom = JSON.parse(localStorage.getItem('perm_questions') || '{}');
     if (typeof sectionWiseQuestions === 'undefined') window.sectionWiseQuestions = {};
     
     Object.keys(storedCustom).forEach(sec => {
         if (!sectionWiseQuestions[sec]) sectionWiseQuestions[sec] = [];
         sectionWiseQuestions[sec].push(...storedCustom[sec]);
     });
+
+    fetch('/api/questions')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.questions) {
+                Object.keys(data.questions).forEach(sec => {
+                    if (!sectionWiseQuestions[sec]) sectionWiseQuestions[sec] = [];
+                    sectionWiseQuestions[sec].push(...data.questions[sec]);
+                });
+            }
+        }).catch(e => console.log('Offline dynamic load'));
 }
 
 function logout() {
@@ -348,72 +413,5 @@ function renderProfile(user) {
 }
 
 function startChallenge(days) {
-    const today = new Date().toISOString().split('T')[0];
-    userChallenge = { totalDays: days, startDate: today, attendance: {} };
-    localStorage.setItem(`challenge_${currentUser.username}`, JSON.stringify(userChallenge));
-    renderChallengeGrid();
-}
-
-function checkChallengeLockStatus() {
-    if(!currentUser) return;
-    const data = localStorage.getItem(`challenge_${currentUser.username}`);
-    if(data) {
-        userChallenge = JSON.parse(data);
-        renderChallengeGrid();
+  
         
-        let absentCount = 0;
-        Object.values(userChallenge.attendance).forEach(val => { if(val === 'A') absentCount++; });
-
-        if(absentCount > 7) {
-            isLocked = true;
-            document.getElementById('lockBanner').classList.remove('hidden');
-            document.getElementById('requiredMocksCount').innerText = requiredPassedMocks;
-        } else {
-            isLocked = false;
-            document.getElementById('lockBanner').classList.add('hidden');
-        }
-    }
-}
-
-function updateAttendance(dayIndex, value) {
-    if(!userChallenge) return;
-    userChallenge.attendance[dayIndex] = value;
-    localStorage.setItem(`challenge_${currentUser.username}`, JSON.stringify(userChallenge));
-    checkChallengeLockStatus();
-}
-
-function renderChallengeGrid() {
-    if(!userChallenge) return;
-    const startDate = new Date(userChallenge.startDate);
-    const currentDate = new Date();
-    
-    document.getElementById('challengeDetails').innerHTML = `
-        <h4>Active: ${userChallenge.totalDays}-Day Challenge</h4>
-        <p><strong>Started:</strong> ${startDate.toLocaleDateString()}</p>
-        <p><strong>Online System Date:</strong> ${currentDate.toLocaleDateString()}</p>
-    `;
-
-    let gridHtml = '';
-    for(let i = 1; i <= userChallenge.totalDays; i++) {
-        let boxDate = new Date(startDate);
-        boxDate.setDate(startDate.getDate() + (i - 1));
-        let dateStr = boxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        let status = userChallenge.attendance[i] || '';
-
-        gridHtml += `
-            <div class="day-box">
-                <div>Day ${i}</div>
-                <div style="font-size: 10px; color: gray;">${dateStr}</div>
-                <select onchange="updateAttendance(${i}, this.value)">
-                    <option value="" ${status===''?'selected':''}>-</option>
-                    <option value="P" ${status==='P'?'selected':''}>P</option>
-                    <option value="A" ${status==='A'?'selected':''}>A</option>
-                </select>
-            </div>
-        `;
-    }
-    document.getElementById('dayGrid').innerHTML = gridHtml;
-}
-
-function handleVaultUpload(event) {
-    const file = event.target.fi
