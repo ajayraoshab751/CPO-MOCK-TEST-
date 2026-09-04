@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPO MOCK TEST</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; color: #1a1a1a; }
+        .hidden { display: none !important; }
+
+        /* Header Bar */
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #ddd; }
+        .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; color: #1e3c72; }
+
+        /* Auth Screen */
+        .auth-container { max-width: 400px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .auth-container input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-blue { background: #1a73e8; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; }
+
+        /* Dashboard */
+        .container { max-width: 800px; margin: 20px auto; padding: 16px; }
+        .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-start { background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* Instructions Screen */
+        .instructions-box { background: #fff; padding: 20px; border-radius: 8px; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; }
+        .instructions-box h2 { font-size: 18px; margin-bottom: 12px; }
+        .instructions-box ul { margin-left: 20px; margin-bottom: 16px; font-size: 14px; line-height: 1.6; }
+
+        /* Test Portal Interface */
+        .test-header { background: #002d62; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .test-body { display: flex; flex-direction: column; min-height: calc(100vh - 60px); }
+        .question-box { background: #fff; padding: 20px; flex: 1; }
+        .option-item { border: 1px solid #ddd; padding: 12px; border-radius: 6px; margin: 10px 0; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .option-item.selected { background: #e8f0fe; border-color: #1a73e8; font-weight: bold; }
+        .test-controls { background: #f1f3f4; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #ccc; }
+        .btn-control { padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-save { background: #1a73e8; color: white; }
+        .btn-review { background: #fbbc04; color: black; }
+
+        /* Stats Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; }
+        .modal-card { background: white; width: 320px; padding: 20px; border-radius: 8px; text-align: center; }
+        .modal-card table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+        .modal-card td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <!-- App Header -->
+    <div class="app-header">
+        <div class="brand">🎯 CPO MOCK TEST</div>
+        <div id="userDisplay" style="font-size: 13px;"></div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="authSection" class="auth-container">
+        <h3 style="margin-bottom: 12px;">Login / Register</h3>
+        <input type="email" id="emailInput" placeholder="Email Address">
+        <input type="password" id="passInput" placeholder="Password">
+        <button class="btn-blue" onclick="login()">Login</button>
+        <button class="btn-blue" style="background:#555;" onclick="register()">Register Account</button>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="container hidden">
+        <h3 style="margin-bottom: 16px;">Available Tests</h3>
+        <div id="testList"></div>
+
+        <h3 style="margin-top: 24px; margin-bottom: 12px;">Your History</h3>
+        <div id="historyList"></div>
+    </div>
+
+    <!-- Instructions Page -->
+    <div id="instructionScreen" class="instructions-box hidden">
+        <h2 id="instTitle">Test Instructions</h2>
+        <ul>
+            <li>Total Time: 15 Minutes</li>
+            <li>Each correct answer awards 2 marks.</li>
+            <li>Each wrong answer deducts 0.5 marks (-0.5 negative marking).</li>
+            <li>Click <strong>Save & Next</strong> to save your response before proceeding.</li>
+        </ul>
+        <label style="font-size: 13px; display: block; margin-bottom: 16px;">
+            <input type="checkbox" id="declarationCheck"> I have read all instructions carefully.
+        </label>
+        <button class="btn-blue" onclick="startTestActual()">I am ready to begin</button>
+    </div>
+
+    <!-- Test Interface -->
+    <div id="testPortal" class="hidden">
+        <div class="test-header">
+            <span id="portalTestTitle" style="font-weight: bold;">CPO Test</span>
+            <div style="background: #28a745; padding: 4px 8px; border-radius: 4px; font-weight: bold;" id="timerDisplay">15:00</div>
+        </div>
+        <div class="test-body">
+            <div class="question-box">
+                <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Question <span id="qNum">1</span></div>
+                <h4 id="questionText" style="margin-bottom: 16px;">Question text...</h4>
+                <div id="optionsContainer"></div>
+            </div>
+            <div class="test-controls">
+                <button class="btn-control btn-review" onclick="nextQuestion()">Mark Review</button>
+                <button class="btn-control btn-save" onclick="nextQuestion()">Save & Next</button>
+                <button class="btn-control" style="background: #dc3545; color: white; margin-left: auto;" onclick="finishTest()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statsModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>STATISTICS</h3>
+            <table>
+                <tr><td>Total Questions</td><td id="statTotal">0</td></tr>
+                <tr><td>Answered</td><td id="statAnswered">0</td></tr>
+                <tr><td>Final Score</td><td id="statScore">0</td></tr>
+            </table>
+            <button class="btn-blue" onclick="closeModal()">Close & Return</button>
+        </div>
+    </div>
+
+    <script>
+        const ALL_MOCK_TESTS = [
+            {
+                id: "cpo_math_1",
+                title: "SSC CPO Maths Chapterwise Test",
+                durationMinutes: 15,
+                questions: [
+                    {
+                        question: "In an election between two candidates, 87% of registered voters cast their vote. The winning candidate got 52% of valid votes and won by 1653 votes. How many voters were registered?",
+                        options: ["50001", "50003", "50000", "49998"],
+                        correctIndex: 2
+                    },
+                    {
+                        question: "If manufacturer gains 10%, wholesale gains 15% and retailer gains 25%, find the cost price if retail price is ₹31,900.",
+                        options: ["23,200", "22,000", "20,173", "25,000"],
+                        correctIndex: 1
+                    }
+                ]
+            }
+        ];
+
+        let activeTest = null, currentQIndex = 0, userAnswers = {}, timerInterval = null, secondsLeft = 0;
+
+        async function register() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passInput').value;
+            const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await res.json(); alert(data.message || data.error);
+        }
+
+        async function login() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passInput').value;
+            const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            if (res.ok) { showDashboard(email); } else { alert("Invalid credentials"); }
+        }
+
+        function showDashboard(email) {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('userDisplay').innerText = email;
+            
+            const list = document.getElementById('testList');
+            list.innerHTML = ALL_MOCK_TESTS.map(t => `
+                <div class="card">
+                    <div><strong>${t.title}</strong><div style="font-size:12px; color:#666;">${t.questions.length} Questions | ${t.durationMinutes} Mins</div></div>
+                    <button class="btn-start" onclick="openInstructions('${t.id}')">Start Test</button>
+                </div>
+            `).join('');
+            loadHistory();
+        }
+
+        function openInstructions(testId) {
+            activeTest = ALL_MOCK_TESTS.find(t => t.id === testId);
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('instructionScreen').classList.remove('hidden');
+            document.getElementById('instTitle').innerText = activeTest.title;
+        }
+
+        function startTestActual() {
+            if (!document.getElementById('declarationCheck').checked) {
+                alert("Please agree to the instructions declaration checkbox."); return;
+            }
+            document.getElementById('instructionScreen').classList.add('hidden');
+            document.getElementById('testPortal').classList.remove('hidden');
+            document.getElementById('portalTestTitle').innerText = activeTest.title;
+            
+            currentQIndex = 0; userAnswers = {};
+            secondsLeft = activeTest.durationMinutes * 60;
+            startTimer();
+            renderQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                let m = Math.floor(secondsLeft / 60), s = secondsLeft % 60;
+                document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (secondsLeft <= 0) { clearInterval(timerInterval); finishTest(); }
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            const q = activeTest.questions[currentQIndex];
+            document.getElementById('qNum').innerText = currentQIndex + 1;
+            document.getElementById('questionText').innerText = q.question;
+            
+            const opts = document.getElementById('optionsContainer');
+            opts.innerHTML = q.options.map((opt, i) => `
+                <div class="option-item ${userAnswers[currentQIndex] === i ? 'selected' : ''}" onclick="selectAnswer(${i})">
+                    <input type="radio" ${userAnswers[currentQIndex] === i ? 'checked' : ''}> ${opt}
+                </div>
+            `).join('');
+        }
+
+        function selectAnswer(index) {
+            userAnswers[currentQIndex] = index;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQIndex < activeTest.questions.length - 1) {
+                currentQIndex++; renderQuestion();
+            } else {
+                finishTest();
+            }
+        }
+
+        async function finishTest() {
+            clearInterval(timerInterval);
+            let answered = Object.keys(userAnswers).length;
+            let score = 0;
+            
+            activeTest.questions.forEach((q, i) => {
+                if (userAnswers[i] === q.correctIndex) score += 2;
+                else if (userAnswers[i] !== undefined) score -= 0.5;
+            });
+
+            await fetch('/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ testTitle: activeTest.title, score: score, totalQuestions: activeTest.questions.length })
+            });
+
+            document.getElementById('statTotal').innerText = activeTest.questions.length;
+            document.getElementById('statAnswered').innerText = answered;
+            document.getElementById('statScore').innerText = score;
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('statsModal').classList.add('hidden');
+            document.getElementById('testPortal').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            loadHistory();
+        }
+
+        async function loadHistory() {
+            const res = await fetch('/api/scores');
+            if (res.ok) {
+                const scores = await res.json();
+                document.getElementById('historyList').innerHTML = scores.map(s => `
+                    <div style="background:#fff; padding:10px; border-radius:6px; margin-bottom:6px; font-size:12px; border:1px solid #ddd;">
+                        <strong>${s.testTitle}</strong> — Score: ${s.score} | Date: ${new Date(s.date).toLocaleDateString()}
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
