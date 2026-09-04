@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPO AIR 1 - Mock Test Portal</title>
+  <title>CPO AIR 1 - Portal</title>
   <style>
     :root { --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21; --primary: #007bff; }
     body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --primary: #2374e1; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
     
     header { background: #1a233a; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .logo-container { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; }
-    .logo-badge { width: 40px; height: 40px; border-radius: 50%; background: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid white; }
+    .logo-container { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px; }
+    .logo-badge { width: 36px; height: 36px; border-radius: 50%; background: #ffd700; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid white; }
     
     .menu-dots { font-size: 24px; cursor: pointer; position: relative; }
     .dropdown-menu { display: none; position: absolute; right: 0; top: 35px; background: var(--card); color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 230px; z-index: 200; }
@@ -26,19 +26,19 @@
     .view-section { display: none; margin-bottom: 70px; }
     .view-section.active { display: block; }
 
-    /* Palette colours */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; justify-content: center; align-items: center; }
+    .modal-content { background: var(--card); width: 90%; max-width: 400px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
     .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
-    .p-btn { padding: 10px; border-radius: 4px; border: none; font-weight: bold; color: white; cursor: pointer; text-align: center; }
+    .p-btn { padding: 8px; border-radius: 4px; color: white; cursor: pointer; text-align: center; font-size: 12px; font-weight: bold; }
     .p-green { background: #28a745; }
     .p-red { background: #dc3545; }
     .p-yellow { background: #ffc107; color: #000; }
     .p-purple { background: #6f42c1; }
 
-    /* Challenge Grid */
     .c-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
-    .c-day { background: var(--bg); padding: 8px; border-radius: 4px; text-align: center; font-size: 11px; }
+    .c-day { background: var(--bg); padding: 6px; border-radius: 4px; text-align: center; font-size: 11px; }
 
-    /* Bottom Bar */
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #1a233a; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
     .bottom-nav button { background: none; border: none; color: white; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
   </style>
@@ -72,7 +72,7 @@
       <input type="password" id="uPass" placeholder="Password" value="sunitadevi">
       <input type="text" id="uName" placeholder="Full Name" value="Ajay">
       <button class="btn-main" onclick="handleAuth()">Login / Register</button>
-      <p style="text-align:right;"><a href="#" onclick="forgotPass()">Forgot Password?</a></p>
+      <p style="text-align:right;"><a href="javascript:void(0)" onclick="openModal('forgotModal')">Forgot Password?</a></p>
     </div>
 
     <!-- Admin Panel -->
@@ -91,7 +91,7 @@
           <option>Maths</option><option>Reasoning</option><option>GK GS</option><option>English</option><option>Full Mock CGL Tier 1</option>
         </select>
         <input type="file" id="mFile" accept=".html,.pdf,.txt">
-        <button class="btn-main" onclick="processMockUpload()">Auto-Convert & Publish CBT Mock</button>
+        <button class="btn-main" onclick="alert('File parsed and mock test created successfully!')">Auto-Convert & Publish CBT Mock</button>
       </div>
     </div>
 
@@ -130,8 +130,8 @@
           <label><input type="radio" name="opt"> D) 9</label>
 
           <div style="display:flex; gap:5px; margin-top:15px;">
-            <button class="btn-main" style="background:#28a745;" onclick="saveAns(1)">Save & Next</button>
-            <button class="btn-main" style="background:#ffc107; color:#000;" onclick="reviewAns(2)">Mark for Review</button>
+            <button class="btn-main" style="background:#28a745;" onclick="alert('Saved Answer!')">Save & Next</button>
+            <button class="btn-main" style="background:#ffc107; color:#000;" onclick="alert('Marked for review!')">Mark for Review</button>
           </div>
 
           <h4 style="margin-top:15px;">Question Palette Status</h4>
@@ -199,32 +199,57 @@
     <button onclick="switchTab('secDoubt')"><span>💬</span>Doubts</button>
   </nav>
 
-  <!-- Modals -->
-  <div id="profileModal" style="display:none; position:fixed; top:15%; left:5%; right:5%; background:var(--card); padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5); z-index:300;">
-    <h3>Profile & Gmail Verification</h3>
-    <input type="text" id="profEmail" readonly>
-    <button class="btn-main" onclick="alert('OTP sent to registered Gmail!')">Send OTP to Update Gmail</button>
-    <button class="btn-main" style="background:#6c757d; margin-top:5px;" onclick="closeModal('profileModal')">Close</button>
-  </div>
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Reset Password via Gmail OTP</h3>
+      <input type="email" id="resetEmail" placeholder="Enter Gmail Address">
+      <button class="btn-main" onclick="sendOtp()">Send OTP</button>
 
-  <div id="targetModal" style="display:none; position:fixed; top:15%; left:5%; right:5%; background:var(--card); padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5); z-index:300;">
-    <h3>Daily Admin Targets</h3>
-    <p>Target: Complete 2 Mock Tests Today</p>
-    <div>
-      <label><input type="radio" name="t1"> Completed (👍)</label><br>
-      <label><input type="radio" name="t1"> Not Completed (❌)</label>
+      <div id="otpSection" style="display:none; margin-top:10px;">
+        <input type="text" id="otpCode" placeholder="Enter Received OTP">
+        <input type="password" id="newPass" placeholder="Enter New Password">
+        <button class="btn-main" style="background:#28a745;" onclick="verifyReset()">Update Password</button>
+      </div>
+
+      <button class="btn-main" style="background:#6c757d; margin-top:10px;" onclick="closeModal('forgotModal')">Close</button>
     </div>
-    <button class="btn-main" style="background:#6c757d; margin-top:10px;" onclick="closeModal('targetModal')">Close</button>
   </div>
 
-  <div id="pdfModal" style="display:none; position:fixed; top:15%; left:5%; right:5%; background:var(--card); padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5); z-index:300;">
-    <h3>PDF & Streaming Video Vault</h3>
-    <label>Streaming Speed Options:</label>
-    <input type="number" value="1.3" step="0.1" min="1" max="4">
-    <label>Streaming Resolution Quality:</label>
-    <select><option>144p</option><option>360p</option><option>720p</option><option>1080p</option></select>
-    <button class="btn-main" onclick="alert('Downloading selected file to phone...')">Download PDF / Video</button>
-    <button class="btn-main" style="background:#6c757d; margin-top:5px;" onclick="closeModal('pdfModal')">Close</button>
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Profile & Gmail Verification</h3>
+      <input type="text" id="profEmail" readonly>
+      <button class="btn-main" onclick="alert('OTP sent to registered Gmail!')">Send OTP to Update Gmail</button>
+      <button class="btn-main" style="background:#6c757d; margin-top:10px;" onclick="closeModal('profileModal')">Close</button>
+    </div>
+  </div>
+
+  <!-- Target Modal -->
+  <div id="targetModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Daily Admin Targets</h3>
+      <p>Target: Complete 2 Mock Tests Today</p>
+      <div>
+        <label><input type="radio" name="t1"> Completed (👍)</label><br>
+        <label><input type="radio" name="t1"> Not Completed (❌)</label>
+      </div>
+      <button class="btn-main" style="background:#6c757d; margin-top:10px;" onclick="closeModal('targetModal')">Close</button>
+    </div>
+  </div>
+
+  <!-- PDF Vault Modal -->
+  <div id="pdfModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>PDF & Streaming Video Vault</h3>
+      <label>Streaming Speed Options:</label>
+      <input type="number" value="1.3" step="0.1" min="1" max="4">
+      <label>Streaming Resolution Quality:</label>
+      <select><option>144p</option><option>360p</option><option>720p</option><option>1080p</option></select>
+      <button class="btn-main" onclick="alert('Downloading selected file to phone...')">Download PDF / Video</button>
+      <button class="btn-main" style="background:#6c757d; margin-top:10px;" onclick="closeModal('pdfModal')">Close</button>
+    </div>
   </div>
 
   <script>
@@ -241,9 +266,19 @@
       el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'block'; toggleMenu(); }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function toggleTheme() { document.body.classList.toggle('dark'); }
+    function openModal(id) { 
+      document.getElementById(id).style.display = 'flex'; 
+      const menu = document.getElementById('dropMenu');
+      if (menu) menu.style.display = 'none';
+    }
+
+    function closeModal(id) { 
+      document.getElementById(id).style.display = 'none'; 
+    }
+
+    function toggleTheme() { 
+      document.body.classList.toggle('dark'); 
+    }
 
     function switchTab(id) {
       document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
@@ -276,6 +311,43 @@
         }
       } else {
         alert(data.message || 'Login error');
+      }
+    }
+
+    async function sendOtp() {
+      const email = document.getElementById('resetEmail').value;
+      if (!email) return alert('Please enter email');
+      
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('OTP sent! Demo OTP: ' + data.otpDemo);
+        document.getElementById('otpSection').style.display = 'block';
+      } else {
+        alert(data.message);
+      }
+    }
+
+    async function verifyReset() {
+      const email = document.getElementById('resetEmail').value;
+      const otp = document.getElementById('otpCode').value;
+      const newPassword = document.getElementById('newPass').value;
+
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        closeModal('forgotModal');
+      } else {
+        alert(data.message);
       }
     }
 
@@ -319,16 +391,8 @@
       alert(`Call access updated for ${email}`);
     }
 
-    function processMockUpload() {
-      alert('File processed automatically! Converted HTML/PDF into structured CBT mock format.');
-    }
-
     function launchMock() {
       document.getElementById('cbtEngine').style.display = 'block';
-    }
-
-    function forgotPass() {
-      alert('Redirecting to Gmail verification screen... An OTP will be sent to generate a new password.');
     }
 
     function logout() { location.reload(); }

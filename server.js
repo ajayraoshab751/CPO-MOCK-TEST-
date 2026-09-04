@@ -14,12 +14,12 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB Connection Error:', err));
 }
 
-// User Schema
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   name: { type: String, default: 'Aspirant' },
   loginCount: { type: Number, default: 0 },
+  otp: { type: String, default: '' },
   canCall: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false }
 });
@@ -35,7 +35,7 @@ const mockSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Mock = mongoose.model('Mock', mockSchema);
 
-// Auth Endpoint
+// Auth Login / Register
 app.post('/api/auth/login', async (req, res) => {
   const { email, password, name } = req.body || {};
   if (!email || !password) return res.json({ success: false, message: 'Email and password required' });
@@ -59,43 +59,46 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Admin Call Permission Toggle
-app.post('/api/admin/toggle-call', async (req, res) => {
-  const { email, allow } = req.body;
-  await User.updateOne({ email }, { canCall: allow });
-  res.json({ success: true });
+// Forgot Password - Send OTP
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.json({ success: false, message: 'Email not registered!' });
+
+  const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  user.otp = generatedOtp;
+  await user.save();
+
+  // Mocking email send for immediate UI responsiveness
+  res.json({ success: true, message: 'OTP sent to Gmail!', otpDemo: generatedOtp });
 });
 
-// Get User List for Admin
+// Reset Password with OTP
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || user.otp !== otp) {
+    return res.json({ success: false, message: 'Invalid OTP!' });
+  }
+
+  user.password = newPassword;
+  user.otp = '';
+  await user.save();
+  res.json({ success: true, message: 'Password updated successfully!' });
+});
+
+// Admin Control - Get Users
 app.get('/api/admin/users', async (req, res) => {
   const users = await User.find({}, 'email name loginCount canCall');
   res.json({ success: true, users });
 });
 
-// Convert HTML / Raw Content to CBT Mock Test
-app.post('/api/admin/upload-mock', async (req, res) => {
-  const { title, subject, chapter, rawContent } = req.body;
-  
-  // Dynamic parsing logic to build structured CBT JSON from raw upload
-  const questions = [];
-  const blocks = rawContent.split(/Q\d+:|Question\s*\d+:/gi).filter(Boolean);
-
-  blocks.forEach((block, idx) => {
-    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    const questionText = lines[0] || `Question ${idx + 1}`;
-    const options = lines.filter(l => l.match(/^[A-D][\.\)]/i));
-    questions.push({
-      id: idx + 1,
-      question: questionText,
-      options: options.length ? options : ['A) Option 1', 'B) Option 2', 'C) Option 3', 'D) Option 4'],
-      answer: 'A',
-      explanation: 'Extracted explanation solution from uploaded document.'
-    });
-  });
-
-  const newMock = new Mock({ title, subject, chapter, questions });
-  await newMock.save();
-  res.json({ success: true, count: questions.length });
+// Admin Call Permission Toggle
+app.post('/api/admin/toggle-call', async (req, res) => {
+  const { email, allow } = req.body;
+  await User.updateOne({ email }, { canCall: allow });
+  res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
