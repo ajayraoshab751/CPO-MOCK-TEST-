@@ -28,6 +28,12 @@
         .chat-img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
         .chat-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .camera-btn { background: #28a745; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Challenge Attendance Grid */
+        .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; margin-top: 15px; max-height: 400px; overflow-y: auto; }
+        .day-box { border: 1px solid #ccc; border-radius: 5px; padding: 5px; text-align: center; font-size: 12px; background: var(--card); }
+        .day-box select { width: 100%; margin-top: 4px; font-size: 11px; }
+        .lock-banner { background: #dc3545; color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -39,11 +45,18 @@
 
 <div class="target-banner" id="targetDisplay">Target: Score 160+ in CPO Tier-1 Mock Tests!</div>
 
+<!-- Account Lock Penalty Banner -->
+<div class="lock-banner hidden" id="lockBanner">
+    🚨 ACCOUNT LOCKED: You were absent for more than 7 days! <br>
+    To unlock access to the portal, you must complete <span id="requiredMocksCount">2</span> mock tests with at least 50% score.
+</div>
+
 <div class="drawer" id="sideDrawer">
     <button class="btn" style="float: right;" onclick="toggleDrawer()">✕</button>
     <h4>Menu Options</h4>
     <button class="drawer-btn" onclick="showView('profileView')">👤 Profile</button>
     <button class="drawer-btn" onclick="showView('mockTestView')">📝 Mock Tests (Sectional)</button>
+    <button class="drawer-btn" onclick="showView('challengeView')">🏆 Challenge System</button>
     <button class="drawer-btn" onclick="showView('captureImageView')">📷 Capture Image</button>
     <button class="drawer-btn" onclick="showView('doubtGroupView')">💬 Doubt Group (AI Scanner)</button>
     <button class="drawer-btn" onclick="showView('performanceView')">📊 Performance & Ranking</button>
@@ -67,6 +80,20 @@
 <div class="card hidden" id="profileView">
     <h3>User Profile</h3>
     <div id="profileDetails">Log in to view profile.</div>
+</div>
+
+<!-- Challenge View -->
+<div class="card hidden" id="challengeView">
+    <h3>🏆 Study Attendance Challenge</h3>
+    <p>Select a challenge duration to track daily attendance:</p>
+    <button class="btn" onclick="startChallenge(100)">100 Days Challenge</button>
+    <button class="btn" onclick="startChallenge(60)">60 Days Challenge</button>
+    <button class="btn" onclick="startChallenge(30)">30 Days Challenge</button>
+    <hr>
+    <div id="challengeDetails">
+        <h4>No Active Challenge</h4>
+    </div>
+    <div class="day-grid" id="dayGrid"></div>
 </div>
 
 <!-- Mock Test Sectional Selection -->
@@ -153,6 +180,7 @@
 <script src="questions.js"></script>
 <script>
 let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
+let userChallenge = null, isLocked = false, requiredPassedMocks = 2;
 
 window.onload = function() {
     try {
@@ -163,6 +191,7 @@ window.onload = function() {
                 document.getElementById('authView').classList.add('hidden');
                 renderProfile(currentUser);
                 loadUserStats();
+                checkChallengeLockStatus();
                 showView('mockTestView');
             }
         }
@@ -172,10 +201,15 @@ window.onload = function() {
 function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('open'); }
 
 function showView(viewId) {
+    if (isLocked && viewId !== 'mockTestView' && viewId !== 'testEngineView') {
+        alert(`Account is locked due to absent records (>7 days)! Pass ${requiredPassedMocks} mock test(s) with >= 50% to unlock.`);
+        return;
+    }
+
     if (document.getElementById('sideDrawer').classList.contains('open')) {
         toggleDrawer();
     }
-    ['authView', 'profileView', 'mockTestView', 'testEngineView', 'captureImageView', 'doubtGroupView', 'performanceView', 'bankView', 'targetView', 'settingsView']
+    ['authView', 'profileView', 'challengeView', 'mockTestView', 'testEngineView', 'captureImageView', 'doubtGroupView', 'performanceView', 'bankView', 'targetView', 'settingsView']
     .forEach(id => document.getElementById(id).classList.add('hidden'));
     
     document.getElementById(viewId).classList.remove('hidden');
@@ -200,6 +234,7 @@ function login() {
             document.getElementById('authView').classList.add('hidden');
             renderProfile(currentUser);
             loadUserStats();
+            checkChallengeLockStatus();
             showView('mockTestView');
         } else alert(d.error || 'Login failed');
     });
@@ -252,6 +287,81 @@ function loadUserStats() {
         document.getElementById('savedContainer').innerHTML = (d.savedQuestions && d.savedQuestions.length) ? d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No saved questions.';
         document.getElementById('wrongContainer').innerHTML = (d.wrongQuestions && d.wrongQuestions.length) ? d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') : 'No wrong questions.';
     });
+}
+
+/* Challenge System Logic */
+function startChallenge(days) {
+    const today = new Date().toISOString().split('T')[0];
+    userChallenge = {
+        totalDays: days,
+        startDate: today,
+        attendance: {}
+    };
+    localStorage.setItem(`challenge_${currentUser.username}`, JSON.stringify(userChallenge));
+    renderChallengeGrid();
+}
+
+function checkChallengeLockStatus() {
+    if(!currentUser) return;
+    const data = localStorage.getItem(`challenge_${currentUser.username}`);
+    if(data) {
+        userChallenge = JSON.parse(data);
+        renderChallengeGrid();
+        
+        let absentCount = 0;
+        Object.values(userChallenge.attendance).forEach(val => {
+            if(val === 'A') absentCount++;
+        });
+
+        if(absentCount > 7) {
+            isLocked = true;
+            document.getElementById('lockBanner').classList.remove('hidden');
+            document.getElementById('requiredMocksCount').innerText = requiredPassedMocks;
+        } else {
+            isLocked = false;
+            document.getElementById('lockBanner').classList.add('hidden');
+        }
+    }
+}
+
+function updateAttendance(dayIndex, value) {
+    if(!userChallenge) return;
+    userChallenge.attendance[dayIndex] = value;
+    localStorage.setItem(`challenge_${currentUser.username}`, JSON.stringify(userChallenge));
+    checkChallengeLockStatus();
+}
+
+function renderChallengeGrid() {
+    if(!userChallenge) return;
+    const startDate = new Date(userChallenge.startDate);
+    const currentDate = new Date();
+    
+    document.getElementById('challengeDetails').innerHTML = `
+        <h4>Active: ${userChallenge.totalDays}-Day Challenge</h4>
+        <p><strong>Started:</strong> ${startDate.toLocaleDateString()}</p>
+        <p><strong>Online System Date:</strong> ${currentDate.toLocaleDateString()}</p>
+    `;
+
+    let gridHtml = '';
+    for(let i = 1; i <= userChallenge.totalDays; i++) {
+        let boxDate = new Date(startDate);
+        boxDate.setDate(startDate.getDate() + (i - 1));
+        let dateStr = boxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        let status = userChallenge.attendance[i] || '';
+
+        gridHtml += `
+            <div class="day-box">
+                <div>Day ${i}</div>
+                <div style="font-size: 10px; color: gray;">${dateStr}</div>
+                <select onchange="updateAttendance(${i}, this.value)">
+                    <option value="" ${status===''?'selected':''}>-</option>
+                    <option value="P" ${status==='P'?'selected':''}>P</option>
+                    <option value="A" ${status==='A'?'selected':''}>A</option>
+                </select>
+            </div>
+        `;
+    }
+    document.getElementById('dayGrid').innerHTML = gridHtml;
 }
 
 // Vault Capture Handler
@@ -322,63 +432,7 @@ function initSectionTest(sec) {
     let html = '';
     activeQuestions.forEach((q, idx) => {
         html += `<p><strong>Q${idx+1}: ${q.question}</strong></p>`;
-        q.options.forEach((opt, oIdx) => {
-            html += `<label><input type="radio" name="q_${idx}" onclick="currentAnswers[${idx}]=${oIdx}"> ${opt}</label><br>`;
-        });
-    });
-    document.getElementById('optionsContainer').innerHTML = html;
-}
-
-function submitSectionTest() {
-    let correct = 0, incorrect = 0, unattempted = 0, wrongQList = [];
-    activeQuestions.forEach((q, idx) => {
-        if(currentAnswers[idx] === undefined) unattempted++;
-        else if(currentAnswers[idx] === q.correctAnswer) correct++;
-        else { incorrect++; wrongQList.push(q); }
-    });
-    
-    let score = (correct * 2) - (incorrect * 0.5);
-    let percentage = ((score / (activeQuestions.length * 2)) * 100).toFixed(2);
-
-    fetch('/api/submit-test', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            username: currentUser.username, section: activeSection, score, percentage,
-            timeTaken: 60, correct, incorrect, unattempted, wrongQList
-        })
-    }).then(r => r.json()).then(d => {
-        if(d.success) {
-            alert(`Test Submitted!\nScore: ${score}\nRight: ${correct}\nWrong: ${incorrect}`);
-            showView('performanceView');
-        } else alert(d.error);
-    });
-}
-
-function setGlobalTarget() {
-    const target = document.getElementById('targetInput').value;
-    fetch('/api/set-target', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ target })
-    }).then(r => r.json()).then(d => {
-        if(d.success) { alert('Target updated globally!'); loadUserStats(); }
-    });
-}
-
-function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-
-function shareWebsite() {
-    if (navigator.share) {
-        navigator.share({ title: 'CPO Mock Portal', url: window.location.href });
-    } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Website link copied to clipboard!');
-    }
-}
-</script>
-</body>
-</html>
+        q.options.forEa
 
 
 
