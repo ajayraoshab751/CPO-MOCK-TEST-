@@ -3,262 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO MOCK TEST</title>
+    <title>CPO Mock Test Portal</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f6f9; color: #1a1a1a; }
-        .hidden { display: none !important; }
-
-        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #ddd; }
-        .brand { font-weight: 700; font-size: 18px; color: #1e3c72; }
-
-        .auth-container { max-width: 400px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .auth-container input, .auth-container select, .code-box input { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .btn-blue { background: #1a73e8; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .toggle-btn { background: none; border: none; color: #1a73e8; text-decoration: underline; cursor: pointer; width: 100%; margin-top: 12px; font-size: 13px; }
-
-        .container { max-width: 800px; margin: 20px auto; padding: 16px; }
-        .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
-        .code-box { background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 20px; }
-        .btn-start { background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-        .instructions-box { background: #fff; padding: 20px; border-radius: 8px; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; }
-        .test-header { background: #002d62; color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
-        .test-body { display: flex; flex-direction: column; min-height: calc(100vh - 60px); }
-        .question-box { background: #fff; padding: 20px; flex: 1; }
-        .option-item { border: 1px solid #ddd; padding: 12px; border-radius: 6px; margin: 10px 0; cursor: pointer; }
-        .option-item.selected { background: #e8f0fe; border-color: #1a73e8; font-weight: bold; }
-        .test-controls { background: #f1f3f4; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #ccc; }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 700px; margin: auto; }
+        .hidden { display: none; }
+        .btn { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin: 5px 2px; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-success { background: #28a745; }
+        .btn-secondary { background: #6c757d; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat-box { background: #e9ecef; padding: 12px; border-radius: 5px; text-align: center; }
+        .option { display: block; width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .solution-card { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin-top: 10px; }
+        .trick-card { background: #d4edda; border-left: 4px solid #28a745; padding: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <div class="brand">🎯 CPO MOCK TEST</div>
-        <div id="userDisplay" style="font-size: 13px;"></div>
+<div class="card" id="authBox">
+    <h2>Student Login / Registration</h2>
+    <input type="text" id="username" placeholder="Username / Email" style="width: 95%; padding: 8px; margin-bottom: 10px;"><br>
+    <input type="password" id="password" placeholder="Password" style="width: 95%; padding: 8px; margin-bottom: 10px;"><br>
+    <button class="btn btn-success" onclick="login()">Login</button>
+    <button class="btn" onclick="register()">Register</button>
+</div>
+
+<div class="card hidden" id="dashboard">
+    <h2>Welcome, <span id="userDisp"></span>!</h2>
+    <p>Total Attempts Used: <strong id="attemptCount">0</strong> / 20</p>
+    <button class="btn btn-success" onclick="startTest()">Start Mock Test</button>
+</div>
+
+<div class="card hidden" id="testEngine">
+    <div style="display: flex; justify-space-between; align-items: center;">
+        <h3 id="qTitle">Question</h3>
+        <div>Timer: <strong id="timer">00:00</strong></div>
     </div>
-
-    <!-- Registration Form -->
-    <div id="registerSection" class="auth-container">
-        <h3 style="margin-bottom:12px;">Student Registration</h3>
-        <input type="text" id="regFullName" placeholder="Full Name">
-        <input type="number" id="regAge" placeholder="Age">
-        <select id="regGender">
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
-        <input type="text" id="regPlace" placeholder="Place / City">
-        <input type="text" id="regUser" placeholder="Username / Email">
-        <input type="password" id="regPass" placeholder="Password">
-        <button class="btn-blue" onclick="register()">Register Account</button>
-        <button class="toggle-btn" onclick="showLoginForm()">Already have an account? Login</button>
+    <p id="qText" style="font-size: 1.1em;"></p>
+    <div id="optionsBox"></div>
+    <div style="margin-top: 15px;">
+        <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
+        <button class="btn btn-warning" onclick="markReview()">Mark for Review</button>
+        <button class="btn" onclick="nextQuestion()">Next</button>
+        <button class="btn btn-success" style="float: right;" onclick="submitTest()">Submit Test</button>
     </div>
+</div>
 
-    <!-- Login Form -->
-    <div id="loginSection" class="auth-container hidden">
-        <h3 style="margin-bottom:12px;">Login</h3>
-        <input type="text" id="loginUser" placeholder="Username / Email">
-        <input type="password" id="loginPass" placeholder="Password">
-        <button class="btn-blue" onclick="login()">Login</button>
-        <button class="toggle-btn" onclick="showRegisterForm()">New user? Register here</button>
+<div class="card hidden" id="resultPage">
+    <h2>Test Summary Performance</h2>
+    <div class="stat-grid">
+        <div class="stat-box">Score: <h3 id="resScore">0</h3></div>
+        <div class="stat-box">Percentage: <h3 id="resPct">0%</h3></div>
+        <div class="stat-box">Time Taken: <h3 id="resTime">0s</h3></div>
+        <div class="stat-box">Attempt #: <h3 id="resAttempt">1</h3></div>
     </div>
-
-    <!-- Main Dashboard -->
-    <div id="mainDashboard" class="container hidden">
-        <div id="lockContainer" class="code-box">
-            <h4>🔒 Enter Access Code</h4>
-            <p style="font-size: 12px; color: #666; margin-top: 4px;">Enter passcode to unlock tests.</p>
-            <input type="text" id="accessCodeInput" placeholder="Enter Access Code (e.g. CPOAIR1)">
-            <button class="btn-blue" onclick="verifyAccessCode()">Unlock Tests</button>
-        </div>
-
-        <h3 style="margin-bottom: 12px;">Available Mock Tests</h3>
-        <div id="testList"></div>
+    <div class="stat-grid">
+        <div class="stat-box" style="color: green;">Correct: <strong id="resCorrect">0</strong></div>
+        <div class="stat-box" style="color: red;">Incorrect: <strong id="resIncorrect">0</strong></div>
+        <div class="stat-box" style="color: gray;">Unattempted: <strong id="resUnattempted">0</strong></div>
+        <div class="stat-box" style="color: orange;">Review: <strong id="resReview">0</strong></div>
     </div>
+    <button class="btn btn-success" onclick="toggleSolutions()">View Detailed Solutions & Short Tricks</button>
+    <button class="btn" onclick="reattemptTest()">Reattempt Test</button>
+</div>
 
-    <!-- Instructions Screen -->
-    <div id="instructionScreen" class="instructions-box hidden">
-        <h2 id="instTitle">Test Instructions</h2>
-        <p style="margin: 12px 0;">Total Time: 15 Minutes | +2 for correct answer, -0.5 for wrong answer.</p>
-        <label style="font-size: 13px; display: block; margin-bottom: 16px;">
-            <input type="checkbox" id="declarationCheck"> I have read all instructions carefully.
-        </label>
-        <button class="btn-blue" onclick="startTestActual()">I am ready to begin</button>
-    </div>
+<div class="card hidden" id="solutionsPage" style="margin-top: 15px;">
+    <h3>Detailed Solutions & Short Tricks</h3>
+    <div id="solutionsList"></div>
+</div>
 
-    <!-- Test Interface -->
-    <div id="testPortal" class="hidden">
-        <div class="test-header">
-            <span id="portalTestTitle">Test Portal</span>
-            <div id="timerDisplay" style="background: #28a745; padding: 4px 8px; border-radius: 4px; font-weight: bold;">15:00</div>
-        </div>
-        <div class="test-body">
-            <div class="question-box">
-                <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Question <span id="qNum">1</span></div>
-                <h4 id="questionText" style="margin-bottom: 16px;">Question text...</h4>
-                <div id="optionsContainer"></div>
-            </div>
-            <div class="test-controls">
-                <button class="btn-blue" style="background:#28a745; width:auto; margin-left:auto;" onclick="finishTest()">Submit Test</button>
-            </div>
-        </div>
-    </div>
+<script src="questions.js"></script>
+<script>
+let currentUser = null, currentQ = 0, timerInterval = null, secondsElapsed = 0;
+let userAnswers = {}, reviewMarks = {};
 
-    <script>
-        const SECRET_CODE = "CPOAIR1";
-        let isUnlocked = false;
+function login() {
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    fetch('/api/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: u, password: p}) })
+    .then(r => r.json()).then(d => {
+        if(d.success) { currentUser = u; showDashboard(); } else alert(d.error);
+    });
+}
 
-        const ALL_MOCK_TESTS = [
-            {
-                id: "cpo_math_1",
-                title: "SSC CPO Maths Chapterwise Test",
-                durationMinutes: 15,
-                questions: [
-                    {
-                        question: "In an election between two candidates, 87% of registered voters cast their vote. The winning candidate got 52% of valid votes and won by 1653 votes. How many voters were registered?",
-                        options: ["50001", "50003", "50000", "49998"],
-                        correctIndex: 2
-                    }
-                ]
-            }
-        ];
+function register() {
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    fetch('/api/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: u, password: p}) })
+    .then(r => r.json()).then(d => {
+        if(d.success) alert('Registration successful! Click Login.'); else alert(d.error);
+    });
+}
 
-        let currentUser = null, activeTest = null, currentQIndex = 0, userAnswers = {};
+function showDashboard() {
+    document.getElementById('authBox').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('userDisp').innerText = currentUser;
+    fetch('/api/attempts/' + currentUser).then(r => r.json()).then(d => {
+        document.getElementById('attemptCount').innerText = d.totalAttempts;
+    });
+}
 
-        // Heartbeat tracker to report active user status
-        setInterval(() => {
-            if (currentUser) {
-                fetch('/api/heartbeat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: currentUser })
-                });
-            }
-        }, 15000);
+function startTest() {
+    userAnswers = {}; reviewMarks = {}; currentQ = 0; secondsElapsed = 0;
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('resultPage').classList.add('hidden');
+    document.getElementById('solutionsPage').classList.add('hidden');
+    document.getElementById('testEngine').classList.remove('hidden');
+    
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        let m = Math.floor(secondsElapsed / 60), s = secondsElapsed % 60;
+        document.getElementById('timer').innerText = `${m < 10 ? '0':''}${m}:${s < 10 ? '0':''}${s}`;
+    }, 1000);
+    
+    renderQuestion();
+}
 
-        function showLoginForm() {
-            document.getElementById('registerSection').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-        }
+function renderQuestion() {
+    const q = testQuestions[currentQ];
+    document.getElementById('qTitle').innerText = `Question ${currentQ + 1} of ${testQuestions.length}`;
+    document.getElementById('qText').innerText = q.question;
+    
+    let html = '';
+    q.options.forEach((opt, idx) => {
+        let checked = userAnswers[currentQ] === idx ? 'checked' : '';
+        html += `<label class="option"><input type="radio" name="opt" onclick="selectOpt(${idx})" ${checked}> ${opt}</label>`;
+    });
+    document.getElementById('optionsBox').innerHTML = html;
+}
 
-        function showRegisterForm() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registerSection').classList.remove('hidden');
-        }
+function selectOpt(idx) { userAnswers[currentQ] = idx; }
+function prevQuestion() { if(currentQ > 0) { currentQ--; renderQuestion(); } }
+function nextQuestion() { if(currentQ < testQuestions.length - 1) { currentQ++; renderQuestion(); } }
+function markReview() { reviewMarks[currentQ] = true; nextQuestion(); }
 
-        async function register() {
-            const fullName = document.getElementById('regFullName').value.trim();
-            const age = document.getElementById('regAge').value.trim();
-            const gender = document.getElementById('regGender').value;
-            const place = document.getElementById('regPlace').value.trim();
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value.trim();
-            
-            if(!fullName || !age || !gender || !place || !username || !password) {
-                alert("Please fill in all registration fields.");
-                return;
-            }
+function submitTest() {
+    clearInterval(timerInterval);
+    let correct = 0, incorrect = 0, unattempted = 0, marked = Object.keys(reviewMarks).length;
+    
+    testQuestions.forEach((q, idx) => {
+        if (userAnswers[idx] === undefined) unattempted++;
+        else if (userAnswers[idx] === q.correctAnswer) correct++;
+        else incorrect++;
+    });
 
-            const res = await fetch('/api/register', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ fullName, age, gender, place, username, password }) 
-            });
-            const data = await res.json();
-            if(res.ok) {
-                alert("Registration successful! Please log in.");
-                showLoginForm();
-            } else {
-                alert(data.error || "Registration failed.");
-            }
-        }
+    let score = (correct * 2) - (incorrect * 0.5); // Marks: +2 Correct, -0.5 Incorrect
+    let maxMarks = testQuestions.length * 2;
+    let percentage = ((score / maxMarks) * 100).toFixed(2);
 
-        async function login() {
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value.trim();
-            
-            const res = await fetch('/api/login', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ username, password }) 
-            });
-            
-            if (res.ok) { 
-                currentUser = username;
-                showDashboard(); 
-            } else { 
-                alert("Invalid credentials"); 
-            }
-        }
+    const payload = {
+        username: currentUser, score, percentage, timeTaken: secondsElapsed,
+        correct, incorrect, unattempted, markedForReview: marked
+    };
 
-        function showDashboard() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registerSection').classList.add('hidden');
-            document.getElementById('mainDashboard').classList.remove('hidden');
-            document.getElementById('userDisplay').innerText = currentUser;
-            renderTestList();
-        }
+    fetch('/api/submit-test', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    }).then(r => r.json()).then(data => {
+        if(!data.success) { alert(data.error); return; }
+        
+        document.getElementById('testEngine').classList.add('hidden');
+        document.getElementById('resultPage').classList.remove('hidden');
+        
+        document.getElementById('resScore').innerText = score;
+        document.getElementById('resPct').innerText = percentage + '%';
+        document.getElementById('resTime').innerText = secondsElapsed + 's';
+        document.getElementById('resAttempt').innerText = data.attemptNumber;
+        document.getElementById('resCorrect').innerText = correct;
+        document.getElementById('resIncorrect').innerText = incorrect;
+        document.getElementById('resUnattempted').innerText = unattempted;
+        document.getElementById('resReview').innerText = marked;
+        
+        buildSolutions();
+    });
+}
 
-        function verifyAccessCode() {
-            const enteredCode = document.getElementById('accessCodeInput').value.trim();
-            if (enteredCode === SECRET_CODE) {
-                isUnlocked = true;
-                alert("Access Code Verified! All mock tests unlocked.");
-                document.getElementById('lockContainer').classList.add('hidden');
-                renderTestList();
-            } else {
-                alert("Incorrect Passcode! Access Denied.");
-            }
-        }
+function buildSolutions() {
+    let html = '';
+    testQuestions.forEach((q, idx) => {
+        let userAns = userAnswers[idx] !== undefined ? q.options[userAnswers[idx]] : 'Unattempted';
+        let correctAns = q.options[q.correctAnswer];
+        
+        html += `<div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+            <p><strong>Q${idx + 1}: ${q.question}</strong></p>
+            <p>Your Answer: <span style="color:${userAnswers[idx] === q.correctAnswer ? 'green':'red'}">${userAns}</span> | Correct Answer: <strong>${correctAns}</strong></p>
+            <div class="solution-card"><strong>Detailed Solution:</strong><br>${q.explanation}</div>
+            ${q.shortTrick ? `<div class="trick-card"><strong>Short Trick:</strong><br>${q.shortTrick}</div>` : ''}
+        </div>`;
+    });
+    document.getElementById('solutionsList').innerHTML = html;
+}
 
-        function renderTestList() {
-            const list = document.getElementById('testList');
-            list.innerHTML = ALL_MOCK_TESTS.map(t => `
-                <div class="card">
-                    <div>
-                        <strong>${t.title}</strong>
-                        <div style="font-size:12px; color:#666;">${t.questions.length} Questions | ${t.durationMinutes} Mins</div>
-                    </div>
-                    ${isUnlocked 
-                        ? `<button class="btn-start" onclick="openInstructions('${t.id}')">Start Test</button>` 
-                        : `<button class="btn-start" style="background:#6c757d;" onclick="alert('Please enter passcode CPOAIR1 above to unlock.')">Locked 🔒</button>`}
-                </div>
-            `).join('');
-        }
+function toggleSolutions() {
+    document.getElementById('solutionsPage').classList.toggle('hidden');
+}
 
-        function openInstructions(testId) {
-            activeTest = ALL_MOCK_TESTS.find(t => t.id === testId);
-            document.getElementById('mainDashboard').classList.add('hidden');
-            document.getElementById('instructionScreen').classList.remove('hidden');
-            document.getElementById('instTitle').innerText = activeTest.title;
-        }
-
-        function startTestActual() {
-            if (!document.getElementById('declarationCheck').checked) {
-                alert("Please check the agreement box to proceed."); return;
-            }
-            document.getElementById('instructionScreen').classList.add('hidden');
-            document.getElementById('testPortal').classList.remove('hidden');
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            const q = activeTest.questions[currentQIndex];
-            document.getElementById('qNum').innerText = currentQIndex + 1;
-            document.getElementById('questionText').innerText = q.question;
-            document.getElementById('optionsContainer').innerHTML = q.options.map((opt, i) => `
-                <div class="option-item ${userAnswers[currentQIndex] === i ? 'selected' : ''}" onclick="userAnswers[${currentQIndex}]=${i}; renderQuestion();">
-                    ${opt}
-                </div>
-            `).join('');
-        }
-
-        function finishTest() {
-            alert("Test submitted successfully!");
-            location.reload();
-        }
-    </script>
+function reattemptTest() {
+    startTest();
+}
+</script>
 </body>
 </html>
+
