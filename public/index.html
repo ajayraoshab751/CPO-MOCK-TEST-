@@ -16,6 +16,7 @@
         .card { background: var(--card); padding: 20px; border-radius: 8px; margin: 15px auto; max-width: 700px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .hidden { display: none; }
         .btn { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .btn-danger { background: #dc3545; }
         .target-banner { background: #ffc107; color: black; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
@@ -38,6 +39,7 @@
     <button class="drawer-btn" onclick="showView('bankView')">⭐ Saved & Wrong Questions</button>
     <button class="drawer-btn" onclick="showView('targetView')">🎯 Set Global Target</button>
     <button class="drawer-btn" onclick="showView('settingsView')">⚙️ Settings</button>
+    <button class="drawer-btn" style="color: red; font-weight: bold;" onclick="logout()">🚪 Logout</button>
 </div>
 
 <div class="card" id="authView">
@@ -101,18 +103,35 @@
     <button class="btn" onclick="location.reload()">🔄 Refresh Portal</button>
     <br><br>
     <button class="btn" onclick="shareWebsite()">🔗 Share Website Link</button>
+    <br><br>
+    <button class="btn btn-danger" onclick="logout()">🚪 Logout Account</button>
 </div>
 
 <script src="questions.js"></script>
 <script>
 let currentUser = null, activeSection = null, activeQuestions = [], currentAnswers = {};
 
+// Auto Auto-Login Check on Page Refresh
+window.onload = function() {
+    const savedUser = localStorage.getItem('cpo_user');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById('authView').classList.add('hidden');
+        renderProfile(currentUser);
+        loadUserStats();
+        showView('mockTestView');
+    }
+};
+
 function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('open'); }
 
 function showView(viewId) {
-    toggleDrawer();
+    if (document.getElementById('sideDrawer').classList.contains('open')) {
+        toggleDrawer();
+    }
     ['authView', 'profileView', 'mockTestView', 'testEngineView', 'performanceView', 'bankView', 'targetView', 'settingsView']
     .forEach(id => document.getElementById(id).classList.add('hidden'));
+    
     document.getElementById(viewId).classList.remove('hidden');
     if(currentUser) loadUserStats();
 }
@@ -124,12 +143,20 @@ function login() {
     .then(r => r.json()).then(d => {
         if(d.success) {
             currentUser = d.user;
+            localStorage.setItem('cpo_user', JSON.stringify(d.user)); // Save Session
             document.getElementById('authView').classList.add('hidden');
             renderProfile(d.user);
             loadUserStats();
             showView('mockTestView');
         } else alert(d.error);
     });
+}
+
+function logout() {
+    localStorage.removeItem('cpo_user'); // Clear Session
+    currentUser = null;
+    alert('Logged out successfully.');
+    location.reload();
 }
 
 function register() {
@@ -156,7 +183,6 @@ function loadUserStats() {
         document.getElementById('userWrong').innerText = d.totalWrong;
         document.getElementById('targetDisplay').innerText = d.globalTarget;
         
-        // Render Banks
         document.getElementById('savedContainer').innerHTML = d.savedQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No saved questions.';
         document.getElementById('wrongContainer').innerHTML = d.wrongQuestions.map(q => `<p>• ${q.question}</p>`).join('') || 'No wrong questions.';
     });
@@ -202,42 +228,4 @@ function submitSectionTest() {
     let score = (correct * 2) - (incorrect * 0.5);
     let percentage = ((score / (activeQuestions.length * 2)) * 100).toFixed(2);
 
-    fetch('/api/submit-test', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            username: currentUser.username, section: activeSection, score, percentage,
-            timeTaken: 60, correct, incorrect, unattempted, wrongQList
-        })
-    }).then(r => r.json()).then(d => {
-        if(d.success) {
-            alert(`Test Submitted!\nScore: ${score}\nRight: ${correct}\nWrong: ${incorrect}`);
-            showView('performanceView');
-        } else alert(d.error);
-    });
-}
-
-function setGlobalTarget() {
-    const target = document.getElementById('targetInput').value;
-    fetch('/api/set-target', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ target })
-    }).then(r => r.json()).then(d => {
-        if(d.success) { alert('Target updated globally!'); loadUserStats(); }
-    });
-}
-
-function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-
-function shareWebsite() {
-    if (navigator.share) {
-        navigator.share({ title: 'CPO Mock Portal', url: window.location.href });
-    } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Website link copied to clipboard!');
-    }
-}
-</script>
-</body>
-</html>
+    fetch('/api
