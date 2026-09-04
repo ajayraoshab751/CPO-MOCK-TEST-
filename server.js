@@ -1,11 +1,15 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enable CORS & payload parsing
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 const users = [];
 const testResults = [];
@@ -13,37 +17,48 @@ const savedQuestionsMap = {};
 const wrongQuestionsMap = {}; 
 let globalTarget = "Target: Score 160+ in CPO Tier-1 Mock Tests!";
 
+// Fast, non-blocking auth endpoints
 app.post('/api/register', (req, res) => {
-    const { fullName, username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
-    
-    let existingUser = users.find(u => u.username === username);
-    if (!existingUser) {
-        existingUser = { fullName: fullName || username, username, password, registeredAt: new Date().toISOString() };
-        users.push(existingUser);
+    try {
+        const { fullName, username, password } = req.body || {};
+        if (!username || !password) {
+            return res.status(400).json({ success: false, error: 'Username & password required' });
+        }
+        
+        let user = users.find(u => u.username === username);
+        if (!user) {
+            user = { fullName: fullName || username, username, password, registeredAt: new Date().toISOString() };
+            users.push(user);
+        }
+        return res.json({ success: true, user });
+    } catch (e) {
+        return res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-    res.json({ success: true, user: existingUser });
 });
 
 app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Username & password required' });
+    try {
+        const { username, password } = req.body || {};
+        if (!username || !password) {
+            return res.status(400).json({ success: false, error: 'Username & password required' });
+        }
 
-    let user = users.find(u => u.username === username);
-    if (!user) {
-        user = { fullName: username, username, password, registeredAt: new Date().toISOString() };
-        users.push(user);
+        let user = users.find(u => u.username === username);
+        if (!user) {
+            user = { fullName: username, username, password, registeredAt: new Date().toISOString() };
+            users.push(user);
+        }
+        return res.json({ success: true, user });
+    } catch (e) {
+        return res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-    res.json({ success: true, user });
 });
 
 app.post('/api/ai-scan-doubt', (req, res) => {
-    setTimeout(() => {
-        res.json({
-            success: true,
-            solution: "<b>Question Scanned Successfully!</b><br><br><b>Step 1:</b> Extracted formula from image.<br><b>Step 2:</b> Apply $(A + B) \\times \\text{time} = \\text{Total Work}$.<br><b>Correct Answer Option:</b> (B)<br><b>Short Trick:</b> Direct ratio method applies to this question type."
-        });
-    }, 1500);
+    return res.json({
+        success: true,
+        solution: "<b>Question Scanned Successfully!</b><br><br><b>Step 1:</b> Extracted formula from image.<br><b>Step 2:</b> Apply $(A + B) \\times \\text{time} = \\text{Total Work}$.<br><b>Correct Answer Option:</b> (B)<br><b>Short Trick:</b> Direct ratio method applies to this question type."
+    });
 });
 
 app.post('/api/submit-test', (req, res) => {
@@ -62,14 +77,7 @@ app.post('/api/submit-test', (req, res) => {
         wrongQuestionsMap[username].push(...wrongQList);
     }
 
-    res.json({ success: true, attemptCount: userAttempts.length + 1 });
-});
-
-app.post('/api/save-question', (req, res) => {
-    const { username, questionObj } = req.body;
-    if (!savedQuestionsMap[username]) savedQuestionsMap[username] = [];
-    savedQuestionsMap[username].push(questionObj);
-    res.json({ success: true });
+    return res.json({ success: true, attemptCount: userAttempts.length + 1 });
 });
 
 app.get('/api/user-stats/:username', (req, res) => {
@@ -85,7 +93,7 @@ app.get('/api/user-stats/:username', (req, res) => {
     const sortedUsers = Object.keys(userScores).sort((a, b) => userScores[b] - userScores[a]);
     const rank = sortedUsers.indexOf(username) !== -1 ? sortedUsers.indexOf(username) + 1 : 'N/A';
 
-    res.json({
+    return res.json({
         totalAttempts: userAttempts.length,
         totalRight,
         totalWrong,
@@ -94,14 +102,6 @@ app.get('/api/user-stats/:username', (req, res) => {
         wrongQuestions: wrongQuestionsMap[username] || [],
         globalTarget
     });
-});
-
-app.post('/api/set-target', (req, res) => {
-    if (req.body.target) {
-        globalTarget = req.body.target;
-        return res.json({ success: true, target: globalTarget });
-    }
-    res.status(400).json({ error: 'Target required' });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
