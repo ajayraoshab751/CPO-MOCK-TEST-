@@ -16,33 +16,30 @@
         .brand-title h1 { font-size: 16px; color: #f59e0b; }
         .brand-title p { font-size: 10px; color: #9ca3af; }
 
-        /* Menu Drawer Button */
         .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; }
         
-        /* Dropdown Menu Popup */
-        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
+        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 230px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
         .admin-dropdown-menu.show { display: block; }
         .admin-dropdown-item { padding: 10px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .admin-dropdown-item:hover { background: #374151; color: #f59e0b; }
 
-        /* Main Container */
-        .main-container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        .main-container { padding: 15px; max-width: 850px; margin: 0 auto; }
         
-        /* Admin Panel Card */
         .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
         .panel-card h2 { font-size: 16px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
         
-        .dropdown-box { background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; margin-bottom: 14px; }
-        .dropdown-box label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 6px; font-weight: bold; }
-        .dropdown-box select, .dropdown-box input[type="file"] { width: 100%; padding: 10px; background: #111827; color: #fff; border: 1px solid #4b5563; border-radius: 4px; font-size: 13px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 240px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; }
+        .form-group label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 6px; font-weight: bold; }
+        .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #111827; color: #fff; border: 1px solid #4b5563; border-radius: 4px; font-size: 13px; }
         
         .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
         .btn-primary:hover { background: #0ea5e9; }
 
         /* Student View Sections */
         .section-box { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .test-item-row { background: #1f2937; padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
         .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
@@ -63,7 +60,6 @@
         .option-item { background: #1f2937; border: 1px solid #374151; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; }
         .option-item input { accent-color: #f59e0b; }
 
-        /* Question Palette */
         .palette-container { margin-top: 15px; border-top: 1px solid #374151; padding-top: 10px; }
         .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 100px; overflow-y: auto; }
         .palette-btn { width: 28px; height: 28px; border-radius: 4px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; background: #374151; color: #fff; }
@@ -91,55 +87,118 @@
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
             <div id="timerDisplay" class="hidden" style="font-size: 13px; color: #f59e0b; font-weight: bold;">Time: 00:00</div>
-            <button class="menu-toggle-btn" onclick="toggleAdminMenu()">⚙️ Admin</button>
+            <button class="menu-toggle-btn" onclick="toggleAdminMenu()">⚙️ Admin Panel</button>
         </div>
 
         <!-- Admin Secret Dropdown Menu -->
         <div id="adminDropdownMenu" class="admin-dropdown-menu">
-            <div class="admin-dropdown-item" onclick="promptAdminAccess()">🛠️ Admin Upload & Parser</div>
-            <div class="admin-dropdown-item" onclick="showStudentDashboard()">📁 View Public Modules</div>
+            <div class="admin-dropdown-item" onclick="openAdminSection('activityView')">📊 1. User Activity & Logins</div>
+            <div class="admin-dropdown-item" onclick="openAdminSection('chapterParserView')">📂 2 & 3. Chapter & Bulk PDFs</div>
+            <div class="admin-dropdown-item" onclick="openAdminSection('codeConverterView')">💻 4. Code-to-Mock Converter</div>
+            <div class="admin-dropdown-item" onclick="showStudentDashboard()">📁 View Student Portal</div>
         </div>
     </div>
 
     <div class="main-container">
         
-        <!-- Admin Parser Section (Protected / Toggleable by Admin) -->
-        <div id="adminParserSection" class="panel-card hidden">
-            <h2>🛠️ Admin Panel & Automated Parsers</h2>
-            <p>Upload PDF or HTML mock files. Select target module section to publish generated mock tests straight into public domain sections.</p>
-
-            <div class="dropdown-box">
-                <label>📁 Select Public Domain Module Destination:</label>
-                <select id="targetModuleSelect">
-                    <option value="Full-Length Tier-1 Mock Suite">Full-Length Tier-1 Mock Suite</option>
-                    <option value="Quantitative Aptitude">Quantitative Aptitude</option>
-                    <option value="Reasoning Section">Reasoning Section</option>
-                    <option value="General Studies & Science">General Studies & Science</option>
-                    <option value="English Section">English Section</option>
-                </select>
+        <!-- ================= ADMIN PANEL ROOT ================= -->
+        <div id="adminPanelRoot" class="hidden">
+            
+            <!-- Button 1: User Activity & Gmail Login Records -->
+            <div id="sectionActivity" class="panel-card">
+                <h2>📊 1. User Activity & Gmail Login Records</h2>
+                <p>Monitor real-time user engagement, session logs, individual investments/purchases, and Gmail authentication records.</p>
+                <div style="background: #1f2937; border-radius: 6px; padding: 12px; overflow-x: auto;">
+                    <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #374151; color: #f59e0b;">
+                                <th style="padding: 8px;">User Gmail Account</th>
+                                <th style="padding: 8px;">Login Timestamp</th>
+                                <th style="padding: 8px;">Investment / Plan</th>
+                                <th style="padding: 8px;">Tests Attempted</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userActivityTableBody">
+                            <tr>
+                                <td style="padding: 8px;">aspirant.delhipolice@gmail.com</td>
+                                <td style="padding: 8px;">2026-09-05 10:30 AM</td>
+                                <td style="color: #34d399; padding: 8px;">₹499 (Tier-1 Master Pass)</td>
+                                <td style="padding: 8px;">4 Mocks</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px;">cpo.aspirant2026@gmail.com</td>
+                                <td style="padding: 8px;">2026-09-05 09:15 AM</td>
+                                <td style="color: #34d399; padding: 8px;">₹199 (Maths Special)</td>
+                                <td style="padding: 8px;">2 Mocks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="dropdown-box">
-                <label>Upload PDF / HTML Mock File:</label>
-                <!-- Universal mobile-friendly accept configuration to prevent Android file managers from greying out PDFs -->
-                <input type="file" id="mockFileInput" accept="application/pdf,text/html,.pdf,.html,*/*" />
+            <!-- Button 2 & 3: Chapter Section Selector, Test Name Box, and Bulk PDF AI Parsers -->
+            <div id="sectionParser" class="panel-card">
+                <h2>📂 2 & 3. Chapter-Wise Section & Bulk PDF AI Parser (Up to 10 Files)</h2>
+                <p>Select chapter category, assign test name, upload up to 10 PDF files in parallel, and track automated AI conversion timing.</p>
+
+                <div class="form-row">
+                    <!-- Button 2: Chapter Selection & Test Name Input -->
+                    <div class="form-group">
+                        <label>2. Select Chapter Test Section:</label>
+                        <select id="chapterSectionSelect">
+                            <option value="Number System">Quantitative Aptitude: Number System</option>
+                            <option value="Percentage">Quantitative Aptitude: Percentage</option>
+                            <option value="English Synonym">English: Synonym & Antonym Drills</option>
+                            <option value="English Voice">English: Active/Passive Voice & Narration</option>
+                            <option value="General Studies & Science">General Studies & GK/GS</option>
+                            <option value="Reasoning Section">Reasoning: Chapter-Wise Test</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Custom Mock Test Name (Right Box):</label>
+                        <input type="text" id="customTestNameInput" placeholder="e.g., CPO Target Batch Set 1" />
+                    </div>
+                </div>
+
+                <!-- Button 3: Bulk PDF Multi-Parser (Up to 10 Files Parallel) -->
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>3. Upload Multiple PDFs (Select up to 10 files simultaneously):</label>
+                    <input type="file" id="bulkPdfInput" multiple accept="application/pdf,.pdf" />
+                </div>
+
+                <div id="conversionTimerBox" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px;" class="hidden">
+                    ⚡ AI Parallel Conversion Time: <span id="timerOutput">0.00</span>s
+                </div>
+
+                <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parallel PDF-to-Mock Parser</button>
             </div>
 
-            <button class="btn-primary" onclick="adminPublishTestFile()">Auto-Parse File & Publish to Public</button>
+            <!-- Button 4: Direct JavaScript / HTML Code Converter -->
+            <div id="sectionCodeConverter" class="panel-card">
+                <h2>💻 4. Code-to-Mock Converter (HTML / JS Code Parser)</h2>
+                <p>Directly paste JavaScript or HTML code block snippets below to convert them into an active chapter mock test based on the section selected above.</p>
+                
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>Paste Raw HTML/JS Coding Structure:</label>
+                    <textarea id="rawCodeInput" rows="5" placeholder="// Paste JavaScript array questions or HTML structure here..."></textarea>
+                </div>
+
+                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Convert Code to Mock Test</button>
+            </div>
+
         </div>
 
-        <!-- Student Public Portal View -->
+        <!-- ================= STUDENT PUBLIC PORTAL ================= -->
         <div id="studentPublicPortal">
             <div class="panel-card" style="border-color: #38bdf8;">
-                <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & CGL Full CBT Master Suite</h2>
-                <p>200 Questions Full Mock, CGL Tier-1 Special Papers, Rani Mam Special Drills, and Chapter-Wise Subject Tests.</p>
+                <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & Chapter-Wise CBT Suite</h2>
+                <p>Full Mock Tests, Chapter Drills (Number System, Percentage, English Synonym/Voice, GK/GS, Reasoning), and AI-Generated Tests.</p>
             </div>
 
-            <!-- Dynamic Sections Rendered Here -->
             <div id="modulesContainer"></div>
         </div>
 
-        <!-- CBT Exam Screen -->
+        <!-- ================= CBT EXAM SCREEN ================= -->
         <div id="cbtExamScreen" class="hidden">
             <div class="cbt-top-bar">
                 <div class="cbt-nav-top-left">
@@ -152,13 +211,10 @@
 
             <div class="question-meta">
                 <span id="qNumberIndicator">Question 1 of 1</span>
-                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO 2024 (PYQ)</span>
+                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO PYQ Drill</span>
             </div>
 
-            <div class="question-text" id="questionTextContainer">
-                Loading question content...
-            </div>
-
+            <div class="question-text" id="questionTextContainer">Loading question...</div>
             <div class="options-list" id="optionsContainer"></div>
 
             <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
@@ -169,21 +225,21 @@
             </div>
         </div>
 
-        <!-- Result Scorecard Screen -->
+        <!-- ================= RESULT SCREEN ================= -->
         <div id="resultScreen" class="panel-card hidden" style="text-align: center;">
             <h2 style="justify-content: center; color: #34d399;">🎉 Test Submitted Successfully!</h2>
-            <p>Here is your detailed performance scorecard breakdown:</p>
+            <p>Your performance scorecard breakdown:</p>
             
             <div style="background: #1f2937; padding: 15px; border-radius: 6px; margin: 15px 0; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
-                <div><strong>Target Section:</strong> <span id="resSection" style="color: #f59e0b;">-</span></div>
-                <div><strong>Total Correct Answers:</strong> <span id="resCorrect" style="color: #34d399;">0</span></div>
-                <div><strong>Total Incorrect Answers:</strong> <span id="resIncorrect" style="color: #ef4444;">0</span></div>
-                <div><strong>Total Unattempted:</strong> <span id="resUnattempted" style="color: #9ca3af;">0</span></div>
-                <div><strong>Total Time Taken:</strong> <span id="resTime" style="color: #38bdf8;">00:00</span></div>
-                <div><strong>Final Score / Percentage:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
+                <div><strong>Test Target:</strong> <span id="resSection" style="color: #f59e0b;">-</span></div>
+                <div><strong>Correct Answers:</strong> <span id="resCorrect" style="color: #34d399;">0</span></div>
+                <div><strong>Incorrect Answers:</strong> <span id="resIncorrect" style="color: #ef4444;">0</span></div>
+                <div><strong>Unattempted:</strong> <span id="resUnattempted" style="color: #9ca3af;">0</span></div>
+                <div><strong>Time Taken:</strong> <span id="resTime" style="color: #38bdf8;">00:00</span></div>
+                <div><strong>Final Score:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
             </div>
 
-            <button class="btn-primary" onclick="location.reload()">Back to Portal Dashboard</button>
+            <button class="btn-primary" onclick="location.reload()">Back to Dashboard</button>
         </div>
 
     </div>
@@ -208,20 +264,23 @@
         let activeSectionName = '';
 
         let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules')) || {
-            "Full-Length Tier-1 Mock Suite": [
-                { title: "CGL Tier-1 Master Mock 1", date: "2026-09-05", questions: getDefaultQuestions() }
+            "Number System": [
+                { title: "Number System - Divisibility & Remainder Master Test", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
-            "Quantitative Aptitude": [
-                { title: "Number System (Divisibility, Unit Digit)", date: "2026-09-05", questions: getDefaultQuestions() }
+            "Percentage": [
+                { title: "Percentage Advanced Calculation Drills", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
-            "Reasoning Section": [
-                { title: "Coding-Decoding & Series Mock", date: "2026-09-05", questions: getDefaultQuestions() }
+            "English Synonym": [
+                { title: "Vocabulary Booster: Synonyms & Antonyms", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "English Voice": [
+                { title: "Active & Passive Voice Practice Set", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
             "General Studies & Science": [
-                { title: "Indian Polity & Constitution PYQ Test", date: "2026-09-05", questions: getDefaultQuestions() }
+                { title: "Static GK & Indian Polity PYQ Session", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
-            "English Section": [
-                { title: "Rani Mam Vocabulary & Grammar Drill", date: "2026-09-05", questions: getDefaultQuestions() }
+            "Reasoning Section": [
+                { title: "Coding-Decoding & Analogy Master Drill", date: "2026-09-05", questions: getDefaultQuestions() }
             ]
         };
 
@@ -229,18 +288,18 @@
             return [
                 {
                     en: {
-                        q: "Which article of the Indian Constitution deals with the establishment and constitution of Supreme Court?",
-                        options: ["Article 124", "Article 324", "Article 280", "Article 356"],
+                        q: "What is the unit digit of the expression $(7^{95} - 3^{58})$?",
+                        options: ["4", "6", "2", "8"],
                         correct: 0,
-                        explanation: "Article 124 provides for the establishment and constitution of the Supreme Court."
+                        explanation: "Power cycles for 7 and 3 help determine the unit digits as 3 and 9, giving 13 - 9 = 4."
                     },
                     hi: {
-                        q: "भारतीय संविधान का कौन सा अनुच्छेद उच्चतम न्यायालय की स्थापना और गठन से संबंधित है?",
-                        options: ["अनुच्छेद 124", "अनुच्छेद 324", "अनुच्छेद 280", "अनुच्छेद 356"],
+                        q: "व्यंजक $(7^{95} - 3^{58})$ का इकाई अंक क्या है?",
+                        options: ["4", "6", "2", "8"],
                         correct: 0,
-                        explanation: "अनुच्छेद 124 उच्चतम न्यायालय की स्थापना और गठन का प्रावधान करता है।"
+                        explanation: "घातांक चक्र के अनुसार 7 और 3 के इकाई अंक क्रमशः 3 और 9 हैं, जिससे 13 - 9 = 4 प्राप्त होता है।"
                     },
-                    pyq: "SSC CPO 2024 (PYQ)",
+                    pyqTag: "SSC CPO 2024 (Chapter PYQ)",
                     status: "not_visited",
                     selectedOption: null,
                     timeSpent: 0
@@ -251,108 +310,20 @@
         renderPublicModules();
 
         function toggleAdminMenu() {
-            document.getElementById('adminDropdownMenu').classList.toggle('show');
+            let menu = document.getElementById('adminDropdownMenu');
+            menu.classList.toggle('show');
         }
 
-        function promptAdminAccess() {
+        function openAdminSection(sectionId) {
             document.getElementById('adminDropdownMenu').classList.remove('show');
             let pass = prompt("Enter Admin Secret Passcode:");
-            if(pass === ADMIN_PASSCODE) {
-                document.getElementById('adminParserSection').classList.remove('hidden');
+            if (pass === ADMIN_PASSCODE) {
                 document.getElementById('studentPublicPortal').classList.add('hidden');
-                alert("Admin Access Granted! You can now upload and publish mock tests.");
-            } else if(pass !== null) {
+                document.getElementById('adminPanelRoot').classList.remove('hidden');
+                alert("Admin Access Granted Successfully!");
+            } else if (pass !== null) {
                 alert("Incorrect Passcode!");
             }
         }
 
-        function showStudentDashboard() {
-            document.getElementById('adminDropdownMenu').classList.remove('show');
-            document.getElementById('adminParserSection').classList.add('hidden');
-            document.getElementById('cbtExamScreen').classList.add('hidden');
-            document.getElementById('resultScreen').classList.add('hidden');
-            document.getElementById('timerDisplay').classList.add('hidden');
-            document.getElementById('studentPublicPortal').classList.remove('hidden');
-            renderPublicModules();
-        }
-
-        function renderPublicModules() {
-            let container = document.getElementById('modulesContainer');
-            let html = '';
-
-            for(let section in publicModules) {
-                html += `
-                    <div class="section-box">
-                        <div class="section-title">📁 ${section} <span style="font-size:11px; color:#9ca3af;">${publicModules[section].length} Tests</span></div>
-                `;
-                publicModules[section].forEach((test, tIdx) => {
-                    html += `
-                        <div class="test-item-row">
-                            <div>
-                                <div style="font-weight: bold; color: #f3f4f6;">${test.title}</div>
-                                <div style="font-size: 11px; color: #9ca3af;">Published: ${test.date} | ${test.questions.length} Qs</div>
-                            </div>
-                            <button class="attempt-btn" onclick="startTest('${section}', ${tIdx})">Attempt</button>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            }
-            container.innerHTML = html;
-        }
-
-        function adminPublishTestFile() {
-            let fileInput = document.getElementById('mockFileInput');
-            let targetSec = document.getElementById('targetModuleSelect').value;
-
-            if(fileInput.files.length === 0) {
-                alert("Please select a file to upload first!");
-                return;
-            }
-
-            let file = fileInput.files[0];
-            let reader = new FileReader();
-
-            reader.onload = function(e) {
-                let newTest = {
-                    title: `AI Parsed: ${file.name.replace(/\.[^/.]+$/, "")}`,
-                    date: new Date().toISOString().split('T')[0],
-                    questions: getDefaultQuestions()
-                };
-
-                if(!publicModules[targetSec]) publicModules[targetSec] = [];
-                publicModules[targetSec].push(newTest);
-                localStorage.setItem('cpo_public_modules', JSON.stringify(publicModules));
-
-                alert(`Successfully parsed "${file.name}" and published to "${targetSec}"! Normal students can now see and attempt it.`);
-                showStudentDashboard();
-            };
-
-            // Using readAsDataURL to safely process PDFs or any file format without text-encoding corruption
-            reader.readAsDataURL(file);
-        }
-
-        let questionStartTime = Date.now();
-
-        function startTest(sectionName, testIdx) {
-            activeSectionName = sectionName;
-            let testObj = publicModules[sectionName][testIdx];
-            activeTestTitle = testObj.title;
-            activeTestQuestions = JSON.parse(JSON.stringify(testObj.questions));
-
-            document.getElementById('studentPublicPortal').classList.add('hidden');
-            document.getElementById('adminParserSection').classList.add('hidden');
-            document.getElementById('cbtExamScreen').classList.remove('hidden');
-            document.getElementById('timerDisplay').classList.remove('hidden');
-
-            globalTimerSeconds = 0;
-            if(timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                globalTimerSeconds++;
-                let mins = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
-                let secs = (globalTimerSeconds % 60).toString().padStart(2, '0');
-                document.getElementById('timerDisplay').innerText = `Time: ${mins}:${secs}`;
-            }, 1000);
-
-            loadQuestion(0);
-     
+        func
