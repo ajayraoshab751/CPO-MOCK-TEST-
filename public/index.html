@@ -19,7 +19,7 @@
         /* Main Container */
         .main-container { padding: 15px; max-width: 800px; margin: 0 auto; }
         
-        /* Admin & Parser Card matching your theme */
+        /* Admin & Parser Card */
         .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
         .panel-card h2 { font-size: 16px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
@@ -79,31 +79,33 @@
 
     <div class="main-container">
         
-        <!-- Admin Panel & Automated Parsers Section -->
+        <!-- Admin & Parser Section -->
         <div id="adminParserSection" class="panel-card">
             <h2>🛠️ Admin Panel & Automated Parsers</h2>
-            <p>Upload PDF/HTML mock files containing questions. Select target module section to push generated mock tests straight into the public domain with AI bilingual extraction, PYQ tagging, and individual question timing.</p>
+            <p>Upload PDF or HTML mock files containing questions. Select target module section to push generated mock tests straight into the public domain with AI bilingual extraction, PYQ tagging, and individual question timing.</p>
 
             <div class="dropdown-box">
                 <label>📁 Select Public Domain Module Destination:</label>
                 <select id="targetModuleSelect">
-                    <option value="Comprehensive Syllabus">Comprehensive Syllabus</option>
-                    <option value="Chapter Test Bank">Chapter Test Bank</option>
                     <option value="Full-Length Tier-1 Mock Suite">Full-Length Tier-1 Mock Suite</option>
+                    <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                    <option value="Reasoning Section">Reasoning Section</option>
+                    <option value="General Studies & Science">General Studies & Science</option>
+                    <option value="English Section">English Section</option>
                 </select>
             </div>
 
             <div class="dropdown-box">
                 <label>Upload PDF / HTML Mock File (Supports 70+ Questions):</label>
-                <input type="file" id="mockFileInput" accept=".pdf,.html,.htm" multiple />
+                <!-- Removed strict accept attribute restriction to allow Android file manager to pick PDFs freely -->
+                <input type="file" id="mockFileInput" multiple />
             </div>
 
             <button class="btn-primary" onclick="processAndLaunchTest()">Auto-Parse File & Publish to Public Test</button>
         </div>
 
-        <!-- CBT Exam Screen (Hidden initially until a test is launched) -->
+        <!-- CBT Exam Screen -->
         <div id="cbtExamScreen" class="hidden">
-            <!-- Top Bar with Top-Left Navigation & Top-Right Language Toggle -->
             <div class="cbt-top-bar">
                 <div class="cbt-nav-top-left">
                     <button class="cbt-btn" onclick="prevQuestion()">Previous</button>
@@ -113,31 +115,22 @@
                 <button class="lang-toggle-btn" onclick="toggleLanguage()">🌐 <span id="langLabel">Hindi</span></button>
             </div>
 
-            <!-- Question Card Header -->
             <div class="question-meta">
                 <span id="qNumberIndicator">Question 1 of 50</span>
                 <span id="pyqTagDisplay" class="pyq-badge">SSC CPO 2024 (PYQ)</span>
             </div>
 
-            <!-- Question Content -->
             <div class="question-text" id="questionTextContainer">
                 Loading question content...
             </div>
 
-            <!-- Options List -->
-            <div class="options-list" id="optionsContainer">
-                <!-- Dynamically injected options -->
-            </div>
+            <div class="options-list" id="optionsContainer"></div>
 
-            <!-- Submit Button -->
             <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
 
-            <!-- Question Palette Navigator -->
             <div class="palette-container">
                 <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette:</div>
-                <div class="palette-grid" id="paletteGrid">
-                    <!-- Palette buttons injected here -->
-                </div>
+                <div class="palette-grid" id="paletteGrid"></div>
             </div>
         </div>
 
@@ -147,6 +140,7 @@
             <p>Here is your detailed performance scorecard breakdown:</p>
             
             <div style="background: #1f2937; padding: 15px; border-radius: 6px; margin: 15px 0; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                <div><strong>Target Section:</strong> <span id="resSection" style="color: #f59e0b;">-</span></div>
                 <div><strong>Total Correct Answers:</strong> <span id="resCorrect" style="color: #34d399;">0</span></div>
                 <div><strong>Total Incorrect Answers:</strong> <span id="resIncorrect" style="color: #ef4444;">0</span></div>
                 <div><strong>Total Unattempted:</strong> <span id="resUnattempted" style="color: #9ca3af;">0</span></div>
@@ -169,13 +163,12 @@
     </div>
 
     <script>
-        // CBT Test Engine State Data
-        let currentLang = 'en'; // 'en' or 'hi'
+        let currentLang = 'en';
         let currentQIndex = 0;
         let globalTimerSeconds = 0;
         let timerInterval = null;
+        let selectedTargetSection = '';
         
-        // Mock sample questions generated dynamically from parser simulation
         let activeTestQuestions = [
             {
                 en: {
@@ -191,7 +184,7 @@
                     explanation: "भारतीय संविधान का अनुच्छेद 124 उच्चतम न्यायालय की स्थापना और गठन का प्रावधान करता है।"
                 },
                 pyq: "SSC CPO 2023 (Shift 1)",
-                status: "not_visited", // not_visited, not_answered, answered, marked
+                status: "not_visited",
                 selectedOption: null,
                 timeSpent: 0
             },
@@ -219,18 +212,16 @@
 
         function processAndLaunchTest() {
             const fileInput = document.getElementById('mockFileInput');
-            const targetSection = document.getElementById('targetModuleSelect').value;
+            selectedTargetSection = document.getElementById('targetModuleSelect').value;
 
             if(fileInput.files.length === 0) {
                 alert("Please select at least one PDF or HTML file to parse!");
                 return;
             }
 
-            // Hide admin parser and show CBT exam interface
             document.getElementById('adminParserSection').classList.add('hidden');
             document.getElementById('cbtExamScreen').classList.remove('hidden');
 
-            // Initialize test session
             globalTimerSeconds = 0;
             if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -245,7 +236,6 @@
         }
 
         function loadQuestion(index) {
-            // Save time spent on previous question
             let now = Date.now();
             if(activeTestQuestions[currentQIndex]) {
                 activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
@@ -259,11 +249,9 @@
                 qData.status = 'not_answered';
             }
 
-            // Update UI indicators
             document.getElementById('qNumberIndicator').innerText = `Question ${currentQIndex + 1} of ${activeTestQuestions.length}`;
             document.getElementById('pyqTagDisplay').innerText = qData.pyqTag;
 
-            // Render text based on active language
             const localized = qData[currentLang];
             document.getElementById('questionTextContainer').innerText = localized.q;
 
@@ -341,7 +329,6 @@
 
         function submitTest() {
             clearInterval(timerInterval);
-            // Record final active question time
             let now = Date.now();
             activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
 
@@ -363,10 +350,10 @@
             let mins = Math.floor(globalTimerSeconds / 60);
             let secs = globalTimerSeconds % 60;
 
-            // Show result screen
             document.getElementById('cbtExamScreen').classList.add('hidden');
             document.getElementById('resultScreen').classList.remove('hidden');
 
+            document.getElementById('resSection').innerText = selectedTargetSection;
             document.getElementById('resCorrect').innerText = correctCount;
             document.getElementById('resIncorrect').innerText = incorrectCount;
             document.getElementById('resUnattempted').innerText = unattemptedCount;
@@ -376,3 +363,4 @@
     </script>
 </body>
 </html>
+
