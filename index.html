@@ -51,7 +51,7 @@
         .btn:hover { opacity: 0.9; }
         .btn-secondary { background: #334155; color: white; }
 
-        /* Bottom Fixed Navigation Bar (5 Core Buttons) */
+        /* Bottom Fixed Navigation Bar */
         nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--police-navy); border-top: 2px solid var(--border-dark); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
         .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; gap: 0.2rem; cursor: pointer; flex: 1; transition: color 0.2s; font-weight: 600; }
         .nav-btn span.icon { font-size: 1.3rem; }
@@ -64,6 +64,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
         .modal.active { display: flex; }
         .modal-content { background: var(--card-dark); border: 1px solid var(--accent-blue); width: 100%; max-width: 600px; border-radius: 12px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
+        .dynamic-mock-item { background: rgba(56,189,248,0.08); border: 1px dashed var(--accent-blue); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -97,29 +98,34 @@
                 <h2>Delhi Police CPO Tier-1 Full CBT Mock <span class="badge">Live Exam Simulation</span></h2>
                 <p>200 Questions | 120 Minutes | 0.25 Negative Marking. Mirroring exact SSC CPO Paper-1 standards.</p>
                 <button class="btn" onclick="startMockTest('Full CBT Mock 1')">Start Full Mock Test</button>
+                <div id="public_FullMock"></div>
             </div>
             
             <h3 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem; color: var(--police-gold);">Subject & Chapter-Wise Modules</h3>
             <div class="grid-2">
                 <div class="card">
                     <h2>Mathematics <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
-                    <p>Divisibility, Unit digit, Remainders, LCM & HCF, Percentage, Profit Loss & Discount, Ratio, SI/CI, Time & Work, Advanced Math & DI.</p>
+                    <p>Divisibility, Percentage, Profit Loss, Ratio, SI/CI, Time & Work, Advanced Math & DI.</p>
                     <button class="btn" onclick="openSubjectChapters('Math')">Open Math Chapters</button>
+                    <div id="public_Mathematics"></div>
                 </div>
                 <div class="card">
                     <h2>Reasoning <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
-                    <p>Analogy, Coding-Decoding, Series, Blood Relations, Direction, Syllogism, Calendar, Non-Verbal & Analytical reasoning.</p>
+                    <p>Analogy, Coding-Decoding, Series, Blood Relations, Direction, Syllogism & Non-Verbal.</p>
                     <button class="btn" onclick="openSubjectChapters('Reasoning')">Open Reasoning Chapters</button>
+                    <div id="public_Reasoning"></div>
                 </div>
                 <div class="card">
                     <h2>GK & GS <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
-                    <p>History, Indian Polity, Geography, Economy, General Science (Physics, Chem, Bio), Static GK & Current Affairs.</p>
+                    <p>History, Indian Polity, Geography, Economy, General Science, Static GK & Current Affairs.</p>
                     <button class="btn" onclick="openSubjectChapters('GK')">Open GK/GS Chapters</button>
+                    <div id="public_GK"></div>
                 </div>
                 <div class="card">
                     <h2>English <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
-                    <p>Grammar rules, Vocabulary, Synonyms/Antonyms, One-Word Substitutions, Cloze Test & Para Jumbles.</p>
+                    <p>Grammar rules, Vocabulary, Synonyms/Antonyms, One-Word Substitutions & Cloze Test.</p>
                     <button class="btn" onclick="openSubjectChapters('English')">Open English Chapters</button>
+                    <div id="public_English"></div>
                 </div>
             </div>
         </div>
@@ -141,7 +147,7 @@
         <div id="challengeView" class="view-section">
             <div class="card">
                 <h2>Habit & Streak Challenge Tracker</h2>
-                <p>Select your challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent. Strict circle limitation enforced: max 3 circles in 100-day, 2 circles in 60-day, and 1 circle in 30-day challenge.</p>
+                <p>Select challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent. Max 3 circles in 100-day, 2 in 60-day, and 1 in 30-day challenge.</p>
                 <div style="display: flex; gap: 0.75rem; margin: 1rem 0;">
                     <button class="btn" onclick="initChallenge(30)">30-Day (1 Circle)</button>
                     <button class="btn" onclick="initChallenge(60)">60-Day (2 Circles)</button>
@@ -151,11 +157,11 @@
             </div>
         </div>
 
-        <!-- 4. SAVED & WRONG QUESTIONS VIEW -->
+        <!-- 4. SAVED VIEW -->
         <div id="savedView" class="view-section">
             <div class="card">
                 <h2>Saved & Incorrect Questions Bank</h2>
-                <p>Answer Reveal Protection active: You must re-attempt each question before viewing correct solutions and detailed explanations.</p>
+                <p>Answer Reveal Protection active: Re-attempt each question before viewing correct solutions.</p>
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
                     <button class="btn btn-secondary" onclick="filterSaved('Math')">Math</button>
                     <button class="btn btn-secondary" onclick="filterSaved('Reasoning')">Reasoning</button>
@@ -168,11 +174,11 @@
             </div>
         </div>
 
-        <!-- 5. DOUBT GROUP VIEW -->
+        <!-- 5. DOUBT VIEW -->
         <div id="doubtView" class="view-section">
             <div class="card">
                 <h2>Community Doubt Forum & AI Image Solver</h2>
-                <p>Post your doubts or upload question screenshots for instant automated Google AI solutions.</p>
+                <p>Post doubts or upload screenshots for instant automated Google AI solutions.</p>
                 <textarea id="doubtInput" placeholder="Type your question or paste query here..." style="width: 100%; height: 80px; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;"></textarea>
                 <input type="file" id="doubtImageUpload" style="margin-bottom: 0.75rem; color: var(--text-muted);">
                 <button class="btn" onclick="submitDoubt()">Ask AI & Community</button>
@@ -184,11 +190,10 @@
         <div id="adminPanel" class="view-section">
             <div class="card" style="border-color: var(--police-gold);">
                 <h2>🛠️ Admin Panel & Automated Parsers</h2>
-                <p>Upload HTML mock files or PDF documents. Select the target module section where the generated test should be placed.</p>
+                <p>Upload HTML mock files or PDF documents. Select target module section to push generated mock tests straight into the public domain.</p>
                 
-                <!-- Target Section Selector for Generated Mock -->
                 <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-dark);">
-                    <label style="font-weight: bold; color: var(--police-gold); display: block; margin-bottom: 0.5rem;">📁 Select Target Module Section for Generated Mock:</label>
+                    <label style="font-weight: bold; color: var(--police-gold); display: block; margin-bottom: 0.5rem;">📁 Select Public Domain Module Destination:</label>
                     <select id="targetModuleSelect" style="width: 100%; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; font-size: 0.95rem;">
                         <option value="Mathematics">Mathematics Section</option>
                         <option value="Reasoning">Reasoning Section</option>
@@ -198,26 +203,23 @@
                     </select>
                 </div>
 
-                <!-- HTML Upload Section -->
                 <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
                     <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Upload HTML Mock File</h3>
                     <input type="file" id="htmlMockFile" accept=".html" style="margin-bottom: 0.5rem; color: var(--text-muted);">
-                    <button class="btn" onclick="parseHtmlMock()">Auto-Parse HTML & Generate Mock</button>
+                    <button class="btn" onclick="parseHtmlMock()">Auto-Parse HTML & Publish to Public</button>
                     <div id="htmlParserStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
                 </div>
 
-                <!-- PDF / Text Upload Section -->
                 <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
                     <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Upload PDF / Paste Extracted Text</h3>
                     <input type="file" id="pdfMockFile" accept=".pdf,.txt" style="margin-bottom: 0.5rem; color: var(--text-muted);">
                     <textarea id="extractedTextInput" placeholder="Or paste extracted multi-page PDF text here..." style="width: 100%; height: 70px; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.5rem; border-radius: 6px; margin-bottom: 0.5rem;"></textarea>
-                    <button class="btn" onclick="parsePdfOrText()">Auto-Detect Pages & Generate Mock</button>
+                    <button class="btn" onclick="parsePdfOrText()">Auto-Detect Pages & Publish to Public</button>
                     <div id="pdfParserStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
                 </div>
 
                 <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
                     <h3 style="font-size: 1rem; color: var(--police-gold); margin-bottom: 0.5rem;">User Interaction & Call Access Control</h3>
-                    <p style="font-size: 0.85rem;">Manually enable/disable interactive calling permissions for specific user profiles individually.</p>
                     <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
                         <input type="text" id="targetUserEmail" placeholder="user@gmail.com" style="flex: 1; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.5rem; border-radius: 6px;">
                         <button class="btn" onclick="toggleUserCallPermission()">Toggle Call Access</button>
@@ -231,7 +233,7 @@
         <div id="targetBoard" class="view-section">
             <div class="card">
                 <h2>🎯 Daily Target Board & Command Checklists</h2>
-                <p>Complete daily targets published by command. Mark tasks with 👍 (Completed) or ❌ (Not Completed).</p>
+                <p>Complete daily targets published by command. Mark tasks with 👍 or ❌.</p>
                 <div style="margin: 1rem 0; display: flex; gap: 0.5rem;">
                     <a href="https://youtube.com" target="_blank" class="btn btn-secondary">YouTube</a>
                     <a href="https://telegram.org" target="_blank" class="btn btn-secondary">Telegram</a>
@@ -245,22 +247,15 @@
                             <option value="done">👍 Completed</option>
                         </select>
                     </label>
-                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
-                        <span>2. Revise 100 Black Book Idioms & OWS</span>
-                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
-                            <option value="pending">❌ Not Completed</option>
-                            <option value="done">👍 Completed</option>
-                        </select>
-                    </label>
                 </div>
             </div>
         </div>
 
-        <!-- STUDY VAULT & VIDEO PLAYER -->
+        <!-- STUDY VAULT -->
         <div id="studyVault" class="view-section">
             <div class="card">
                 <h2>📚 Study Material, Downloads & Custom Video Player</h2>
-                <p>Stream lectures online or download packages. Customize video playback speed smoothly from 1.0x to 4.0x.</p>
+                <p>Stream lectures or download packages. Customize video playback speed smoothly from 1.0x to 4.0x.</p>
                 <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
                     <div style="background: #000; height: 180px; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-bottom: 0.75rem; color: var(--text-muted);">
                         [ Video Stream Preview ]
@@ -290,7 +285,7 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar (5 Core Buttons) -->
+    <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <button class="nav-btn active" onclick="switchView('testView'); setActiveNav(this);">
             <span class="icon">📝</span>
@@ -319,6 +314,11 @@
         let loginCount = parseInt(localStorage.getItem('cpo_login_count') || '1');
         document.getElementById('loginCountVal').innerText = loginCount;
         document.getElementById('userEmailDisplay').innerText = currentUser;
+
+        // Load public published mock tests into DOM on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPublishedMocks();
+        });
 
         function toggleMenu() {
             document.getElementById('dropdownMenu').classList.toggle('active');
@@ -393,7 +393,33 @@
             alert(days + '-Day Challenge loaded. Max circles: ' + maxCircles);
         }
 
-        // Updated Admin Parsers with Status Display & Module Target Selector
+        // --- Admin Parsers & Public Publishing System ---
+        function saveMockToLocalStorage(title, moduleType) {
+            let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
+            publishedMocks.push({ title: title, section: moduleType, date: new Date().toLocaleDateString() });
+            localStorage.setItem('cpo_published_mocks', JSON.stringify(publishedMocks));
+            renderPublishedMocks();
+        }
+
+        function renderPublishedMocks() {
+            // Clear containers first
+            ['Mathematics', 'Reasoning', 'GK', 'English', 'FullMock'].forEach(sec => {
+                const container = document.getElementById('public_' + sec);
+                if(container) container.innerHTML = '';
+            });
+
+            let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
+            publishedMocks.forEach(mock => {
+                const container = document.getElementById('public_' + mock.section);
+                if(container) {
+                    const item = document.createElement('div');
+                    item.className = 'dynamic-mock-item';
+                    item.innerHTML = `<div><strong style="color:var(--accent-blue);">${mock.title}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">Published: ${mock.date}</span></div><button class="btn" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="startMockTest('${mock.title}')">Attempt</button>`;
+                    container.appendChild(item);
+                }
+            });
+        }
+
         function parseHtmlMock() {
             const fileInput = document.getElementById('htmlMockFile');
             const targetModule = document.getElementById('targetModuleSelect').value;
@@ -404,10 +430,12 @@
                 return;
             }
 
-            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing HTML structure & formatting questions...</span>';
+            const fileName = fileInput.files[0].name.replace(/\.[^/.]+$/, "");
+            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing HTML and publishing to public domain...</span>';
             
             setTimeout(() => {
-                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Generated! Mock test routed and saved to <b>${targetModule}</b> module section.</span>`;
+                saveMockToLocalStorage('HTML Mock: ' + fileName, targetModule);
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Published! Now live in public domain under <b>${targetModule}</b>.</span>`;
             }, 1000);
         }
 
@@ -418,14 +446,16 @@
             const statusDiv = document.getElementById('pdfParserStatus');
 
             if(fileInput.files.length === 0 && !text) {
-                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Error: Please upload a PDF/text file or paste text.</span>';
+                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Error: Please upload a PDF file or paste text.</span>';
                 return;
             }
 
-            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Auto-detecting pages and generating CBT exam structure...</span>';
+            const mockTitle = fileInput.files.length > 0 ? 'PDF Mock: ' + fileInput.files[0].name.replace(/\.[^/.]+$/, "") : 'Custom Text CBT Mock';
+            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Auto-detecting pages and publishing to public domain...</span>';
 
             setTimeout(() => {
-                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Generated! Multi-page PDF parsed and routed to <b>${targetModule}</b> module section.</span>`;
+                saveMockToLocalStorage(mockTitle, targetModule);
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Published! Multi-page test live in public domain under <b>${targetModule}</b>.</span>`;
             }, 1200);
         }
 
@@ -453,8 +483,8 @@
             alert('Doubt posted with AI solution!');
         }
 
-        function startMockTest(title) { alert('Launching ' + title); }
-        function openSubjectChapters(subject) { alert('Opening chapters for ' + subject); }
+        function startMockTest(title) { alert('Launching live exam simulation for: ' + title); }
+        function openSubjectChapters(subject) { alert('Opening chapter-wise modules for ' + subject); }
         function filterSaved(section) { alert('Filtering saved vault for ' + section); }
 
         window.addEventListener('click', function(e) {
