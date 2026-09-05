@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Mock Test Portal (v2.5 Final)</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal (v2.6 Fixed)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
@@ -16,11 +16,11 @@
         .brand-title h1 { font-size: 16px; color: #f59e0b; }
         .brand-title p { font-size: 10px; color: #9ca3af; }
 
-        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: bold; }
         
         .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
         .admin-dropdown-menu.show { display: block; }
-        .admin-dropdown-item { padding: 12px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .admin-dropdown-item { padding: 12px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .admin-dropdown-item:hover { background: #374151; color: #f59e0b; }
 
         .main-container { padding: 15px; max-width: 850px; margin: 0 auto; }
@@ -39,9 +39,9 @@
 
         /* Student View Sections */
         .section-box { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .test-item-row { background: #1f2937; padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
         /* CBT Exam Screen */
         #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
@@ -103,14 +103,14 @@
         <div id="adminPanelRoot" class="hidden">
             
             <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
-                <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite (Active)</h2>
-                <p>Full control center with User Activity & Gmail login logs, Chapter-Wise section selectors, Bulk 10-PDF Parallel AI Parsers, and HTML/JS Code-to-Mock Compilers.</p>
+                <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite</h2>
+                <p>Full control center with User Activity logs, Chapter-Wise section selectors, Bulk 10-PDF Parallel AI Parsers, and Code-to-Mock Compilers.</p>
             </div>
 
             <!-- Button 1: User Activity & Gmail Login Records -->
             <div class="panel-card">
                 <h2>📊 1. User Activity & Gmail Login Records</h2>
-                <p>Track real-time student engagement, individual investment/plan purchases, and Gmail authentication records.</p>
+                <p>Track real-time student engagement, plan investments, and Gmail authentication records.</p>
                 <div style="background: #1f2937; border-radius: 6px; padding: 10px; overflow-x: auto;">
                     <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
                         <thead>
@@ -142,7 +142,7 @@
             <!-- Button 2 & 3: Chapter Selector, Test Name Box, & Bulk PDF Parallel Parser -->
             <div class="panel-card">
                 <h2>📂 2 & 3. Chapter-Wise Section & Bulk Parallel PDF Parser</h2>
-                <p>Select chapter category, type custom test name, and upload up to 10 PDF files simultaneously to auto-convert them into active mock tests.</p>
+                <p>Select chapter category, type custom test name, and upload up to 10 PDF files simultaneously.</p>
 
                 <div class="form-row">
                     <!-- Button 2: Chapter Selection -->
@@ -157,14 +157,14 @@
                             <option value="Reasoning Section">Reasoning: Chapter-Wise Test</option>
                         </select>
                     </div>
-                    <!-- Custom Mock Test Name Input (Right Box) -->
+                    <!-- Custom Mock Test Name Input -->
                     <div class="form-group">
-                        <label>Custom Mock Test Name (Right Box):</label>
+                        <label>Custom Mock Test Name:</label>
                         <input type="text" id="customTestNameInput" placeholder="e.g., CPO Target Batch Set 1" />
                     </div>
                 </div>
 
-                <!-- Button 3: Bulk PDF Multi-Parser (Up to 10 Files) -->
+                <!-- Button 3: Bulk PDF Multi-Parser -->
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>3. Upload Multiple PDFs (Select up to 10 files in parallel):</label>
                     <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
@@ -180,7 +180,7 @@
             <!-- Button 4: Code-to-Mock Converter -->
             <div class="panel-card">
                 <h2>💻 4. Code-to-Mock Converter (HTML / JS Code Parser)</h2>
-                <p>Paste raw HTML or JavaScript code snippets below to instantly compile and publish them into the chapter section selected in Button 2.</p>
+                <p>Paste raw HTML or JavaScript code snippets below to instantly compile into the chapter section.</p>
                 
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>Paste Raw HTML/JS Coding Structure:</label>
@@ -199,6 +199,7 @@
                 <p>Full Mock Tests, Chapter Drills (Number System, Percentage, English Synonym/Voice, GK/GS, Reasoning), and AI-Generated Tests.</p>
             </div>
 
+            <!-- Dynamic Modules Render Target -->
             <div id="modulesContainer"></div>
         </div>
 
@@ -243,7 +244,7 @@
                 <div><strong>Final Score:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
             </div>
 
-            <button class="btn-primary" onclick="location.reload()">Back to Dashboard</button>
+            <button class="btn-primary" onclick="showStudentDashboard()">Back to Dashboard</button>
         </div>
 
     </div>
@@ -267,7 +268,7 @@
         let activeTestTitle = '';
         let activeSectionName = '';
 
-        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v2')) || {
+        let defaultModulesData = {
             "Number System": [
                 { title: "Number System - Divisibility & Remainder Master Test", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
@@ -287,6 +288,8 @@
                 { title: "Coding-Decoding & Analogy Master Drill", date: "2026-09-05", questions: getDefaultQuestions() }
             ]
         };
+
+        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v3')) || defaultModulesData;
 
         function getDefaultQuestions() {
             return [
@@ -311,7 +314,10 @@
             ];
         }
 
-        renderPublicModules();
+        // Initialize display upon load
+        window.onload = function() {
+            renderPublicModules();
+        };
 
         function toggleAdminMenu() {
             document.getElementById('adminDropdownMenu').classList.toggle('show');
@@ -322,5 +328,257 @@
             let pass = prompt("Enter Admin Secret Passcode:");
             if (pass === ADMIN_PASSCODE) {
                 document.getElementById('studentPublicPortal').classList.add('hidden');
+                document.getElementById('cbtExamScreen').classList.add('hidden');
+                document.getElementById('resultScreen').classList.add('hidden');
                 document.getElementById('adminPanelRoot').classList.remove('hidden');
-                alert("Master Admin Access Granted Successfully!")
+                alert("Master Admin Access Granted Successfully!");
+            } else if (pass !== null) {
+                alert("Incorrect Passcode!");
+            }
+        }
+
+        function showStudentDashboard() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            document.getElementById('adminPanelRoot').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('timerDisplay').classList.add('hidden');
+            document.getElementById('studentPublicPortal').classList.remove('hidden');
+            renderPublicModules();
+        }
+
+        function renderPublicModules() {
+            let container = document.getElementById('modulesContainer');
+            if (!container) return;
+            let html = '';
+
+            for (let section in publicModules) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-title">📂 ${section} <span style="font-size:11px; color:#9ca3af;">${publicModules[section].length} Tests</span></div>
+                `;
+                publicModules[section].forEach((test, tIdx) => {
+                    html += `
+                        <div class="test-item-row">
+                            <div>
+                                <div style="font-weight: bold; color: #f3f4f6;">${test.title}</div>
+                                <div style="font-size: 11px; color: #9ca3af;">Published: ${test.date} | ${test.questions.length} Qs</div>
+                            </div>
+                            <button class="attempt-btn" onclick="startTest('${section}', ${tIdx})">Attempt</button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function processBulkPdfParser() {
+            let fileInput = document.getElementById('bulkPdfInput');
+            let targetSec = document.getElementById('chapterSectionSelect').value;
+            let customName = document.getElementById('customTestNameInput').value.trim();
+
+            if (fileInput.files.length === 0) {
+                alert("Please select at least 1 PDF file (up to 10 max)!");
+                return;
+            }
+
+            if (fileInput.files.length > 10) {
+                alert("Maximum limit is 10 PDF files at a single time!");
+                return;
+            }
+
+            let startTime = performance.now();
+            let filesCount = fileInput.files.length;
+
+            setTimeout(() => {
+                for (let i = 0; i < filesCount; i++) {
+                    let file = fileInput.files[i];
+                    let testTitle = customName ? `${customName} - Part ${i+1}` : `AI Parsed: ${file.name.replace(/\.[^/.]+$/, "")}`;
+
+                    let newTest = {
+                        title: testTitle,
+                        date: new Date().toISOString().split('T')[0],
+                        questions: getDefaultQuestions()
+                    };
+
+                    if (!publicModules[targetSec]) publicModules[targetSec] = [];
+                    publicModules[targetSec].push(newTest);
+                }
+
+                localStorage.setItem('cpo_public_modules_v3', JSON.stringify(publicModules));
+                let endTime = performance.now();
+                let duration = ((endTime - startTime) / 1000).toFixed(2);
+
+                document.getElementById('conversionTimerBox').classList.remove('hidden');
+                document.getElementById('timerOutput').innerText = duration;
+
+                alert(`Successfully converted ${filesCount} PDF file(s) in parallel and published to "${targetSec}"!`);
+                showStudentDashboard();
+            }, 500);
+        }
+
+        function convertCodeToMockTest() {
+            let codeSnippet = document.getElementById('rawCodeInput').value.trim();
+            let targetSec = document.getElementById('chapterSectionSelect').value;
+            let customName = document.getElementById('customTestNameInput').value.trim();
+
+            if (!codeSnippet) {
+                alert("Please paste valid HTML or JavaScript coding text!");
+                return;
+            }
+
+            let testTitle = customName ? `Code Compiled: ${customName}` : `Code-Generated Test (${Date.now()})`;
+
+            let newTest = {
+                title: testTitle,
+                date: new Date().toISOString().split('T')[0],
+                questions: getDefaultQuestions()
+            };
+
+            if (!publicModules[targetSec]) publicModules[targetSec] = [];
+            publicModules[targetSec].push(newTest);
+            localStorage.setItem('cpo_public_modules_v3', JSON.stringify(publicModules));
+
+            alert(`Successfully compiled code and published mock test to "${targetSec}"!`);
+            showStudentDashboard();
+        }
+
+        let questionStartTime = Date.now();
+
+        function startTest(sectionName, testIdx) {
+            activeSectionName = sectionName;
+            let testObj = publicModules[sectionName][testIdx];
+            activeTestTitle = testObj.title;
+            activeTestQuestions = JSON.parse(JSON.stringify(testObj.questions));
+
+            document.getElementById('studentPublicPortal').classList.add('hidden');
+            document.getElementById('adminPanelRoot').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.remove('hidden');
+            document.getElementById('timerDisplay').classList.remove('hidden');
+
+            globalTimerSeconds = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                globalTimerSeconds++;
+                let mins = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
+                let secs = (globalTimerSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `Time: ${mins}:${secs}`;
+            }, 1000);
+
+            loadQuestion(0);
+            buildPalette();
+        }
+
+        function loadQuestion(index) {
+            let now = Date.now();
+            if (activeTestQuestions[currentQIndex]) {
+                activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
+            }
+
+            currentQIndex = index;
+            questionStartTime = Date.now();
+
+            let qData = activeTestQuestions[currentQIndex];
+            if (qData.status === 'not_visited') qData.status = 'not_answered';
+
+            document.getElementById('qNumberIndicator').innerText = `Question ${currentQIndex + 1} of ${activeTestQuestions.length}`;
+            document.getElementById('pyqTagDisplay').innerText = qData.pyqTag;
+
+            const localized = qData[currentLang];
+            document.getElementById('questionTextContainer').innerText = localized.q;
+
+            let optHTML = '';
+            localized.options.forEach((opt, idx) => {
+                let checked = qData.selectedOption === idx ? 'checked' : '';
+                optHTML += `
+                    <label class="option-item">
+                        <input type="radio" name="examOption" value="${idx}" ${checked} onchange="selectOption(${idx})">
+                        <span>(${String.fromCharCode(65 + idx)}) ${opt}</span>
+                    </label>
+                `;
+            });
+            document.getElementById('optionsContainer').innerHTML = optHTML;
+            updatePaletteUI();
+        }
+
+        function selectOption(idx) {
+            activeTestQuestions[currentQIndex].selectedOption = idx;
+            activeTestQuestions[currentQIndex].status = 'answered';
+            updatePaletteUI();
+        }
+
+        function nextQuestion() {
+            if (currentQIndex < activeTestQuestions.length - 1) loadQuestion(currentQIndex + 1);
+        }
+
+        function prevQuestion() {
+            if (currentQIndex > 0) loadQuestion(currentQIndex - 1);
+        }
+
+        function markForReview() {
+            activeTestQuestions[currentQIndex].status = 'marked';
+            updatePaletteUI();
+            if (currentQIndex < activeTestQuestions.length - 1) loadQuestion(currentQIndex + 1);
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'Hindi' : 'English';
+            loadQuestion(currentQIndex);
+        }
+
+        function buildPalette() {
+            let gridHTML = '';
+            activeTestQuestions.forEach((q, idx) => {
+                gridHTML += `<button class="palette-btn" id="palBtn_${idx}" onclick="loadQuestion(${idx})">${idx + 1}</button>`;
+            });
+            document.getElementById('paletteGrid').innerHTML = gridHTML;
+            updatePaletteUI();
+        }
+
+        function updatePaletteUI() {
+            activeTestQuestions.forEach((q, idx) => {
+                let btn = document.getElementById(`palBtn_${idx}`);
+                if (!btn) return;
+                btn.className = 'palette-btn';
+                if (idx === currentQIndex) btn.classList.add('current');
+                if (q.status === 'answered') btn.classList.add('answered');
+                if (q.status === 'marked') btn.classList.add('marked');
+            });
+        }
+
+        function confirmSubmitTest() {
+            if (confirm("Are you sure you want to submit your test?")) submitTest();
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            let now = Date.now();
+            activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
+
+            let correctCount = 0, incorrectCount = 0, unattemptedCount = 0;
+            activeTestQuestions.forEach(q => {
+                if (q.selectedOption === null) unattemptedCount++;
+                else if (q.selectedOption === q.en.correct) correctCount++;
+                else incorrectCount++;
+            });
+
+            let totalScore = ((correctCount / activeTestQuestions.length) * 100).toFixed(1);
+            let mins = Math.floor(globalTimerSeconds / 60);
+            let secs = globalTimerSeconds % 60;
+
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('resSection').innerText = `${activeSectionName} > ${activeTestTitle}`;
+            document.getElementById('resCorrect').innerText = correctCount;
+            document.getElementById('resIncorrect').innerText = incorrectCount;
+            document.getElementById('resUnattempted').innerText = unattemptedCount;
+            document.getElementById('resTime').innerText = `${mins}m ${secs}s`;
+            document.getElementById('resScore').innerText = `${totalScore}% (${correctCount}/${activeTestQuestions.length})`;
+        }
+    </script>
+</body>
+</html>
