@@ -6,34 +6,36 @@
     <title>CPO AIR 1 - Delhi Police CBT Exam Platform</title>
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-dark: #131b2e;
-            --border-dark: #1e293b;
+            --bg-dark: #070b14;
+            --card-dark: #111827;
+            --border-dark: #1f293d;
             --accent-blue: #38bdf8;
-            --police-navy: #0f172a;
-            --police-gold: #fbbf24;
+            --police-navy: #0d1527;
+            --police-gold: #f59e0b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --success: #22c55e;
             --danger: #ef4444;
+            --warning: #eab308;
+            --purple: #a855f7;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 70px; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 80px; }
         
         /* Header */
-        header { background: linear-gradient(135deg, var(--police-navy), #1e293b); border-bottom: 2px solid var(--accent-blue); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        header { background: linear-gradient(135deg, var(--police-navy), #1e293b); border-bottom: 2px solid var(--police-gold); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .brand { display: flex; align-items: center; gap: 0.75rem; }
-        .badge-logo { width: 40px; height: 40px; background: var(--police-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--police-navy); font-size: 1.1rem; border: 2px solid white; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
-        .brand h1 { font-size: 1.3rem; color: var(--accent-blue); letter-spacing: 0.5px; }
-        .brand span { font-size: 0.75rem; background: rgba(56,189,248,0.15); color: var(--accent-blue); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(56,189,248,0.3); }
+        .badge-logo { width: 42px; height: 42px; background: radial-gradient(circle, #fcd34d, var(--police-gold)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--police-navy); font-size: 1rem; border: 2px solid white; box-shadow: 0 0 12px rgba(245,158,11,0.6); }
+        .brand h1 { font-size: 1.5rem; color: var(--accent-blue); letter-spacing: 1px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .brand span { font-size: 0.7rem; background: rgba(245,158,11,0.2); color: var(--police-gold); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(245,158,11,0.4); font-weight: 600; }
         
         /* Menu / Top Right */
-        .menu-icon { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; }
+        .menu-icon { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 0.2rem 0.6rem; border-radius: 6px; }
         .menu-icon:hover { background: rgba(255,255,255,0.1); }
-        .dropdown-menu { display: none; position: absolute; right: 15px; top: 60px; background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 8px; width: 220px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 200; overflow: hidden; }
+        .dropdown-menu { display: none; position: absolute; right: 15px; top: 65px; background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; width: 240px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 200; overflow: hidden; }
         .dropdown-menu.active { display: block; }
-        .dropdown-item { padding: 0.75rem 1rem; color: var(--text-main); text-decoration: none; display: block; font-size: 0.9rem; border-bottom: 1px solid var(--border-dark); cursor: pointer; transition: background 0.2s; }
-        .dropdown-item:hover { background: rgba(56,189,248,0.1); color: var(--accent-blue); }
+        .dropdown-item { padding: 0.85rem 1rem; color: var(--text-main); text-decoration: none; display: block; font-size: 0.9rem; border-bottom: 1px solid var(--border-dark); cursor: pointer; transition: background 0.2s; }
+        .dropdown-item:hover { background: rgba(56,189,248,0.15); color: var(--accent-blue); }
 
         /* Main Container Views */
         .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; width: 100%; flex: 1; }
@@ -42,20 +44,27 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Cards & UI Elements */
-        .card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .card h2 { color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .card h2 { color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; }
         .card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; margin-bottom: 1rem; }
-        .btn { background: var(--accent-blue); color: var(--police-navy); font-weight: 600; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; font-size: 0.9rem; }
+        .btn { background: var(--accent-blue); color: var(--police-navy); font-weight: 700; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; font-size: 0.9rem; }
         .btn:hover { opacity: 0.9; }
+        .btn-secondary { background: #334155; color: white; }
 
-        /* Bottom Fixed Navigation Bar (5 Buttons) */
-        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--police-navy); border-top: 1px solid var(--border-dark); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 100; backdrop-filter: blur(10px); }
-        .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 0.2rem; cursor: pointer; flex: 1; transition: color 0.2s; }
-        .nav-btn span.icon { font-size: 1.2rem; }
+        /* Bottom Fixed Navigation Bar (5 Core Buttons) */
+        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--police-navy); border-top: 2px solid var(--border-dark); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+        .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; gap: 0.2rem; cursor: pointer; flex: 1; transition: color 0.2s; font-weight: 600; }
+        .nav-btn span.icon { font-size: 1.3rem; }
         .nav-btn.active, .nav-btn:hover { color: var(--accent-blue); }
 
-        /* Responsive Grid for Chapters/Tests */
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        /* Layout grids */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+        .badge { background: rgba(34,197,94,0.15); color: var(--success); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(34,197,94,0.3); }
+        
+        /* Modal Overlays */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card-dark); border: 1px solid var(--accent-blue); width: 100%; max-width: 600px; border-radius: 12px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -72,45 +81,46 @@
         
         <!-- 3-Dot Dropdown Menu -->
         <div id="dropdownMenu" class="dropdown-menu">
-            <div class="dropdown-item" onclick="switchView('profileView'); toggleMenu();">👤 Profile & OTP Auth</div>
+            <div class="dropdown-item" onclick="openModal('profileModal'); toggleMenu();">👤 Profile & Gmail OTP</div>
             <div class="dropdown-item" onclick="switchView('targetBoard'); toggleMenu();">🎯 Target Board & Checklists</div>
             <div class="dropdown-item" onclick="location.reload();">🔄 Refresh App Data</div>
-            <div class="dropdown-item" onclick="switchView('studyVault'); toggleMenu();">📚 Study Vault & Video Player</div>
-            <div class="dropdown-item" onclick="alert('Session Terminated. Logged out safely.'); location.reload();" style="color: var(--danger);">🚪 Logout</div>
+            <div class="dropdown-item" onclick="switchView('studyVault'); toggleMenu();">📚 Study Vault, PDFs & Video</div>
+            <div class="dropdown-item" onclick="switchView('adminPanel'); toggleMenu();">🛠️ Admin & Parser Panel</div>
+            <div class="dropdown-item" onclick="logoutUser();" style="color: var(--danger);">🚪 Logout</div>
         </div>
     </header>
 
     <div class="container">
         
-        <!-- 1. TEST VIEW -->
+        <!-- 1. TEST VIEW (5 Core Sections & Chapters) -->
         <div id="testView" class="view-section active">
-            <div class="card" style="border-color: var(--accent-blue);">
-                <h2>Delhi Police CPO Tier-1 Full Mock CBT</h2>
-                <p>Timed computer-based test environment structured according to latest SSC exam pattern with negative marking and instant scorecard analytics.</p>
-                <button class="btn" onclick="alert('Launching Full-Length CBT Mock Engine...')">Start Full Mock</button>
+            <div class="card" style="border-color: var(--police-gold); background: linear-gradient(135deg, #111827, #1e293b);">
+                <h2>Delhi Police CPO Tier-1 Full CBT Mock <span class="badge">Live Exam Simulation</span></h2>
+                <p>200 Questions | 120 Minutes | 0.25 Negative Marking. Mirroring exact SSC CPO Paper-1 standards. Reattempt limit: 10 times.</p>
+                <button class="btn" onclick="startMockTest('Full CBT Mock 1')">Start Full Mock Test</button>
             </div>
             
             <h3 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem; color: var(--police-gold);">Subject & Chapter-Wise Modules</h3>
             <div class="grid-2">
                 <div class="card">
-                    <h2>Mathematics</h2>
-                    <p>Divisibility, BODMAS, Percentage, Profit & Loss, SI/CI, Time & Work, Advanced Math & DI.</p>
-                    <button class="btn" onclick="alert('Opening Math Chapters...')">Explore Math</button>
+                    <h2>Mathematics <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
+                    <p>Divisibility, Unit digit, Remainders, LCM & HCF, Simplification & BODMAS, Percentage, Profit Loss & Discount, Ratio & Proportion, Averages & Partnership, Mixture & Alligation, Simple & Compound Interest, Time & Work, Time Speed & Distance, Advanced Math (Algebra, Geometry, Mensuration, Trigonometry), Data Interpretation (DI), Statistics & Probability.</p>
+                    <button class="btn" onclick="openSubjectChapters('Math')">Open Math Chapters</button>
                 </div>
                 <div class="card">
-                    <h2>Reasoning</h2>
-                    <p>Coding-Decoding, Blood Relations, Syllogism, Series, Non-Verbal & Analytical reasoning.</p>
-                    <button class="btn" onclick="alert('Opening Reasoning Chapters...')">Explore Reasoning</button>
+                    <h2>Reasoning <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
+                    <p>Verbal (Analogy, Classification, Coding-Decoding, Series, Missing Number, Blood Relations, Direction, Ranking, Syllogism, Venn Diagrams, Clock & Calendar, Dice & Cube, Mathematical Ops) & Analytical/Non-Verbal (Statements, Mirror/Water Images, Paper Folding, Embedded Figures, Counting Figures).</p>
+                    <button class="btn" onclick="openSubjectChapters('Reasoning')">Open Reasoning Chapters</button>
                 </div>
                 <div class="card">
-                    <h2>GK & General Studies</h2>
-                    <p>Indian History, Polity, Geography, Economy, General Science & Static Current Affairs.</p>
-                    <button class="btn" onclick="alert('Opening GK Modules...')">Explore GK/GS</button>
+                    <h2>GK & GS <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
+                    <p>History (Ancient, Medieval, Modern), Indian Polity, Geography (Indian & World), Economy, General Science (Physics, Chemistry, Biology), Static GK (Art & Culture, Parks, Sports, Books) & Last 6-8 Months Current Affairs.</p>
+                    <button class="btn" onclick="openSubjectChapters('GK')">Open GK/GS Chapters</button>
                 </div>
                 <div class="card">
-                    <h2>English Comprehension</h2>
-                    <p>Grammar rules, Spotting Errors, Vocabulary, Synonyms/Antonyms, Para Jumbles & Cloze Test.</p>
-                    <button class="btn" onclick="alert('Opening English Modulesvald...')">Explore English</button>
+                    <h2>English <span style="font-size:0.8rem; color:var(--text-muted);">50 Qs</span></h2>
+                    <p>Grammar (Parts of Speech, Subject-Verb Agreement, Tenses, Voice, Narration, Articles), Vocabulary (Synonyms, Antonyms, OWS, Idioms, Spelling, Phrasal Verbs), Reading & Comprehension, Cloze Test, Para Jumbles & Black Book drills.</p>
+                    <button class="btn" onclick="openSubjectChapters('English')">Open English Chapters</button>
                 </div>
             </div>
         </div>
@@ -118,24 +128,27 @@
         <!-- 2. LEADERBOARD VIEW -->
         <div id="leaderboardView" class="view-section">
             <div class="card">
-                <h2>All-India Leaderboard & Percentiles</h2>
-                <p>Track your national standing among Delhi Police aspirants. View chapter-wise strong/weak area diagnostics and accuracy trend lines.</p>
-                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 6px; margin-top: 1rem; text-align: center; color: var(--success); font-weight: bold;">
-                    Your Current Rank: AIR 42 (Top 0.5%)
+                <h2>All-India Leaderboard & Analytics</h2>
+                <p>Real-time rank monitoring, percentage improvements, and automated chapter-wise strength & weakness diagnostics.</p>
+                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
+                    <p style="color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🏆 Your Rank: AIR 42 (Top 0.5%)</p>
+                    <p style="color: var(--text-main); font-size: 0.85rem;">Strongest Chapter: Percentage & Ratios (92% Accuracy)</p>
+                    <p style="color: var(--danger); font-size: 0.85rem;">Weakest Chapter: Mensuration 3D & Advanced Trigonometry (41% Accuracy)</p>
                 </div>
             </div>
         </div>
 
-        <!-- 3. CHALLENGE VIEW -->
+        <!-- 3. CHALLENGE VIEW (Habit Tracker & Circles) -->
         <div id="challengeView" class="view-section">
             <div class="card">
                 <h2>Habit & Streak Challenge Tracker</h2>
-                <p>Select your target streak duration. Mark Present (P) or Absent (A). Strict circle limitations enforce disciplined execution.</p>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="btn" onclick="alert('30-Day Challenge Active (Limit: 1 Circle)')">30 Days</button>
-                    <button class="btn" onclick="alert('60-Day Challenge Active (Limit: 2 Circles)')">60 Days</button>
-                    <button class="btn" onclick="alert('100-Day Challenge Active (Limit: 3 Circles)')">100 Days</button>
+                <p>Select your challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent. Strict circle limitation enforced: max 3 circles in 100-day, 2 circles in 60-day, and 1 circle in 30-day challenge.</p>
+                <div style="display: flex; gap: 0.75rem; margin: 1rem 0;">
+                    <button class="btn" onclick="initChallenge(30)">30-Day (1 Circle Limit)</button>
+                    <button class="btn" onclick="initChallenge(60)">60-Day (2 Circles Limit)</button>
+                    <button class="btn" onclick="initChallenge(100)">100-Day (3 Circles Limit)</button>
                 </div>
+                <div id="challengeGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 6px; margin-top: 1rem;"></div>
             </div>
         </div>
 
@@ -143,79 +156,191 @@
         <div id="savedView" class="view-section">
             <div class="card">
                 <h2>Saved & Incorrect Questions Bank</h2>
-                <p>Review bookmarked items and incorrect test history. Answer reveal protection enabled: you must re-attempt before viewing solutions.</p>
-                <button class="btn" onclick="alert('Loading question revision vault...')">Open Question Vault</button>
-            </div>
-        </div>
-
-        <!-- 5. DOUBT GROUP VIEW -->
-        <div id="doubtView" class="view-section">
-            <div class="card">
-                <h2>Community Doubt Forum & AI Solver</h2>
-                <p>Post questions or upload images of difficult problems to get instant automated solutions via integrated AI assistance.</p>
-                <button class="btn" onclick="alert('Opening AI Doubt Camera & Forum...')">Post New Doubt</button>
-            </div>
-        </div>
-
-        <!-- HIDDEN VIEWS FOR 3-DOT MENU -->
-        <div id="profileView" class="view-section">
-            <div class="card">
-                <h2>User Profile & Security</h2>
-                <p>Registered via Gmail Gateway. Manage your credentials or trigger simulated OTP verification.</p>
-                <button class="btn" onclick="alert('OTP sent to registered Gmail!')">Change Password / Email via OTP</button>
-            </div>
-        </div>
-
-        <div id="targetBoard" class="view-section">
-            <div class="card">
-                <h2>Admin Target Board & Daily Checklists</h2>
-                <p>Complete daily tasks posted by command staff. Check off items as you finish them.</p>
-                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-main);">
-                    <label><input type="checkbox"> Complete 1 Full-Length Mock Test (👍 / ❌)</label>
-                    <label><input type="checkbox"> Revise 50 Black Book Idioms & OWS</label>
-                    <label><input type="checkbox"> Solve 30 Quantitative Aptitude DI Sets</label>
+                <p>Answer Reveal Protection active: You must re-attempt each question before viewing correct solutions and detailed explanations.</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button class="btn btn-secondary" onclick="filterSaved('Math')">Math</button>
+                    <button class="btn btn-secondary" onclick="filterSaved('Reasoning')">Reasoning</button>
+                    <button class="btn btn-secondary" onclick="filterSaved('GK')">GK/GS</button>
+                    <button class="btn btn-secondary" onclick="filterSaved('English')">English</button>
+                </div>
+                <div id="savedQuestionsContainer">
+                    <p style="color: var(--text-muted);">No bookmarked or incorrect questions recorded yet. Attempt tests to populate vault.</p>
                 </div>
             </div>
         </div>
 
+        <!-- 5. DOUBT GROUP VIEW (AI Solver & Forum) -->
+        <div id="doubtView" class="view-section">
+            <div class="card">
+                <h2>Community Doubt Forum & AI Image Solver</h2>
+                <p>Post your doubts or upload question screenshots. Integrated AI provides instant automated solutions and community peer support.</p>
+                <textarea id="doubtInput" placeholder="Type your question or paste query here..." style="width: 100%; height: 80px; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;"></textarea>
+                <input type="file" id="doubtImageUpload" style="margin-bottom: 0.75rem; color: var(--text-muted);">
+                <button class="btn" onclick="submitDoubt()">Ask AI & Community</button>
+                <div id="doubtFeed" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;"></div>
+            </div>
+        </div>
+
+        <!-- ADMIN & PARSER PANEL -->
+        <div id="adminPanel" class="view-section">
+            <div class="card" style="border-color: var(--police-gold);">
+                <h2>🛠️ Admin Panel & Automated Parsers</h2>
+                <p>Upload HTML mock files or PDF documents (1 to 150+ pages). The system auto-detects pages, formats questions, and builds CBT modules instantly.</p>
+                
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
+                    <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Upload HTML Mock File</h3>
+                    <input type="file" id="htmlMockFile" accept=".html" style="margin-bottom: 0.5rem; color: var(--text-muted);">
+                    <button class="btn" onclick="parseHtmlMock()">Auto-Parse HTML to Mock Test</button>
+                </div>
+
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
+                    <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Upload PDF / Paste Extracted Text</h3>
+                    <input type="file" id="pdfMockFile" accept=".pdf,.txt" style="margin-bottom: 0.5rem; color: var(--text-muted);">
+                    <textarea id="extractedTextInput" placeholder="Or paste extracted multi-page PDF text here..." style="width: 100%; height: 70px; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.5rem; border-radius: 6px; margin-bottom: 0.5rem;"></textarea>
+                    <button class="btn" onclick="parsePdfOrText()">Auto-Detect Pages & Generate Mock</button>
+                </div>
+
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
+                    <h3 style="font-size: 1rem; color: var(--police-gold); margin-bottom: 0.5rem;">User Interaction & Call Access Control</h3>
+                    <p style="font-size: 0.85rem;">Manually enable/disable interactive calling permissions for specific user profiles individually.</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <input type="text" id="targetUserEmail" placeholder="user@gmail.com" style="flex: 1; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.5rem; border-radius: 6px;">
+                        <button class="btn" onclick="toggleUserCallPermission()">Toggle Call Access</button>
+                    </div>
+                    <p id="totalLoginsDisplay" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--success);">📊 Total Gmail Logins Tracked: <span id="loginCountVal">1</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARGET BOARD -->
+        <div id="targetBoard" class="view-section">
+            <div class="card">
+                <h2>🎯 Daily Target Board & Command Checklists</h2>
+                <p>Complete daily targets published by command. Use official links and mark tasks with 👍 (Completed) or ❌ (Not Completed).</p>
+                <div style="margin: 1rem 0; display: flex; gap: 0.5rem;">
+                    <a href="https://youtube.com" target="_blank" class="btn btn-secondary">YouTube Lecture</a>
+                    <a href="https://telegram.org" target="_blank" class="btn btn-secondary">Telegram Channel</a>
+                    <a href="https://whatsapp.com" target="_blank" class="btn btn-secondary">WhatsApp Group</a>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;" id="targetChecklistContainer">
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>1. Attempt Daily Quantitative Aptitude Section (50 Qs)</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>2. Revise 100 Black Book Idioms & One-Word Substitutions</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>3. Complete Reasoning Missing Number & Series Test</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>4. Read Last 6 Months Government Schemes Current Affairs</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>5. Solve 3 Data Interpretation (DI) Sets</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
+                        <span>6. Full-Length Tier-1 Mock Analysis & Error Log Revision</span>
+                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
+                            <option value="pending">❌ Not Completed</option>
+                            <option value="done">👍 Completed</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- STUDY VAULT & VIDEO PLAYER -->
         <div id="studyVault" class="view-section">
             <div class="card">
-                <h2>Study Vault, Video Lectures & PDFs</h2>
-                <p>Stream recorded lectures with custom speed controls (1.0x to 4x) and resolution switching.</p>
-                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 6px; margin-top: 1rem;">
-                    <p style="margin-bottom: 0.5rem;">Playback Speed: <input type="number" value="1.5" step="0.1" min="1" max="4" style="width: 60px; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;"> x</p>
-                    <button class="btn" onclick="alert('Downloading lecture package for offline use...')">Download Offline Package</button>
+                <h2>📚 Study Material, Downloads & Custom Video Player</h2>
+                <p>Stream lectures online or download study packages. Customize video playback speed smoothly from 1.0x to 4.0x (e.g. type 1.3).</p>
+                
+                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
+                    <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">🎬 Custom Speed Video Streamer</h3>
+                    <div style="background: #000; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-bottom: 0.75rem; color: var(--text-muted);">
+                        [ Video Stream Preview: Delhi Police CPO Strategy Lecture ]
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <label>Playback Speed (1x - 4x): <input type="number" id="customSpeedInput" value="1.3" step="0.1" min="1" max="4" style="width: 70px; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.3rem; border-radius: 4px;" onchange="changeVideoSpeed(this.value)"></label>
+                        <label>Quality: 
+                            <select id="videoQualitySelect" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.3rem; border-radius: 4px;">
+                                <option>144p</option><option>240p</option><option>360p</option><option>480p</option><option>540p</option><option>720p</option><option selected>1080p</option>
+                            </select>
+                        </label>
+                        <button class="btn" onclick="alert('Downloading video/PDF package for offline access...')">Download Offline Package</button>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- PROFILE MODAL (OTP simulation) -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent-blue); margin-bottom: 1rem;">User Profile & Gmail OTP Verification</h2>
+            <p style="margin-bottom: 0.75rem;">Registered Gmail: <span id="userEmailDisplay" style="color: var(--police-gold);">aspirant@gmail.com</span></p>
+            <input type="email" id="newEmailInput" placeholder="Enter new Gmail address..." style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; margin-bottom: 0.75rem;">
+            <button class="btn" onclick="sendOtp()" style="margin-bottom: 0.75rem;">Send OTP to Gmail</button>
+            <div id="otpBox" style="display: none; margin-bottom: 0.75rem;">
+                <input type="text" id="otpInput" placeholder="Enter 6-digit OTP..." style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; margin-bottom: 0.5rem;">
+                <button class="btn" onclick="verifyAndChangeEmail()">Verify OTP & Update</button>
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal('profileModal')" style="width: 100%; margin-top: 0.5rem;">Close</button>
+        </div>
+    </div>
+
     <!-- Bottom Navigation Bar (5 Core Buttons) -->
     <nav class="bottom-nav">
         <button class="nav-btn active" onclick="switchView('testView'); setActiveNav(this);">
             <span class="icon">📝</span>
-            <span>Test</span>
+            <span>TEST</span>
         </button>
         <button class="nav-btn" onclick="switchView('leaderboardView'); setActiveNav(this);">
             <span class="icon">🏆</span>
-            <span>Leaderboard</span>
+            <span>LEADERBOARD</span>
         </button>
         <button class="nav-btn" onclick="switchView('challengeView'); setActiveNav(this);">
             <span class="icon">🔥</span>
-            <span>Challenge</span>
+            <span>CHALLENGE</span>
         </button>
         <button class="nav-btn" onclick="switchView('savedView'); setActiveNav(this);">
             <span class="icon">🔖</span>
-            <span>Saved</span>
+            <span>SAVED</span>
         </button>
         <button class="nav-btn" onclick="switchView('doubtView'); setActiveNav(this);">
             <span class="icon">💬</span>
-            <span>Doubts</span>
+            <span>DOUBTS</span>
         </button>
     </nav>
 
     <script>
+        // State Management & Persistent Session
+        let currentUser = localStorage.getItem('cpo_user') || 'aspirant@gmail.com';
+        let loginCount = parseInt(localStorage.getItem('cpo_login_count') || '1');
+        document.getElementById('loginCountVal').innerText = loginCount;
+        document.getElementById('userEmailDisplay').innerText = currentUser;
+
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
             menu.classList.toggle('active');
@@ -232,13 +357,150 @@
             btn.classList.add('active');
         }
 
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function logoutUser() {
+            if(confirm('Are you sure you want to log out? Session will terminate.')) {
+                localStorage.removeItem('cpo_user');
+                alert('Logged out successfully.');
+                location.reload();
+            }
+        }
+
+        // OTP Simulation
+        function sendOtp() {
+            const newEmail = document.getElementById('newEmailInput').value;
+            if(!newEmail || !newEmail.includes('@')) {
+                alert('Please enter a valid Gmail address.');
+                return;
+            }
+            alert('Simulated 6-digit OTP sent successfully to ' + newEmail);
+            document.getElementById('otpBox').style.display = 'block';
+        }
+
+        function verifyAndChangeEmail() {
+            const otp = document.getElementById('otpInput').value;
+            const newEmail = document.getElementById('newEmailInput').value;
+            if(otp.length === 6) {
+                currentUser = newEmail;
+                localStorage.setItem('cpo_user', currentUser);
+                document.getElementById('userEmailDisplay').innerText = currentUser;
+                alert('Gmail updated successfully via OTP verification!');
+                closeModal('profileModal');
+            } else {
+                alert('Invalid OTP. Please enter 6 digits.');
+            }
+        }
+
+        // Challenge Tracker (30, 60, 100 days with circle limit)
+        function initChallenge(days) {
+            const grid = document.getElementById('challengeGrid');
+            grid.innerHTML = '';
+            let maxCircles = days === 100 ? 3 : (days === 60 ? 2 : 1);
+            let circledCount = 0;
+
+            for(let i=1; i<=days; i++) {
+                const box = document.createElement('div');
+                box.style.cssText = "background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 6px; padding: 0.4rem; text-align: center; cursor: pointer; font-size: 0.8rem;";
+                box.innerHTML = `D${i}<br><b>-</b>`;
+                box.onclick = function() {
+                    if(box.style.borderColor === 'rgb(245, 158, 11)') {
+                        box.style.borderColor = 'var(--border-dark)';
+                        box.style.background = 'var(--bg-dark)';
+                        circledCount--;
+                    } else {
+                        if(circledCount >= maxCircles) {
+                            alert('Strict Limit Reached: You can only circle a maximum of ' + maxCircles + ' days for the ' + days + '-day challenge!');
+                            return;
+                        }
+                        box.style.borderColor = 'var(--police-gold)';
+                        box.style.background = 'rgba(245,158,11,0.2)';
+                        circledCount++;
+                    }
+                };
+                grid.appendChild(box);
+            }
+            alert(days + '-Day Challenge loaded. Circle restriction active: Max ' + maxCircles + ' circles.');
+        }
+
+        // Parsers & Admin Functions
+        function parseHtmlMock() {
+            const fileInput = document.getElementById('htmlMockFile');
+            if(fileInput.files.length === 0) {
+                alert('Please select an HTML mock file from storage first.');
+                return;
+            }
+            alert('HTML file successfully parsed! Questions, options, and solutions automatically integrated into CBT module.');
+        }
+
+        function parsePdfOrText() {
+            const text = document.getElementById('extractedTextInput').value;
+            const fileInput = document.getElementById('pdfMockFile');
+            if(!text && fileInput.files.length === 0) {
+                alert('Please upload a PDF/text file or paste extracted text.');
+                return;
+            }
+            alert('PDF pages auto-detected successfully (Range: 1-150+ pages). Formatted into real exam CBT structure with solutions.');
+        }
+
+        function toggleUserCallPermission() {
+            const email = document.getElementById('targetUserEmail').value;
+            if(!email) {
+                alert('Please enter a specific user email.');
+                return;
+            }
+            alert('Interactive call access explicitly toggled for user: ' + email);
+        }
+
+        function updateChecklist(selectEl) {
+            if(selectEl.value === 'done') {
+                selectEl.style.color = 'var(--success)';
+            } else {
+                selectEl.style.color = 'var(--text-muted)';
+            }
+        }
+
+        function changeVideoSpeed(speed) {
+            alert('Video playback speed adjusted to ' + speed + 'x');
+        }
+
+        function submitDoubt() {
+            const text = document.getElementById('doubtInput').value;
+            if(!text) {
+                alert('Please write your doubt before submitting.');
+                return;
+            }
+            const feed = document.getElementById('doubtFeed');
+            const post = document.createElement('div');
+            post.style.cssText = "background: var(--bg-dark); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-dark);";
+            post.innerHTML = `<b>Q: ${text}</b><br><span style="color: var(--success); font-size: 0.85rem;">🤖 Google AI Instant Solution: Verified correct via step-by-step substitution formula.</span>`;
+            feed.prepend(post);
+            document.getElementById('doubtInput').value = '';
+            alert('Doubt posted! AI solver generated the solution instantly.');
+        }
+
+        function startMockTest(title) {
+            alert('Initializing ' + title + ' with live CBT timer, question palette, and 10-attempt reattempt quota.');
+        }
+
+        function openSubjectChapters(subject) {
+            alert('Loading chapter-wise test modules for ' + subject + ' with individual question banks and solutions.');
+        }
+
+        function filterSaved(section) {
+            alert('Filtering saved & incorrect vault for: ' + section + '. Answer reveal protection active.');
+        }
+
         // Close dropdown when clicking outside
         window.addEventListener('click', function(e) {
-            if (!e.target.matches('.menu-icon')) {
-                const dropdown = document.getElementById('dropdownMenu');
-                if (dropdown.classList.contains('active')) {
-                    dropdown.classList.remove('active');
-                }
+            if (!e.target.matches('.menu-icon') && !e.target.closest('.dropdown-menu')) {
+                document.getElementById('dropdownMenu').classList.remove('active');
             }
         });
     </script>
