@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Mock Test Portal (v2.9 Crash-Proof Fix)</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal (v3.0 Bulletproof Fix)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
@@ -105,41 +105,16 @@
             
             <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
                 <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite</h2>
-                <p>Crash-proof unlimited question compiler active.</p>
+                <p>Bulletproof unlimited question compiler active.</p>
             </div>
 
-            <!-- Button 1: User Activity -->
             <div class="panel-card">
-                <h2>📊 1. User Activity & Login Records</h2>
-                <p>Track real-time student engagement.</p>
-                <div style="background: #1f2937; border-radius: 6px; padding: 10px; overflow-x: auto;">
-                    <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid #374151; color: #f59e0b;">
-                                <th style="padding: 8px;">User Gmail Account</th>
-                                <th style="padding: 8px;">Login Time</th>
-                                <th style="padding: 8px;">Investment Plan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 8px;">aspirant.delhipolice@gmail.com</td>
-                                <td style="padding: 8px;">Today, 10:30 AM</td>
-                                <td style="color: #34d399; padding: 8px;">₹499 (Tier-1 Master Pass)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Button 2 & 3: Chapter Selector & Bulk PDF Parser -->
-            <div class="panel-card">
-                <h2>📂 2 & 3. Chapter-Wise Section & Bulk PDF Parser</h2>
-                <p>Select chapter category, type custom test name, and upload PDF files for unlimited questions.</p>
+                <h2>📂 Chapter-Wise Section & Bulk PDF Parser</h2>
+                <p>Select chapter category, type custom test name, and upload questions.</p>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>2. Select Chapter Test Section:</label>
+                        <label>Select Chapter Test Section:</label>
                         <select id="chapterSectionSelect">
                             <option value="Number System">Quantitative Aptitude: Number System</option>
                             <option value="Percentage">Quantitative Aptitude: Percentage</option>
@@ -156,17 +131,17 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 14px;">
-                    <label>3. Upload Multiple PDFs:</label>
+                    <label>Upload Files / PDFs:</label>
                     <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
                 </div>
 
-                <button class="btn-primary" onclick="processBulkPdfParser()">Run AI PDF-to-Mock Parser</button>
+                <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parser</button>
             </div>
 
-            <!-- Button 4: Code-to-Mock Converter (Unlimited Questions) -->
+            <!-- Code-to-Mock Converter -->
             <div class="panel-card">
-                <h2>💻 4. Code-to-Mock Converter (Unlimited Questions)</h2>
-                <p>Paste any JavaScript array or JSON containing <strong>unlimited questions</strong> safely.</p>
+                <h2>💻 Code-to-Mock Converter (Unlimited Questions)</h2>
+                <p>Paste any JavaScript array or JSON containing unlimited questions.</p>
                 
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>Paste Raw Questions JSON or JavaScript Array:</label>
@@ -253,7 +228,7 @@
         let activeTestTitle = '';
         let activeSectionName = '';
 
-        let defaultModulesData = {
+        const defaultModulesData = {
             "Number System": [
                 { title: "Number System - Master Test", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Number System") }
             ],
@@ -278,13 +253,13 @@
 
         function loadModulesSafely() {
             try {
-                let saved = localStorage.getItem('cpo_public_modules_v7');
+                let saved = localStorage.getItem('cpo_public_modules_v8');
                 if (!saved) return defaultModulesData;
                 let parsed = JSON.parse(saved);
                 return (parsed && typeof parsed === 'object') ? parsed : defaultModulesData;
             } catch (e) {
-                console.error("Corrupted localStorage detected, resetting cache...", e);
-                localStorage.removeItem('cpo_public_modules_v7');
+                console.error("Storage corruption caught, falling back to defaults.", e);
+                localStorage.removeItem('cpo_public_modules_v8');
                 return defaultModulesData;
             }
         }
@@ -313,9 +288,8 @@
             try {
                 renderPublicModules();
             } catch (e) {
-                console.error("Render error:", e);
-                localStorage.clear();
-                location.reload();
+                console.error("Window onload render error:", e);
+                document.getElementById('modulesContainer').innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading modules. Please use Admin Panel to Reset Cache.</div>';
             }
         };
 
@@ -338,4 +312,29 @@
         }
 
         function showStudentDashboard() {
-            document.getElementById('adminDropdownMenu').classList
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            document.getElementById('adminPanelRoot').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('timerDisplay').classList.add('hidden');
+            document.getElementById('studentPublicPortal').classList.remove('hidden');
+            renderPublicModules();
+        }
+
+        function renderPublicModules() {
+            let container = document.getElementById('modulesContainer');
+            if (!container) return;
+            let html = '';
+
+            for (let section in publicModules) {
+                if (!Array.isArray(publicModules[section])) continue;
+                html += `
+                    <div class="section-box">
+                        <div class="section-title">📂 ${section} <span style="font-size:11px; color:#9ca3af;">${publicModules[section].length} Tests</span></div>
+                `;
+                publicModules[section].forEach((test, tIdx) => {
+                    let qLen = test.questions ? test.questions.length : 0;
+                    html += `
+                        <div class="test-item-row">
+                            <div>
+                                <div style="font-weight: bold; color: #f3f4f6;">${tes
