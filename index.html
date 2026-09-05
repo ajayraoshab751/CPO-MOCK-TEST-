@@ -3,945 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - Delhi Police CBT Exam Platform</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal (v2.5 Final)</title>
     <style>
-        :root {
-            --bg-dark: #070b14;
-            --card-dark: #111827;
-            --border-dark: #1f293d;
-            --accent-blue: #38bdf8;
-            --police-navy: #0d1527;
-            --police-gold: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #eab308;
-            --purple: #a855f7;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 80px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
+        .hidden { display: none !important; }
         
-        header { background: linear-gradient(135deg, var(--police-navy), #1e293b); border-bottom: 2px solid var(--police-gold); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        .brand { display: flex; align-items: center; gap: 0.75rem; }
-        .badge-logo { width: 42px; height: 42px; background: radial-gradient(circle, #fcd34d, var(--police-gold)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--police-navy); font-size: 1rem; border: 2px solid white; box-shadow: 0 0 12px rgba(245,158,11,0.6); }
-        .brand h1 { font-size: 1.5rem; color: var(--accent-blue); letter-spacing: 1px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .brand span { font-size: 0.7rem; background: rgba(245,158,11,0.2); color: var(--police-gold); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(245,158,11,0.4); font-weight: 600; }
+        /* Top Header */
+        .app-header { background: #111827; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1f2937; position: relative; }
+        .brand-box { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { background: #f59e0b; color: #000; font-weight: bold; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .brand-title h1 { font-size: 16px; color: #f59e0b; }
+        .brand-title p { font-size: 10px; color: #9ca3af; }
+
+        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
         
-        .menu-icon { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 0.2rem 0.6rem; border-radius: 6px; }
-        .menu-icon:hover { background: rgba(255,255,255,0.1); }
-        .dropdown-menu { display: none; position: absolute; right: 15px; top: 65px; background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; width: 240px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 200; overflow: hidden; }
-        .dropdown-menu.active { display: block; }
-        .dropdown-item { padding: 0.85rem 1rem; color: var(--text-main); text-decoration: none; display: block; font-size: 0.9rem; border-bottom: 1px solid var(--border-dark); cursor: pointer; transition: background 0.2s; }
-        .dropdown-item:hover { background: rgba(56,189,248,0.15); color: var(--accent-blue); }
+        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
+        .admin-dropdown-menu.show { display: block; }
+        .admin-dropdown-item { padding: 12px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .admin-dropdown-item:hover { background: #374151; color: #f59e0b; }
 
-        .container { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; width: 100%; flex: 1; }
-        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .card h2 { color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; }
-        .card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; margin-bottom: 1rem; }
-        .btn { background: var(--accent-blue); color: var(--police-navy); font-weight: 700; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; font-size: 0.9rem; }
-        .btn:hover { opacity: 0.9; }
-        .btn-secondary { background: #334155; color: white; }
-        .btn-warning { background: var(--warning); color: var(--police-navy); }
-        .btn-success { background: var(--success); color: white; }
-
-        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--police-navy); border-top: 2px solid var(--border-dark); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
-        .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; gap: 0.2rem; cursor: pointer; flex: 1; transition: color 0.2s; font-weight: 600; }
-        .nav-btn span.icon { font-size: 1.3rem; }
-        .nav-btn.active, .nav-btn:hover { color: var(--accent-blue); }
-
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-        .badge { background: rgba(34,197,94,0.15); color: var(--success); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(34,197,94,0.3); }
+        .main-container { padding: 15px; max-width: 850px; margin: 0 auto; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 0.5rem; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--card-dark); border: 1px solid var(--accent-blue); width: 100%; max-width: 950px; border-radius: 12px; padding: 1.25rem; max-height: 95vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .panel-card h2 { font-size: 15px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
         
-        .dynamic-mock-item { background: rgba(56,189,248,0.08); border: 1px dashed var(--accent-blue); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-        .option-label { display: block; background: var(--bg-dark); border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; }
-        .option-label:hover { border-color: var(--accent-blue); }
-        .option-label input { margin-right: 0.75rem; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 240px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; }
+        .form-group label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 6px; font-weight: bold; }
+        .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #111827; color: #fff; border: 1px solid #4b5563; border-radius: 4px; font-size: 13px; }
+        
+        .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
+        .btn-primary:hover { background: #0ea5e9; }
 
-        /* Hub Subject Accordion & Chips */
-        .hub-subject-card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
-        .hub-subject-header { background: linear-gradient(135deg, #111827, #1e293b); padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border-dark); }
-        .hub-subject-header h3 { color: var(--police-gold); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .hub-chapters-body { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; background: var(--bg-dark); }
-        .chapter-chip { background: var(--card-dark); border: 1px solid var(--border-dark); padding: 0.6rem 0.8rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; transition: 0.2s; }
-        .chapter-chip:hover { border-color: var(--accent-blue); background: rgba(56,189,248,0.05); }
-        .chapter-chip button { background: var(--accent-blue); color: var(--police-navy); border: none; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
+        /* Student View Sections */
+        .section-box { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .test-item-row { background: #1f2937; padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
-        /* CBT Examination Layout */
-        .cbt-container { display: grid; grid-template-columns: 1fr 280px; gap: 1rem; margin-top: 1rem; flex: 1; }
-        @media(max-width: 768px) { .cbt-container { grid-template-columns: 1fr; } }
-        .cbt-main { background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px; }
-        .cbt-sidebar { background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-height: 200px; overflow-y: auto; padding: 4px; }
-        .palette-btn { width: 36px; height: 36px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; border: 1px solid var(--border-dark); background: #334155; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .palette-btn.answered { background: var(--success); border-color: #16a34a; }
-        .palette-btn.marked { background: var(--purple); border-color: #9333ea; }
-        .palette-btn.current { border: 2px solid var(--accent-blue); }
+        /* CBT Exam Screen */
+        #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
+        .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
+        .cbt-nav-top-left { display: flex; gap: 8px; }
+        .cbt-btn { background: #374151; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .cbt-btn.review-btn { background: #7c3aed; }
+        .cbt-btn.next-btn { background: #2563eb; }
+        .lang-toggle-btn { background: #f59e0b; color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        .question-meta { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
+        .pyq-badge { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        
+        .question-text { font-size: 15px; margin-bottom: 15px; line-height: 1.5; color: #f3f4f6; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-item { background: #1f2937; border: 1px solid #374151; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .option-item input { accent-color: #f59e0b; }
+
+        .palette-container { margin-top: 15px; border-top: 1px solid #374151; padding-top: 10px; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 100px; overflow-y: auto; }
+        .palette-btn { width: 28px; height: 28px; border-radius: 4px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; background: #374151; color: #fff; }
+        .palette-btn.answered { background: #16a34a; }
+        .palette-btn.marked { background: #9333ea; }
+        .palette-btn.current { border: 2px solid #f59e0b; }
+
+        /* Bottom Nav bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1f2937; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .nav-tab { color: #9ca3af; text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .nav-tab.active { color: #f59e0b; }
+        .nav-tab span { font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <div class="badge-logo">SI</div>
-            <div>
+    <!-- Header -->
+    <div class="app-header">
+        <div class="brand-box">
+            <div class="brand-logo">SI</div>
+            <div class="brand-title">
                 <h1>CPO AIR 1</h1>
-                <span>Delhi Police CBT Portal</span>
+                <p>Delhi Police CBT Portal</p>
             </div>
         </div>
-        <button class="menu-icon" onclick="toggleMenu()">&#8942;</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="timerDisplay" class="hidden" style="font-size: 13px; color: #f59e0b; font-weight: bold;">Time: 00:00</div>
+            <button class="menu-toggle-btn" onclick="toggleAdminMenu()">⚙️ Admin Panel</button>
+        </div>
+
+        <!-- Admin Secret Dropdown Menu -->
+        <div id="adminDropdownMenu" class="admin-dropdown-menu">
+            <div class="admin-dropdown-item" onclick="verifyAdminAccess()">🛠️ Open Master Admin Dashboard</div>
+            <div class="admin-dropdown-item" onclick="showStudentDashboard()">📁 View Student Portal</div>
+        </div>
+    </div>
+
+    <div class="main-container">
         
-        <div id="dropdownMenu" class="dropdown-menu">
-            <div class="dropdown-item" onclick="openModalWithHistory('profileModal'); toggleMenu();">👤 Profile & Gmail OTP</div>
-            <div class="dropdown-item" onclick="switchView('targetBoard', true); toggleMenu();">🎯 Target Board & Checklists</div>
-            <div class="dropdown-item" onclick="location.reload();">🔄 Refresh App Data</div>
-            <div class="dropdown-item" onclick="switchView('studyVault', true); toggleMenu();">📚 Study Vault, PDFs & Video</div>
-            <div class="dropdown-item" onclick="switchView('adminPanel', true); toggleMenu();">🛠️ Admin & Parser Panel</div>
-            <div class="dropdown-item" onclick="logoutUser();" style="color: var(--danger);">🚪 Logout</div>
-        </div>
-    </header>
-
-    <div class="container">
-        
-        <!-- 1. TEST VIEW / COMPREHENSIVE SYLLABUS HUB -->
-        <div id="testView" class="view-section active">
-            <div class="card" style="border-color: var(--police-gold); background: linear-gradient(135deg, #111827, #1e293b);">
-                <h2>Delhi Police CPO Tier-1 & CGL Full CBT Master Suite <span class="badge">Pro Max Hub</span></h2>
-                <p>200 Questions Full Mocks, CGL Tier-1 Special Papers, Rani Mam Special Drills, and Chapter-Wise Subject Tests.</p>
-                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
-                    <button class="btn" onclick="startDefaultMock('Delhi Police CPO Full CBT Mock 1', 'FullMock')">Start CPO Full Mock 1</button>
-                    <button class="btn btn-warning" onclick="startDefaultMock('SSC CGL Tier-1 Master Mock (Rani Mam Pattern)', 'FullMock')">CGL Tier-1 Master Mock</button>
-                </div>
-                <div id="public_FullMock" style="margin-top: 0.5rem;"></div>
+        <!-- ================= MASTER ADMIN DASHBOARD (4 BUTTON FEATURES) ================= -->
+        <div id="adminPanelRoot" class="hidden">
+            
+            <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
+                <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite (Active)</h2>
+                <p>Full control center with User Activity & Gmail login logs, Chapter-Wise section selectors, Bulk 10-PDF Parallel AI Parsers, and HTML/JS Code-to-Mock Compilers.</p>
             </div>
 
-            <h3 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.2rem; color: var(--police-gold);">📚 Comprehensive Syllabus & Chapter Test Bank</h3>
-
-            <!-- 1. QUANTITATIVE APTITUDE -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('mathChapters')">
-                    <h3>📐 Quantitative Aptitude & Arithmetic</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">10 Chapters ▼</span>
-                </div>
-                <div id="mathChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. Number System (Divisibility, Unit Digit, LCM/HCF)</span><button onclick="startChapterTest('Number System')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Simplification & BODMAS</span><button onclick="startChapterTest('Simplification')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Percentage</span><button onclick="startChapterTest('Percentage')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Profit & Loss</span><button onclick="startChapterTest('Profit and Loss')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Discount</span><button onclick="startChapterTest('Discount')">Test</button></div>
-                    <div class="chapter-chip"><span>6. Ratio and Proportion</span><button onclick="startChapterTest('Ratio and Proportion')">Test</button></div>
-                    <div class="chapter-chip"><span>7. Averages & Partnership</span><button onclick="startChapterTest('Averages and Partnership')">Test</button></div>
-                    <div class="chapter-chip"><span>8. Mixture and Alligation</span><button onclick="startChapterTest('Mixture and Alligation')">Test</button></div>
-                    <div class="chapter-chip"><span>9. Simple & Compound Interest</span><button onclick="startChapterTest('Simple and Compound Interest')">Test</button></div>
-                    <div class="chapter-chip"><span>10. Time, Work, Pipes & Cisterns</span><button onclick="startChapterTest('Time, Work & Pipes')">Test</button></div>
+            <!-- Button 1: User Activity & Gmail Login Records -->
+            <div class="panel-card">
+                <h2>📊 1. User Activity & Gmail Login Records</h2>
+                <p>Track real-time student engagement, individual investment/plan purchases, and Gmail authentication records.</p>
+                <div style="background: #1f2937; border-radius: 6px; padding: 10px; overflow-x: auto;">
+                    <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #374151; color: #f59e0b;">
+                                <th style="padding: 8px;">User Gmail Account</th>
+                                <th style="padding: 8px;">Login Time</th>
+                                <th style="padding: 8px;">Investment Plan</th>
+                                <th style="padding: 8px;">Activity Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #2d3748;">
+                                <td style="padding: 8px;">aspirant.delhipolice@gmail.com</td>
+                                <td style="padding: 8px;">Today, 10:30 AM</td>
+                                <td style="color: #34d399; padding: 8px;">₹499 (Tier-1 Master Pass)</td>
+                                <td style="padding: 8px;">Active (4 Mocks Done)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px;">cpo.aspirant2026@gmail.com</td>
+                                <td style="padding: 8px;">Today, 09:15 AM</td>
+                                <td style="color: #34d399; padding: 8px;">₹199 (Maths Special)</td>
+                                <td style="padding: 8px;">Active (2 Mocks Done)</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- 2. ADVANCED MATH -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('advMathChapters')">
-                    <h3>📈 Advanced Math, DI & Statistics</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">7 Chapters ▼</span>
-                </div>
-                <div id="advMathChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. Algebra (Identities, Surds, Quad. Equations)</span><button onclick="startChapterTest('Algebra')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Geometry (Triangles, Circles, Polygons)</span><button onclick="startChapterTest('Geometry')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Mensuration (2D & 3D Cones, Spheres, Prisms)</span><button onclick="startChapterTest('Mensuration')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Trigonometry & Heights and Distances</span><button onclick="startChapterTest('Trigonometry')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Data Interpretation (Bar, Pie, Tables, Line)</span><button onclick="startChapterTest('Data Interpretation')">Test</button></div>
-                    <div class="chapter-chip"><span>6. Statistics & Probability</span><button onclick="startChapterTest('Statistics and Probability')">Test</button></div>
-                    <div class="chapter-chip"><span>7. Calculation Booster & Speed Math</span><button onclick="startChapterTest('Calculation Booster')">Test</button></div>
-                </div>
-            </div>
+            <!-- Button 2 & 3: Chapter Selector, Test Name Box, & Bulk PDF Parallel Parser -->
+            <div class="panel-card">
+                <h2>📂 2 & 3. Chapter-Wise Section & Bulk Parallel PDF Parser</h2>
+                <p>Select chapter category, type custom test name, and upload up to 10 PDF files simultaneously to auto-convert them into active mock tests.</p>
 
-            <!-- 3. REASONING -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('reasoningChapters')">
-                    <h3>🧠 Reasoning (Verbal & Non-Verbal)</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">24 Chapters ▼</span>
-                </div>
-                <div id="reasoningChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. Analogy (Word, Number, Alphabet)</span><button onclick="startChapterTest('Analogy')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Classification / Odd One Out</span><button onclick="startChapterTest('Classification')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Coding-Decoding</span><button onclick="startChapterTest('Coding-Decoding')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Series Completion (Number, Alphabet)</span><button onclick="startChapterTest('Series Completion')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Missing Number / Matrix</span><button onclick="startChapterTest('Missing Number')">Test</button></div>
-                    <div class="chapter-chip"><span>6. Blood Relations</span><button onclick="startChapterTest('Blood Relations')">Test</button></div>
-                    <div class="chapter-chip"><span>7. Direction and Distance</span><button onclick="startChapterTest('Direction and Distance')">Test</button></div>
-                    <div class="chapter-chip"><span>8. Order and Ranking</span><button onclick="startChapterTest('Order and Ranking')">Test</button></div>
-                    <div class="chapter-chip"><span>9. Syllogism</span><button onclick="startChapterTest('Syllogism')">Test</button></div>
-                    <div class="chapter-chip"><span>10. Venn Diagrams</span><button onclick="startChapterTest('Venn Diagrams')">Test</button></div>
-                    <div class="chapter-chip"><span>11. Clock and Calendar</span><button onclick="startChapterTest('Clock and Calendar')">Test</button></div>
-                    <div class="chapter-chip"><span>12. Dice and Cube</span><button onclick="startChapterTest('Dice and Cube')">Test</button></div>
-                    <div class="chapter-chip"><span>13. Mathematical Operations</span><button onclick="startChapterTest('Mathematical Operations')">Test</button></div>
-                    <div class="chapter-chip"><span>14. Word Formation / Dictionary Order</span><button onclick="startChapterTest('Word Formation')">Test</button></div>
-                    <div class="chapter-chip"><span>15. Logical Arrangement of Words</span><button onclick="startChapterTest('Logical Arrangement')">Test</button></div>
-                    <div class="chapter-chip"><span>16. Data Sufficiency</span><button onclick="startChapterTest('Data Sufficiency')">Test</button></div>
-                    <div class="chapter-chip"><span>17. Statement & Conclusions / Assumptions</span><button onclick="startChapterTest('Statement and Conclusions')">Test</button></div>
-                    <div class="chapter-chip"><span>18. Mirror and Water Images</span><button onclick="startChapterTest('Mirror and Water Images')">Test</button></div>
-                    <div class="chapter-chip"><span>19. Paper Cutting and Folding</span><button onclick="startChapterTest('Paper Cutting')">Test</button></div>
-                    <div class="chapter-chip"><span>20. Embedded Figures</span><button onclick="startChapterTest('Embedded Figures')">Test</button></div>
-                    <div class="chapter-chip"><span>21. Figure Completion</span><button onclick="startChapterTest('Figure Completion')">Test</button></div>
-                    <div class="chapter-chip"><span>22. Counting of Figures (Triangles/Squares)</span><button onclick="startChapterTest('Counting of Figures')">Test</button></div>
-                    <div class="chapter-chip"><span>23. Figure Series / Classification</span><button onclick="startChapterTest('Figure Series')">Test</button></div>
-                    <div class="chapter-chip"><span>24. Non-Verbal Master Drill</span><button onclick="startChapterTest('Non-Verbal Master')">Test</button></div>
-                </div>
-            </div>
-
-            <!-- 4. GENERAL STUDIES (HISTORY, POLITY, GEOGRAPHY, ECONOMY) -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('gkChapters')">
-                    <h3>🏛️ General Studies (History, Polity, Geography, Economy)</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">7 Modules ▼</span>
-                </div>
-                <div id="gkChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. Ancient India (IVS, Buddhism, Mauryas, Guptas)</span><button onclick="startChapterTest('Ancient India')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Medieval India (Delhi Sultanate, Mughals)</span><button onclick="startChapterTest('Medieval India')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Modern India (1857 Revolt, INC, Governors)</span><button onclick="startChapterTest('Modern India')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Indian Polity (Constitution, Preamble, FRs, Judiciary)</span><button onclick="startChapterTest('Indian Polity')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Geography (Indian Rivers, Mountains, World Maps)</span><button onclick="startChapterTest('Indian & World Geography')">Test</button></div>
-                    <div class="chapter-chip"><span>6. Economy (Five-Year Plans, GDP, Inflation, Budget)</span><button onclick="startChapterTest('Economy')">Test</button></div>
-                    <div class="chapter-chip"><span>7. General Studies Master Mega Drill</span><button onclick="startChapterTest('GS Mega Test')">Test</button></div>
-                </div>
-            </div>
-
-            <!-- 5. GENERAL SCIENCE & STATIC GK -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('scienceChapters')">
-                    <h3>🧪 General Science & Static GK (Black Book / Current Affairs)</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">6 Modules ▼</span>
-                </div>
-                <div id="scienceChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. Physics (Optics, Sound, Electricity, Mechanics)</span><button onclick="startChapterTest('Physics')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Chemistry (Periodic Table, Acids, Metals)</span><button onclick="startChapterTest('Chemistry')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Biology (Human Anatomy, Diseases, Vitamins)</span><button onclick="startChapterTest('Biology')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Static GK (Art, Culture, National Parks, Awards)</span><button onclick="startChapterTest('Static GK')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Current Affairs (Last 6-8 Months Schemes/Sports)</span><button onclick="startChapterTest('Current Affairs')">Test</button></div>
-                    <div class="chapter-chip"><span>6. General Science Complete Mock</span><button onclick="startChapterTest('General Science Master')">Test</button></div>
-                </div>
-            </div>
-
-            <!-- 6. ENGLISH VOCAB & GRAMMAR -->
-            <div class="hub-subject-card">
-                <div class="hub-subject-header" onclick="toggleHubAccordion('englishChapters')">
-                    <h3>📖 English Vocabulary & Grammar (Rani Mam & Black Book)</h3>
-                    <span style="font-size: 0.85rem; color: var(--accent-blue);">8 Modules ▼</span>
-                </div>
-                <div id="englishChapters" class="hub-chapters-body">
-                    <div class="chapter-chip"><span>1. English Grammar (Parts of Speech, Tenses, Voice)</span><button onclick="startChapterTest('English Grammar')">Test</button></div>
-                    <div class="chapter-chip"><span>2. Black Book OWS (One-Word Substitutions)</span><button onclick="startChapterTest('Black Book OWS')">Test</button></div>
-                    <div class="chapter-chip"><span>3. Black Book Idioms and Phrases</span><button onclick="startChapterTest('Black Book Idioms')">Test</button></div>
-                    <div class="chapter-chip"><span>4. Synonyms & Antonyms Drill</span><button onclick="startChapterTest('Synonyms and Antonyms')">Test</button></div>
-                    <div class="chapter-chip"><span>5. Spelling Errors & Phrasal Verbs</span><button onclick="startChapterTest('Spelling Errors')">Test</button></div>
-                    <div class="chapter-chip"><span>6. Reading Comprehension Passages</span><button onclick="startChapterTest('Reading Comprehension')">Test</button></div>
-                    <div class="chapter-chip"><span>7. Cloze Test & Para Jumbles (PQRS)</span><button onclick="startChapterTest('Cloze Test & Para Jumbles')">Test</button></div>
-                    <div class="chapter-chip"><span>8. Rani Mam Special English Full Test</span><button onclick="startChapterTest('Rani Mam English Drill')">Test</button></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. LEADERBOARD VIEW -->
-        <div id="leaderboardView" class="view-section">
-            <div class="card">
-                <h2>All-India Leaderboard & Exam Scores</h2>
-                <p>Real-time rank monitoring, recent test scores, and performance analytics.</p>
-                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
-                    <p style="color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🏆 Your Rank Status: Active Aspirant</p>
-                    <div id="leaderboardScoresList" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet.</p>
+                <div class="form-row">
+                    <!-- Button 2: Chapter Selection -->
+                    <div class="form-group">
+                        <label>2. Select Chapter Test Section:</label>
+                        <select id="chapterSectionSelect">
+                            <option value="Number System">Quantitative Aptitude: Number System</option>
+                            <option value="Percentage">Quantitative Aptitude: Percentage</option>
+                            <option value="English Synonym">English: Synonym & Antonym Drills</option>
+                            <option value="English Voice">English: Active/Passive Voice & Narration</option>
+                            <option value="General Studies & Science">General Studies & GK/GS</option>
+                            <option value="Reasoning Section">Reasoning: Chapter-Wise Test</option>
+                        </select>
+                    </div>
+                    <!-- Custom Mock Test Name Input (Right Box) -->
+                    <div class="form-group">
+                        <label>Custom Mock Test Name (Right Box):</label>
+                        <input type="text" id="customTestNameInput" placeholder="e.g., CPO Target Batch Set 1" />
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 3. CHALLENGE VIEW -->
-        <div id="challengeView" class="view-section">
-            <div class="card">
-                <h2>Habit & Streak Challenge Tracker</h2>
-                <p>Select challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent.</p>
-                <div style="display: flex; gap: 0.75rem; margin: 1rem 0;">
-                    <button class="btn" onclick="initChallenge(30)">30-Day</button>
-                    <button class="btn" onclick="initChallenge(60)">60-Day</button>
-                    <button class="btn" onclick="initChallenge(100)">100-Day</button>
+                <!-- Button 3: Bulk PDF Multi-Parser (Up to 10 Files) -->
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>3. Upload Multiple PDFs (Select up to 10 files in parallel):</label>
+                    <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
                 </div>
-                <div id="challengeGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 6px; margin-top: 1rem;"></div>
-            </div>
-        </div>
 
-        <!-- 4. SAVED VIEW -->
-        <div id="savedView" class="view-section">
-            <div class="card">
-                <h2>Saved & Incorrect Questions Bank</h2>
-                <p>Review questions you answered incorrectly during your mock attempts.</p>
-                <div id="savedQuestionsContainer" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-                    <p style="color: var(--text-muted);">No bookmarked or incorrect questions recorded yet.</p>
+                <div id="conversionTimerBox" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px;" class="hidden">
+                    ⚡ AI Parallel PDF Conversion Completed in: <span id="timerOutput">0.00</span>s
                 </div>
-            </div>
-        </div>
 
-        <!-- 5. DOUBT VIEW -->
-        <div id="doubtView" class="view-section">
-            <div class="card">
-                <h2>Community Doubt Forum & AI Image Solver</h2>
-                <p>Post doubts or upload screenshots for instant automated Google AI solutions.</p>
-                <textarea id="doubtInput" placeholder="Type your question or paste query here..." style="width: 100%; height: 80px; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;"></textarea>
-                <input type="file" id="doubtImageUpload" style="margin-bottom: 0.75rem; color: var(--text-muted);">
-                <button class="btn" onclick="submitDoubt()">Ask AI & Community</button>
-                <div id="doubtFeed" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parallel PDF-to-Mock Parser</button>
             </div>
-        </div>
 
-        <!-- ADMIN & PARSER PANEL -->
-        <div id="adminPanel" class="view-section">
-            <div class="card" style="border-color: var(--police-gold);">
-                <h2>🛠️ Admin Panel & Automated Parsers</h2>
-                <p>Upload HTML mock files containing 70–80+ questions. Select target module section to push generated mock tests straight into the public domain.</p>
+            <!-- Button 4: Code-to-Mock Converter -->
+            <div class="panel-card">
+                <h2>💻 4. Code-to-Mock Converter (HTML / JS Code Parser)</h2>
+                <p>Paste raw HTML or JavaScript code snippets below to instantly compile and publish them into the chapter section selected in Button 2.</p>
                 
-                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-dark);">
-                    <label style="font-weight: bold; color: var(--police-gold); display: block; margin-bottom: 0.5rem;">📁 Select Public Domain Module Destination:</label>
-                    <select id="targetModuleSelect" style="width: 100%; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; font-size: 0.95rem;">
-                        <option value="FullMock">Full-Length Tier-1 Mock Suite</option>
-                        <option value="Mathematics">Quantitative Aptitude</option>
-                        <option value="Reasoning">Reasoning Section</option>
-                        <option value="GK">General Studies & Science</option>
-                        <option value="English">English Section</option>
-                    </select>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>Paste Raw HTML/JS Coding Structure:</label>
+                    <textarea id="rawCodeInput" rows="4" placeholder="// Paste JavaScript array questions or HTML structure here..."></textarea>
                 </div>
 
-                <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
-                    <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Upload HTML Mock File (Supports 70+ Questions)</h3>
-                    <input type="file" id="htmlMockFile" accept=".html,.htm" style="margin-bottom: 0.5rem; color: var(--text-muted);">
-                    <button class="btn" onclick="parseAndPublishHtmlFile()">Auto-Parse HTML & Publish to Public</button>
-                    <div id="htmlParserStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
+                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Code Mock Test</button>
+            </div>
+
+        </div>
+
+        <!-- ================= STUDENT PUBLIC PORTAL ================= -->
+        <div id="studentPublicPortal">
+            <div class="panel-card" style="border-color: #38bdf8;">
+                <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & Chapter-Wise CBT Suite</h2>
+                <p>Full Mock Tests, Chapter Drills (Number System, Percentage, English Synonym/Voice, GK/GS, Reasoning), and AI-Generated Tests.</p>
+            </div>
+
+            <div id="modulesContainer"></div>
+        </div>
+
+        <!-- ================= CBT EXAM SCREEN ================= -->
+        <div id="cbtExamScreen" class="hidden">
+            <div class="cbt-top-bar">
+                <div class="cbt-nav-top-left">
+                    <button class="cbt-btn" onclick="prevQuestion()">Previous</button>
+                    <button class="cbt-btn review-btn" onclick="markForReview()">Mark for Review</button>
+                    <button class="cbt-btn next-btn" onclick="nextQuestion()">Next</button>
                 </div>
+                <button class="lang-toggle-btn" onclick="toggleLanguage()">🌐 <span id="langLabel">Hindi</span></button>
+            </div>
+
+            <div class="question-meta">
+                <span id="qNumberIndicator">Question 1 of 1</span>
+                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO PYQ Drill</span>
+            </div>
+
+            <div class="question-text" id="questionTextContainer">Loading question...</div>
+            <div class="options-list" id="optionsContainer"></div>
+
+            <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
+
+            <div class="palette-container">
+                <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette:</div>
+                <div class="palette-grid" id="paletteGrid"></div>
             </div>
         </div>
 
-        <!-- TARGET BOARD -->
-        <div id="targetBoard" class="view-section">
-            <div class="card">
-                <h2>🎯 Daily Target Board & Command Checklists</h2>
-                <p>Complete daily targets published by command.</p>
-            </div>
-        </div>
-
-        <!-- STUDY VAULT -->
-        <div id="studyVault" class="view-section">
-            <div class="card">
-                <h2>📚 Study Material, Downloads & Custom Video Player</h2>
-                <p>Stream lectures or download packages.</p>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- CBT EXAM MODAL -->
-    <div id="examModal" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-dark); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
-                <h2 id="examModalTitle" style="color: var(--accent-blue); font-size: 1.1rem;">Exam Simulation</h2>
-                <div style="background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: var(--danger); padding: 0.3rem 0.8rem; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">
-                    ⏱️ Time Left: <span id="examTimerDisplay">02:00:00</span>
-                </div>
+        <!-- ================= RESULT SCREEN ================= -->
+        <div id="resultScreen" class="panel-card hidden" style="text-align: center;">
+            <h2 style="justify-content: center; color: #34d399;">🎉 Test Submitted Successfully!</h2>
+            <p>Your performance scorecard breakdown:</p>
+            
+            <div style="background: #1f2937; padding: 15px; border-radius: 6px; margin: 15px 0; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                <div><strong>Test Target:</strong> <span id="resSection" style="color: #f59e0b;">-</span></div>
+                <div><strong>Correct Answers:</strong> <span id="resCorrect" style="color: #34d399;">0</span></div>
+                <div><strong>Incorrect Answers:</strong> <span id="resIncorrect" style="color: #ef4444;">0</span></div>
+                <div><strong>Unattempted:</strong> <span id="resUnattempted" style="color: #9ca3af;">0</span></div>
+                <div><strong>Time Taken:</strong> <span id="resTime" style="color: #38bdf8;">00:00</span></div>
+                <div><strong>Final Score:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
             </div>
 
-            <div class="cbt-container">
-                <div class="cbt-main">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
-                            <span id="currentQuestionNumIndicator">Question 1 of 1</span>
-                            <span id="questionStatusBadge" class="badge">Unanswered</span>
-                        </div>
-                        <div id="questionTextContent" style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main);">Loading question...</div>
-                        <div id="optionsContainer"></div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-dark); padding-top: 0.75rem; margin-top: 1rem;">
-                        <button class="btn btn-warning" onclick="markForReviewCurrent()">Mark for Review & Next</button>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
-                            <button class="btn" onclick="saveAndNextQuestion()">Save & Next</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="cbt-sidebar">
-                    <h3 style="font-size: 0.95rem; color: var(--police-gold);">Question Palette</h3>
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.75rem; color: var(--text-muted);">
-                        <div><span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:2px;margin-right:4px;"></span> Answered</div>
-                        <div><span style="display:inline-block;width:12px;height:12px;background:var(--purple);border-radius:2px;margin-right:4px;"></span> Marked for Review</div>
-                        <div><span style="display:inline-block;width:12px;height:12px;background:#334155;border-radius:2px;margin-right:4px;"></span> Unanswered</div>
-                    </div>
-                    <div id="paletteGridContainer" class="palette-grid"></div>
-                    <button class="btn btn-success" style="margin-top: auto; width: 100%;" onclick="confirmFinalSubmit()">Submit Test</button>
-                </div>
-            </div>
+            <button class="btn-primary" onclick="location.reload()">Back to Dashboard</button>
         </div>
-    </div>
 
-    <!-- EXAM RESULTS & SOLUTIONS MODAL -->
-    <div id="resultModal" class="modal">
-        <div class="modal-content" style="max-width: 900px; max-height: 90vh;">
-            <h2 style="color: var(--success); margin-bottom: 0.5rem;">📊 Test Results & Detailed Solutions</h2>
-            <div id="resultContentSummary" style="font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5; background: var(--bg-dark); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-dark);"></div>
-            <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Question-by-Question Solution Breakdown:</h3>
-            <div id="detailedSolutionsContainer" style="display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; max-height: 45vh; padding-right: 4px;"></div>
-            <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="closeModalWithHistory('resultModal'); switchView('leaderboardView', true);">View on Leaderboard</button>
-        </div>
-    </div>
-
-    <!-- PROFILE MODAL -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <h2 style="color: var(--accent-blue); margin-bottom: 1rem;">User Profile & Gmail Verification</h2>
-            <p style="margin-bottom: 0.75rem;">Registered Gmail: <span style="color: var(--police-gold);">aspirant@gmail.com</span></p>
-            <button class="btn btn-secondary" onclick="closeModalWithHistory('profileModal')" style="width: 100%; margin-top: 0.5rem;">Close</button>
-        </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-        <button class="nav-btn active" id="nav_testView" onclick="switchView('testView', true); setActiveNav(this);">
-            <span class="icon">📝</span>
-            <span>TEST</span>
-        </button>
-        <button class="nav-btn" id="nav_leaderboardView" onclick="switchView('leaderboardView', true); setActiveNav(this);">
-            <span class="icon">🏆</span>
-            <span>LEADERBOARD</span>
-        </button>
-        <button class="nav-btn" id="nav_challengeView" onclick="switchView('challengeView', true); setActiveNav(this);">
-            <span class="icon">🔥</span>
-            <span>CHALLENGE</span>
-        </button>
-        <button class="nav-btn" id="nav_savedView" onclick="switchView('savedView', true); setActiveNav(this);">
-            <span class="icon">🔖</span>
-            <span>SAVED</span>
-        </button>
-        <button class="nav-btn" id="nav_doubtView" onclick="switchView('doubtView', true); setActiveNav(this);">
-            <span class="icon">💬</span>
-            <span>DOUBTS</span>
-        </button>
-    </nav>
+    <div class="bottom-nav">
+        <a class="nav-tab active" onclick="showStudentDashboard()"><span>✏️</span>TEST</a>
+        <a class="nav-tab"><span>🏆</span>LEADERBOARD</a>
+        <a class="nav-tab"><span>🔥</span>CHALLENGE</a>
+        <a class="nav-tab"><span>🔖</span>SAVED</a>
+        <a class="nav-tab"><span>💬</span>DOUBTS</a>
+    </div>
 
     <script>
-        let activeExamTitle = '';
-        let activeQuestions = [];
-        let userResponses = {}; 
-        let questionStatuses = {}; 
+        const ADMIN_PASSCODE = "sunitadevi";
+        let currentLang = 'en';
         let currentQIndex = 0;
+        let globalTimerSeconds = 0;
         let timerInterval = null;
-        let timeLeftSeconds = 7200; 
+        let activeTestQuestions = [];
+        let activeTestTitle = '';
+        let activeSectionName = '';
 
-        const fallbackQuestions = [
-            { q: "If 20% of a number is 120, what is 120% of that number?", options: ["600", "720", "800", "900"], ans: 1, explanation: "20% = 120, so 100% = 600. 120% of 600 = 720." },
-            { q: "Find the missing number in series: 4, 9, 19, 39, 79, ?", options: ["149", "159", "169", "139"], ans: 1, explanation: "Pattern is multiply by 2 and add 1 (e.g. 4x2+1=9, 9x2+1=19... 79x2+1=159)." },
-            { q: "Which Article of Indian Constitution deals with Right to Equality?", options: ["Article 14", "Article 19", "Article 21", "Article 32"], ans: 0, explanation: "Article 14 guarantees equality before law and equal protection of laws." },
-            { q: "Choose the correct synonym of 'MANDATORY':", options: ["Optional", "Compulsory", "Redundant", "Flexible"], ans: 1, explanation: "Mandatory means required by law or mandate; compulsory." }
-        ];
+        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v2')) || {
+            "Number System": [
+                { title: "Number System - Divisibility & Remainder Master Test", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "Percentage": [
+                { title: "Percentage Advanced Calculation Drills", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "English Synonym": [
+                { title: "Vocabulary Booster: Synonyms & Antonyms", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "English Voice": [
+                { title: "Active & Passive Voice Practice Set", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "General Studies & Science": [
+                { title: "Static GK & Indian Polity PYQ Session", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "Reasoning Section": [
+                { title: "Coding-Decoding & Analogy Master Drill", date: "2026-09-05", questions: getDefaultQuestions() }
+            ]
+        };
 
-        window.addEventListener('DOMContentLoaded', () => {
-            renderPublishedMocks();
-            renderLeaderboardScores();
-            renderSavedQuestions();
-
-            if (!history.state) {
-                history.replaceState({ view: 'testView' }, '', '');
-            }
-
-            restoreActiveSession();
-        });
-
-        window.addEventListener('popstate', (event) => {
-            const openModals = document.querySelectorAll('.modal.active');
-            if (openModals.length > 0) {
-                openModals.forEach(m => m.classList.remove('active'));
-                return;
-            }
-
-            if (event.state && event.state.view) {
-                switchView(event.state.view, false);
-            } else {
-                switchView('testView', false);
-            }
-        });
-
-        function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
-        
-        function toggleHubAccordion(id) {
-            const elem = document.getElementById(id);
-            if(elem.style.display === 'none') {
-                elem.style.display = 'grid';
-            } else {
-                elem.style.display = 'none';
-            }
-        }
-
-        function switchView(viewId, pushHistory = true) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            const activeNavBtn = document.getElementById('nav_' + viewId);
-            if(activeNavBtn) activeNavBtn.classList.add('active');
-
-            if (pushHistory) {
-                history.pushState({ view: viewId }, '', '');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function openModalWithHistory(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            history.pushState({ modal: modalId }, '', '');
-        }
-
-        function closeModalWithHistory(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            if (history.state && history.state.modal === modalId) {
-                history.back();
-            }
-        }
-
-        function logoutUser() {
-            if(confirm('Are you sure you want to log out?')) { 
-                localStorage.clear();
-                location.reload(); 
-            }
-        }
-
-        function initChallenge(days) {
-            const grid = document.getElementById('challengeGrid');
-            grid.innerHTML = '';
-            for(let i=1; i<=days; i++) {
-                const box = document.createElement('div');
-                box.style.cssText = "background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 6px; padding: 0.4rem; text-align: center; cursor: pointer; font-size: 0.8rem;";
-                box.innerHTML = `D${i}<br><b>-</b>`;
-                box.onclick = function() {
-                    box.style.borderColor = box.style.borderColor === 'rgb(245, 158, 11)' ? 'var(--border-dark)' : 'var(--police-gold)';
-                    box.style.background = box.style.background.includes('245') ? 'var(--bg-dark)' : 'rgba(245,158,11,0.2)';
-                };
-                grid.appendChild(box);
-            }
-        }
-
-        function parseAndPublishHtmlFile() {
-            const fileInput = document.getElementById('htmlMockFile');
-            const targetModule = document.getElementById('targetModuleSelect').value;
-            const statusDiv = document.getElementById('htmlParserStatus');
-
-            if(fileInput.files.length === 0) {
-                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Please select an HTML mock file.</span>';
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing HTML and extracting questions...</span>';
-
-            reader.onload = function(e) {
-                const htmlContent = e.target.result;
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlContent, 'text/html');
-
-                let extracted = [];
-                let currentQ = null;
-                let currentOpts = [];
-                
-                doc.querySelectorAll('*').forEach(node => {
-                    let txt = node.textContent.trim();
-                    if((txt.match(/^Q[\.\:\d]+/i) || txt.match(/^Question\s*\d+/i) || (txt.length > 15 && txt.endsWith('?'))) && node.children.length < 3) {
-                        if(currentQ && currentOpts.length >= 2) {
-                            extracted.push({ q: currentQ, options: currentOpts, ans: 0, explanation: "Correct answer verified from parsed HTML test key." });
-                        }
-                        currentQ = txt.replace(/^Q[\.\:\d]+\s*/i, '');
-                        currentOpts = [];
-                    } else if(currentQ && (node.tagName === 'LABEL' || node.tagName === 'LI' || node.className.includes('option') || node.className.includes('choice'))) {
-                        if(txt.length > 0 && currentOpts.length < 4) {
-                            currentOpts.push(txt.replace(/^[A-Da-d][\.\)]\s*/, ''));
-                        }
-                    }
-                });
-
-                if(currentQ && currentOpts.length >= 2) {
-                    extracted.push({ q: currentQ, options: currentOpts, ans: 0, explanation: "Correct answer verified from parsed HTML test key." });
+        function getDefaultQuestions() {
+            return [
+                {
+                    en: {
+                        q: "What is the unit digit of the expression (7^95 - 3^58)?",
+                        options: ["4", "6", "2", "8"],
+                        correct: 0,
+                        explanation: "Power cycles for 7 and 3 help determine the unit digits as 3 and 9, giving 13 - 9 = 4."
+                    },
+                    hi: {
+                        q: "व्यंजक (7^95 - 3^58) का इकाई अंक क्या है?",
+                        options: ["4", "6", "2", "8"],
+                        correct: 0,
+                        explanation: "घातांक चक्र के अनुसार 7 और 3 के इकाई अंक क्रमशः 3 और 9 हैं, जिससे 13 - 9 = 4 प्राप्त होता है।"
+                    },
+                    pyqTag: "SSC CPO 2024 (Chapter PYQ)",
+                    status: "not_visited",
+                    selectedOption: null,
+                    timeSpent: 0
                 }
-
-                if(extracted.length < 3) {
-                    let baseTitle = file.name.replace(/\.[^/.]+$/, "");
-                    for(let i=1; i<=75; i++) {
-                        extracted.push({
-                            q: `[${baseTitle}] Question ${i}: Which of the following statements or calculations is accurate for this exam module?`,
-                            options: [`Option A for Q${i}`, `Option B for Q${i}`, `Option C for Q${i}`, `Option D for Q${i}`],
-                            ans: i % 4,
-                            explanation: `Detailed step-by-step solution for Question ${i} derived from parser package.`
-                        });
-                    }
-                }
-
-                let customMocks = JSON.parse(localStorage.getItem('cpo_custom_mock_db') || '{}');
-                let mockId = 'mock_' + Date.now();
-                customMocks[mockId] = { title: file.name.replace(/\.[^/.]+$/, ""), questions: extracted };
-                localStorage.setItem('cpo_custom_mock_db', JSON.stringify(customMocks));
-
-                let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
-                publishedMocks.push({ id: mockId, title: file.name.replace(/\.[^/.]+$/, ""), section: targetModule, date: new Date().toLocaleDateString() });
-                localStorage.setItem('cpo_published_mocks', JSON.stringify(publishedMocks));
-
-                renderPublishedMocks();
-                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully parsed ${extracted.length} questions and published under <b>${targetModule}</b>!</span>`;
-            };
-            reader.readAsText(file);
+            ];
         }
 
-        function renderPublishedMocks() {
-            const container = document.getElementById('public_FullMock');
-            if(container) container.innerHTML = '';
+        renderPublicModules();
 
-            let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
-            publishedMocks.forEach(mock => {
-                if(container) {
-                    const item = document.createElement('div');
-                    item.className = 'dynamic-mock-item';
-                    item.innerHTML = `<div><strong style="color:var(--accent-blue);">${mock.title}</strong><br><span style="font-size:0.75rem; color:var::var(--text-muted);">Published: ${mock.date} (${mock.section})</span></div><button class="btn" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="startCustomMock('${mock.id}', '${mock.title}')">Attempt</button>`;
-                    container.appendChild(item);
-                }
-            });
+        function toggleAdminMenu() {
+            document.getElementById('adminDropdownMenu').classList.toggle('show');
         }
 
-        function startDefaultMock(title, section) {
-            activeExamTitle = title;
-            activeQuestions = fallbackQuestions;
-            initExamSession();
-        }
-
-        function startChapterTest(chapterName) {
-            activeExamTitle = "Chapter Drill: " + chapterName;
-            activeQuestions = [];
-            for(let i=1; i<=25; i++) {
-                activeQuestions.push({
-                    q: `[${chapterName}] Practice Question ${i}: Solve and select the correct option based on standard SSC CPO/CGL exam standards.`,
-                    options: [`Choice A (${chapterName})`, `Choice B (${chapterName})`, `Choice C (${chapterName})`, `Choice D (${chapterName})`],
-                    ans: i % 4,
-                    explanation: `Detailed explanation and shortcut tricks for ${chapterName} Question ${i}.`
-                });
-            }
-            initExamSession();
-        }
-
-        function startCustomMock(mockId, title) {
-            let customMocks = JSON.parse(localStorage.getItem('cpo_custom_mock_db') || '{}');
-            if(customMocks[mockId]) {
-                activeExamTitle = title;
-                activeQuestions = customMocks[mockId].questions;
-                initExamSession();
-            } else {
-                startDefaultMock(title, 'FullMock');
-            }
-        }
-
-        function initExamSession() {
-            userResponses = {};
-            questionStatuses = {};
-            currentQIndex = 0;
-            timeLeftSeconds = activeQuestions.length > 50 ? 7200 : 3600;
-
-            activeQuestions.forEach((_, idx) => { questionStatuses[idx] = 'unanswered'; });
-
-            document.getElementById('examModalTitle').innerText = 'Attempting: ' + activeExamTitle;
-            buildPalette();
-            loadQuestion(0);
-            startTimer();
-            
-            document.getElementById('examModal').classList.add('active');
-            history.pushState({ modal: 'examModal', activeExam: activeExamTitle }, '', '');
-            saveActiveSessionState();
-        }
-
-        function startTimer() {
-            if(timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeftSeconds--;
-                let hrs = Math.floor(timeLeftSeconds / 3600);
-                let mins = Math.floor((timeLeftSeconds % 3600) / 60);
-                let secs = timeLeftSeconds % 60;
-                let timerElem = document.getElementById('examTimerDisplay');
-                if(timerElem) {
-                    timerElem.innerText = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-                }
-                saveActiveSessionState();
-                
-                if(timeLeftSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    submitExamAnswers();
-                }
-            }, 1000);
-        }
-
-        function buildPalette() {
-            const grid = document.getElementById('paletteGridContainer');
-            if(!grid) return;
-            grid.innerHTML = '';
-            activeQuestions.forEach((_, idx) => {
-                let btn = document.createElement('button');
-                btn.className = 'palette-btn';
-                btn.id = 'palette_btn_' + idx;
-                btn.innerText = idx + 1;
-                btn.onclick = () => jumpToQuestion(idx);
-                grid.appendChild(btn);
-            });
-            updatePaletteUI();
-        }
-
-        function updatePaletteUI() {
-            activeQuestions.forEach((_, idx) => {
-                let btn = document.getElementById('palette_btn_' + idx);
-                if(!btn) return;
-                btn.className = 'palette-btn';
-                if(idx === currentQIndex) btn.classList.add('current');
-                if(questionStatuses[idx] === 'answered') btn.classList.add('answered');
-                else if(questionStatuses[idx] === 'marked') btn.classList.add('marked');
-            });
-        }
-
-        function loadQuestion(index) {
-            currentQIndex = index;
-            const q = activeQuestions[index];
-            document.getElementById('currentQuestionNumIndicator').innerText = `Question ${index + 1} of ${activeQuestions.length}`;
-            document.getElementById('questionTextContent').innerText = q.q;
-
-            const statusBadge = document.getElementById('questionStatusBadge');
-            statusBadge.innerText = questionStatuses[index].toUpperCase();
-            statusBadge.className = 'badge';
-            if(questionStatuses[index] === 'answered') statusBadge.style.color = 'var(--success)';
-            else if(questionStatuses[index] === 'marked') statusBadge.style.color = 'var(--purple)';
-            else statusBadge.style.color = 'var(--text-muted)';
-
-            const optsContainer = document.getElementById('optionsContainer');
-            optsContainer.innerHTML = '';
-            q.options.forEach((opt, oIdx) => {
-                let checked = userResponses[index] === oIdx ? 'checked' : '';
-                optsContainer.innerHTML += `
-                    <label class="option-label">
-                        <input type="radio" name="exam_opt" value="${oIdx}" ${checked} onchange="selectOption(${oIdx})">
-                        ${opt}
-                    </label>
-                `;
-            });
-            updatePaletteUI();
-            saveActiveSessionState();
-        }
-
-        function selectOption(oIdx) {
-            userResponses[currentQIndex] = oIdx;
-            questionStatuses[currentQIndex] = 'answered';
-            updatePaletteUI();
-            saveActiveSessionState();
-        }
-
-        function jumpToQuestion(index) { loadQuestion(index); }
-        function prevQuestion() { if(currentQIndex > 0) loadQuestion(currentQIndex - 1); }
-        function saveAndNextQuestion() { if(currentQIndex < activeQuestions.length - 1) loadQuestion(currentQIndex + 1); }
-
-        function markForReviewCurrent() {
-            questionStatuses[currentQIndex] = 'marked';
-            updatePaletteUI();
-            if(currentQIndex < activeQuestions.length - 1) loadQuestion(currentQIndex + 1);
-            saveActiveSessionState();
-        }
-
-        function confirmFinalSubmit() {
-            if(confirm('Are you sure you want to submit your test?')) {
-                clearInterval(timerInterval);
-                localStorage.removeItem('cpo_active_exam_session');
-                submitExamAnswers();
-            }
-        }
-
-        function saveActiveSessionState() {
-            if(!activeExamTitle || activeQuestions.length === 0) return;
-            let sessionState = {
-                activeExamTitle,
-                activeQuestions,
-                userResponses,
-                questionStatuses,
-                currentQIndex,
-                timeLeftSeconds
-            };
-            localStorage.setItem('cpo_active_exam_session', JSON.stringify(sessionState));
-        }
-
-        function restoreActiveSession() {
-            let saved = localStorage.getItem('cpo_active_exam_session');
-            if(!saved) return;
-            try {
-                let session = JSON.parse(saved);
-                if(session && session.activeExamTitle && session.timeLeftSeconds > 0) {
-                    activeExamTitle = session.activeExamTitle;
-                    activeQuestions = session.activeQuestions;
-                    userResponses = session.userResponses || {};
-                    questionStatuses = session.questionStatuses || {};
-                    currentQIndex = session.currentQIndex || 0;
-                    timeLeftSeconds = session.timeLeftSeconds;
-
-                    document.getElementById('examModalTitle').innerText = 'Resumed: ' + activeExamTitle;
-                    buildPalette();
-                    loadQuestion(currentQIndex);
-                    startTimer();
-                    document.getElementById('examModal').classList.add('active');
-                }
-            } catch(e) {
-                console.error("Could not restore session", e);
-            }
-        }
-
-        function submitExamAnswers() {
-            if(timerInterval) clearInterval(timerInterval);
-            localStorage.removeItem('cpo_active_exam_session');
-            document.getElementById('examModal').classList.remove('active');
-
-            let correctCount = 0;
-            let incorrectCount = 0;
-            let unattemptedCount = 0;
-            let markedCount = 0;
-            let detailedHtml = '';
-            let incorrectSavedList = [];
-
-            activeQuestions.forEach((item, idx) => {
-                let userAns = userResponses[idx];
-                let status = questionStatuses[idx];
-
-                if(status === 'marked') markedCount++;
-
-                if(userAns === undefined) {
-                    unattemptedCount++;
-                    detailedHtml += `
-                        <div style="background:var(--bg-dark); padding:0.75rem; border-radius:6px; border:1px solid var(--border-dark);">
-                            <p style="font-weight:600;">Q${idx+1}: ${item.q}</p>
-                            <p style="color:var(--warning); font-size:0.85rem;">Status: Unattempted</p>
-                            <p style="color:var(--success); font-size:0.85rem;">Correct Answer: ${item.options[item.ans]}</p>
-                            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:4px;"><b>Solution:</b> ${item.explanation}</p>
-                        </div>
-                    `;
-                } else if(userAns === item.ans) {
-                    correctCount++;
-                    detailedHtml += `
-                        <div style="background:var(--bg-dark); padding:0.75rem; border-radius:6px; border:1px solid var(--border-dark);">
-                            <p style="font-weight:600;">Q${idx+1}: ${item.q}</p>
-                            <p style="color:var(--success); font-size:0.85rem;">Your Answer: ${item.options[userAns]} (Correct)</p>
-                            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:4px;"><b>Solution:</b> ${item.explanation}</p>
-                        </div>
-                    `;
-                } else {
-                    incorrectCount++;
-                    incorrectSavedList.push({
-                        q: item.q,
-                        userAnswer: item.options[userAns],
-                        correctAnswer: item.options[item.ans],
-                        explanation: item.explanation
-                    });
-
-                    detailedHtml += `
-                        <div style="background:var(--bg-dark); padding:0.75rem; border-radius:6px; border:1px solid var(--border-dark);">
-                            <p style="font-weight:600;">Q${idx+1}: ${item.q}</p>
-                            <p style="color:var(--danger); font-size:0.85rem;">Your Answer: ${item.options[userAns]} (Incorrect)</p>
-                            <p style="color:var(--success); font-size:0.85rem;">Correct Answer: ${item.options[item.ans]}</p>
-                            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:4px;"><b>Solution:</b> ${item.explanation}</p>
-                        </div>
-                    `;
-                }
-            });
-
-            let totalMarks = (correctCount * 1.0) - (incorrectCount * 0.25);
-            let totalExamTimeSecs = activeQuestions.length > 50 ? 7200 : 3600;
-            let timeTakenSecs = totalExamTimeSecs - timeLeftSeconds;
-            let timeTakenFormatted = `${Math.floor(timeTakenSecs / 60)} mins ${timeTakenSecs % 60} secs`;
-
-            let scoresHistory = JSON.parse(localStorage.getItem('cpo_scores_history') || '[]');
-            scoresHistory.unshift({
-                title: activeExamTitle,
-                score: totalMarks.toFixed(2),
-                maxScore: activeQuestions.length,
-                correct: correctCount,
-                incorrect: incorrectCount,
-                unattempted: unattemptedCount,
-                timeTaken: timeTakenFormatted,
-                date: new Date().toLocaleDateString()
-            });
-            localStorage.setItem('cpo_scores_history', JSON.stringify(scoresHistory));
-
-            let savedQs = JSON.parse(localStorage.getItem('cpo_saved_questions') || '[]');
-            incorrectSavedList.forEach(item => savedQs.unshift(item));
-            localStorage.setItem('cpo_saved_questions', JSON.stringify(savedQs));
-
-            document.getElementById('resultContentSummary').innerHTML = `
-                <p style="font-size:1.1rem; color:var(--accent-blue); font-weight:bold; margin-bottom:0.5rem;">${activeExamTitle}</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; text-align: left;">
-                    <div>Final Score: <strong style="color:var(--police-gold);">${totalMarks.toFixed(2)} / ${activeQuestions.length}</strong></div>
-                    <div>Correct: <strong style="color:var(--success);">${correctCount}</strong></div>
-                    <div>Incorrect: <strong style="color:var(--danger);">${incorrectCount}</strong></div>
-                    <div>Marked for Review: <strong style="color:var(--purple);">${markedCount}</strong></div>
-                    <div>Unattempted: <strong>${unattemptedCount}</strong></div>
-                    <div>Time Taken: <strong>${timeTakenFormatted}</strong></div>
-                </div>
-            `;
-
-            document.getElementById('detailedSolutionsContainer').innerHTML = detailedHtml;
-            openModalWithHistory('resultModal');
-
-            renderLeaderboardScores();
-            renderSavedQuestions();
-        }
-
-        function renderLeaderboardScores() {
-            const container = document.getElementById('leaderboardScoresList');
-            let scoresHistory = JSON.parse(localStorage.getItem('cpo_scores_history') || '[]');
-            if(scoresHistory.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet.</p>`;
-                return;
-            }
-            container.innerHTML = '';
-            scoresHistory.forEach(record => {
-                let div = document.createElement('div');
-                div.style.cssText = "background: var(--card-dark); border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;";
-                div.innerHTML = `<div><strong style="color:var(--accent-blue);">${record.title}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">Date: ${record.date} | Time: ${record.timeTaken}</span></div><div style="text-align:right;"><span style="color:var(--success); font-weight:bold;">Score: ${record.score}</span><br><span style="font-size:0.75rem; color:var(--text-muted);">C:${record.correct} | I:${record.incorrect}</span></div>`;
-                container.appendChild(div);
-            });
-        }
-
-        function renderSavedQuestions() {
-            const container = document.getElementById('savedQuestionsContainer');
-            let savedQs = JSON.parse(localStorage.getItem('cpo_saved_questions') || '[]');
-            if(savedQs.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted);">No bookmarked or incorrect questions recorded yet.</p>`;
-                return;
-            }
-            container.innerHTML = '';
-            savedQs.forEach(item => {
-                let card = document.createElement('div');
-                card.style.cssText = "background: var(--bg-dark); border: 1px solid var(--border-dark); padding: 1rem; border-radius: 8px;";
-                card.innerHTML = `<p style="color:var(--text-main); font-weight:600; margin-bottom:0.5rem;">Q: ${item.q}</p><p style="font-size:0.85rem; color:var(--danger);">Your Answer: ${item.userAnswer}</p><p style="font-size:0.85rem; color:var(--success);">Correct Answer: ${item.correctAnswer}</p><p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"><b>Solution:</b> ${item.explanation}</p>`;
-                container.appendChild(card);
-            });
-        }
-
-        function submitDoubt() {
-            const text = document.getElementById('doubtInput').value;
-            if(!text) return;
-            const feed = document.getElementById('doubtFeed');
-            const post = document.createElement('div');
-            post.style.cssText = "background: var(--bg-dark); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-dark);";
-            post.innerHTML = `<b>Q: ${text}</b><br><span style="color: var(--success); font-size: 0.85rem;">🤖 AI Solution Generated.</span>`;
-            feed.prepend(post);
-            document.getElementById('doubtInput').value = '';
-        }
-    </script>
-</body>
-</html>
+        function verifyAdminAccess() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            let pass = prompt("Enter Admin Secret Passcode:");
+            if (pass === ADMIN_PASSCODE) {
+                document.getElementById('studentPublicPortal').classList.add('hidden');
+                document.getElementById('adminPanelRoot').classList.remove('hidden');
+                alert("Master Admin Access Granted Successfully!")
