@@ -12,7 +12,6 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB Connection Error:', err));
 }
 
-// User Schema
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   name: { type: String, default: 'Aspirant' },
@@ -23,7 +22,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Mock Test Schema
 const mockSchema = new mongoose.Schema({
   title: { type: String, required: true },
   subject: { type: String, required: true },
@@ -39,7 +37,6 @@ const mockSchema = new mongoose.Schema({
 
 const MockTest = mongoose.model('MockTest', mockSchema);
 
-// Main Application Route (Single-File Portal)
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -125,7 +122,7 @@ app.get('/', (req, res) => {
         </div>
       </div>
 
-      <!-- 2. TEST PORTAL VIEW (Bottom Nav 1) -->
+      <!-- 2. TEST PORTAL VIEW -->
       <div id="testView" class="view-section">
         <h2>CPO & CGL Tier-1 CBT Mock Test Center</h2>
         <div id="adminUploadPanel" style="display:none;" class="card">
@@ -205,7 +202,7 @@ app.get('/', (req, res) => {
         </div>
       </div>
 
-      <!-- 3. LEADERBOARD & ANALYTICS VIEW (Bottom Nav 2) -->
+      <!-- 3. LEADERBOARD VIEW -->
       <div id="leaderboardView" class="view-section">
         <h2>🏆 Leaderboard & Performance Analytics</h2>
         <div class="card">
@@ -216,21 +213,21 @@ app.get('/', (req, res) => {
         </div>
       </div>
 
-      <!-- 4. CHALLENGE TRACKER VIEW (Bottom Nav 3) -->
+      <!-- 4. CHALLENGE VIEW -->
       <div id="challengeView" class="view-section">
         <h2>📅 100 / 60 / 30 Days Challenge Tracker</h2>
         <div class="card">
           <h3>Select Challenge Program</h3>
           <select id="challengeType" onchange="renderChallengeGrid()">
-            <option value="100">100-Day Challenge (Max 3 Circle Marks)</option>
-            <option value="60">60-Day Challenge (Max 2 Circle Marks)</option>
-            <option value="30">30-Day Challenge (Max 1 Circle Mark)</option>
+            <option value="100">100-Day Challenge</option>
+            <option value="60">60-Day Challenge</option>
+            <option value="30">30-Day Challenge</option>
           </select>
           <div id="challengeGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap:10px; margin-top:20px;"></div>
         </div>
       </div>
 
-      <!-- 5. SAVED QUESTIONS & WRONG VAULT (Bottom Nav 4) -->
+      <!-- 5. SAVED VAULT VIEW -->
       <div id="savedView" class="view-section">
         <h2>⭐ Saved & Wrong Questions Vault</h2>
         <div class="card">
@@ -239,17 +236,17 @@ app.get('/', (req, res) => {
         </div>
       </div>
 
-      <!-- 6. DOUBT RESOLUTION GROUP (Bottom Nav 5) -->
+      <!-- 6. DOUBT VIEW -->
       <div id="doubtView" class="view-section">
         <h2>💬 Doubt Resolution Hub</h2>
         <div class="card">
           <textarea placeholder="Type your doubt or upload question screenshot..."></textarea>
           <input type="file" accept="image/*" />
-          <button class="btn-primary" onclick="alert('Doubt submitted to Admin & Google AI successfully!')">Submit Doubt</button>
+          <button class="btn-primary" onclick="alert('Doubt submitted to Admin successfully!')">Submit Doubt</button>
         </div>
       </div>
 
-      <!-- PROFILE VIEW (Drawer 1) -->
+      <!-- PROFILE VIEW -->
       <div id="profileView" class="view-section">
         <h2>👤 Aspirant Profile & Gmail OTP Verification</h2>
         <div class="card">
@@ -270,35 +267,22 @@ app.get('/', (req, res) => {
         </div>
       </div>
 
-      <!-- DAILY TARGETS VIEW (Drawer 2) -->
+      <!-- DAILY TARGETS VIEW -->
       <div id="targetView" class="view-section">
         <h2>🎯 Daily Targets & Study Posts</h2>
         <div class="card">
           <h3>Today's Assigned Mission</h3>
           <p>Complete 50 calculation questions and revise Black Book idioms.</p>
-          <p>Quick Links: <a href="https://youtube.com" target="_blank" style="color:var(--accent);">YouTube Class</a> | <a href="https://telegram.org" target="_blank" style="color:var(--accent);">Telegram Channel</a> | <a href="https://whatsapp.com" target="_blank" style="color:var(--accent);">WhatsApp Group</a></p>
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:15px;">
-            <div>Task 1: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-            <div>Task 2: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-            <div>Task 3: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-            <div>Task 4: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-            <div>Task 5: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-            <div>Task 6: <select><option>👍 Completed</option><option selected>❌ Not Completed</option></select></div>
-          </div>
+          <p>Quick Links: <a href="https://youtube.com" target="_blank" style="color:var(--accent);">YouTube Class</a> | <a href="https://telegram.org" target="_blank" style="color:var(--accent);">Telegram Channel</a></p>
         </div>
       </div>
 
-      <!-- PDF & VIDEO VAULT VIEW (Drawer 5) -->
+      <!-- VAULT VIEW -->
       <div id="vaultView" class="view-section">
         <h2>📦 PDF & Video Study Vault</h2>
         <div class="card">
           <h3>Download Class Notes & PDFs</h3>
-          <button class="btn-primary" onclick="alert('Downloading CPO Complete Math Formula PDF...')">📥 Download CPO Complete Math Formula PDF</button>
-          <button class="btn-primary" onclick="alert('Downloading Black Book Vocabulary PDF...')">📥 Download Black Book Vocab PDF</button>
-          <h3 style="margin-top:20px;">Video Stream Player (Quality & Speed Scaler)</h3>
-          <select><option>1080p HD</option><option>720p</option><option>480p</option><option>360p</option><option>240p</option><option>144p</option></select>
-          <input type="number" step="0.1" min="1.0" max="4.0" value="1.0" placeholder="Custom Video Speed (e.g. 1.3)" />
-          <div style="background:#000; height:200px; display:flex; align-items:center; justify-content:center; color:#fff; border-radius:8px; margin-top:10px;">Video Streaming Active</div>
+          <button class="btn-primary" onclick="alert('Downloading PDF...')">📥 Download CPO Complete Math Formula PDF</button>
         </div>
       </div>
 
@@ -326,50 +310,32 @@ app.get('/', (req, res) => {
           }
         };
 
-        async function handleLogin(e) {
+        function handleLogin(e) {
           e.preventDefault();
           const email = document.getElementById('emailInput').value.trim();
           const name = document.getElementById('nameInput').value.trim();
-          const msg = document.getElementById('authMsg');
-          const loginBtn = document.getElementById('loginBtn');
 
-          msg.style.color = '#38bdf8';
-          msg.innerText = 'Connecting to database...';
-          loginBtn.disabled = true;
+          const isAdmin = (email === 'ajayraoshab751@gmail.com');
 
-          try {
-            const response = await fetch('/api/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, name })
-            });
+          // Instantly set user profile locally so it never freezes
+          currentUser = {
+            email: email,
+            name: name,
+            loginCount: 1,
+            isAdmin: isAdmin,
+            canCall: isAdmin
+          };
+          
+          localStorage.setItem('cpo_user', JSON.stringify(currentUser));
+          
+          // Background sync with database without blocking the UI
+          fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name })
+          }).catch(err => console.log('Background sync skipped'));
 
-            const data = await response.json();
-            if (data.success) {
-              currentUser = data.user;
-              localStorage.setItem('cpo_user', JSON.stringify(currentUser));
-              msg.style.color = '#22c55e';
-              msg.innerText = 'Success! Opening Portal...';
-              setTimeout(bootPortal, 500);
-            } else {
-              msg.style.color = '#ef4444';
-              msg.innerText = data.message || 'Login failed.';
-              loginBtn.disabled = false;
-            }
-          } catch (err) {
-            // Fallback for offline or slow server wake-ups so it never freezes user out
-            currentUser = {
-              email: email,
-              name: name,
-              loginCount: 1,
-              isAdmin: (email === 'ajayraoshab751@gmail.com'),
-              canCall: (email === 'ajayraoshab751@gmail.com')
-            };
-            localStorage.setItem('cpo_user', JSON.stringify(currentUser));
-            msg.style.color = '#22c55e';
-            msg.innerText = 'Offline/Fast Login Active. Launching...';
-            setTimeout(bootPortal, 500);
-          }
+          bootPortal();
         }
 
         function bootPortal() {
@@ -446,22 +412,12 @@ app.get('/', (req, res) => {
           const chapter = document.getElementById('mockChapter').value;
           const rawText = document.getElementById('rawParserInput').value;
 
-          let questions = [];
-          if (rawText.trim()) {
-            questions.push({
-              questionText: "Parsed Question: " + rawText.substring(0, 80) + "...",
-              options: ["Option A", "Option B", "Option C", "Option D"],
-              correctAnswer: 0,
-              solution: "Detailed step-by-step verified solution."
-            });
-          } else {
-            questions.push({
-              questionText: "Sample CPO Standard Question for " + chapter,
-              options: ["25", "30", "35", "40"],
-              correctAnswer: 1,
-              solution: "Calculated using standard shortcut formula."
-            });
-          }
+          let questions = [{
+            questionText: rawText.trim() ? "Parsed: " + rawText.substring(0, 80) + "..." : "Sample CPO Standard Question for " + chapter,
+            options: ["Option A", "Option B", "Option C", "Option D"],
+            correctAnswer: 0,
+            solution: "Detailed step-by-step verified solution."
+          }];
 
           const res = await fetch('/api/admin/upload-mock', {
             method: 'POST',
@@ -470,10 +426,8 @@ app.get('/', (req, res) => {
           });
           const data = await res.json();
           if (data.success) {
-            alert('Mock Test successfully converted and published!');
+            alert('Mock Test successfully published!');
             document.getElementById('uploadMockForm').reset();
-          } else {
-            alert('Error publishing mock.');
           }
         });
 
@@ -565,7 +519,7 @@ app.get('/', (req, res) => {
             if (userAnswers[idx] === q.correctAnswer) score++;
           });
           const percentage = ((score / currentQuestions.length) * 100).toFixed(2);
-          alert('Mock Submitted Successfully!\nScore: ' + score + '/' + currentQuestions.length + '\nPercentage: ' + percentage + '%\nPercentile: 98.4%');
+          alert('Mock Submitted!\nScore: ' + score + '/' + currentQuestions.length + '\nPercentage: ' + percentage + '%');
           document.getElementById('cbtExamArena').style.display = 'none';
           document.getElementById('chapterContainer').style.display = 'block';
         }
@@ -584,13 +538,11 @@ app.get('/', (req, res) => {
   `);
 });
 
-// APIs
 app.post('/api/auth/login', async (req, res) => {
   const { email, name } = req.body || {};
-  if (!email) return res.json({ success: false, message: 'Email is required' });
+  if (!email) return res.json({ success: false });
 
   const isAdmin = (email === 'ajayraoshab751@gmail.com');
-
   try {
     let user = await User.findOne({ email });
     if (!user) {
@@ -620,7 +572,7 @@ app.post('/api/admin/call-perm', async (req, res) => {
     await User.findOneAndUpdate({ email }, { canCall });
     res.json({ success: true });
   } catch (err) {
-    res.json({ success: false, error: err.message });
+    res.json({ success: false });
   }
 });
 
@@ -630,7 +582,7 @@ app.post('/api/admin/upload-mock', async (req, res) => {
     await newMock.save();
     res.json({ success: true });
   } catch (err) {
-    res.json({ success: false, error: err.message });
+    res.json({ success: false });
   }
 });
 
@@ -649,4 +601,4 @@ app.get('/api/mock', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`CPO AIR 1 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
