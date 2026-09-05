@@ -1,65 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPO AIR 1 Portal</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .card { background: #1e1e1e; padding: 30px; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    h2 { margin-bottom: 20px; font-size: 22px; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 4px; border: 1px solid #333; background: #2a2a2a; color: #fff; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    button:hover { background: #0056b3; }
-    .msg { margin-top: 15px; text-align: center; color: #ff4d4d; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPO AIR 1 - CBT Mock Test Portal</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
+        .hidden { display: none !important; }
+        
+        /* Top Header */
+        .app-header { background: #111827; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1f2937; }
+        .brand-box { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { background: #f59e0b; color: #000; font-weight: bold; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .brand-title h1 { font-size: 16px; color: #f59e0b; }
+        .brand-title p { font-size: 10px; color: #9ca3af; }
+
+        /* Main Container */
+        .main-container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        
+        /* Admin & Parser Card matching your theme */
+        .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .panel-card h2 { font-size: 16px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
+        
+        .dropdown-box { background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; margin-bottom: 14px; }
+        .dropdown-box label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 6px; font-weight: bold; }
+        .dropdown-box select, .dropdown-box input[type="file"] { width: 100%; padding: 10px; background: #111827; color: #fff; border: 1px solid #4b5563; border-radius: 4px; font-size: 13px; }
+        
+        .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
+        .btn-primary:hover { background: #0ea5e9; }
+
+        /* CBT Exam Interface Container */
+        #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
+        .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
+        .cbt-nav-top-left { display: flex; gap: 8px; }
+        .cbt-btn { background: #374151; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .cbt-btn.review-btn { background: #7c3aed; }
+        .cbt-btn.next-btn { background: #2563eb; }
+        .lang-toggle-btn { background: #f59e0b; color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        .question-meta { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
+        .pyq-badge { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        
+        .question-text { font-size: 15px; margin-bottom: 15px; line-height: 1.5; color: #f3f4f6; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-item { background: #1f2937; border: 1px solid #374151; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .option-item input { accent-color: #f59e0b; }
+
+        /* Question Palette */
+        .palette-container { margin-top: 15px; border-top: 1px solid #374151; padding-top: 10px; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 100px; overflow-y: auto; }
+        .palette-btn { width: 28px; height: 28px; border-radius: 4px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; background: #374151; color: #fff; }
+        .palette-btn.answered { background: #16a34a; }
+        .palette-btn.marked { background: #9333ea; }
+        .palette-btn.current { border: 2px solid #f59e0b; }
+
+        /* Bottom Nav bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1f2937; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .nav-tab { color: #9ca3af; text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .nav-tab.active { color: #f59e0b; }
+        .nav-tab span { font-size: 16px; }
+    </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Aspirant Login / Register</h2>
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="Enter your email" required />
-    <input type="text" id="name" placeholder="Enter your name (Optional)" />
-    <button type="submit">Login / Register</button>
-  </form>
-  <div id="message" class="msg"></div>
-</div>
+    <!-- Header -->
+    <div class="app-header">
+        <div class="brand-box">
+            <div class="brand-logo">SI</div>
+            <div class="brand-title">
+                <h1>CPO AIR 1</h1>
+                <p>Delhi Police CBT Portal</p>
+            </div>
+        </div>
+        <div id="timerDisplay" style="font-size: 13px; color: #f59e0b; font-weight: bold;">Time: 00:00</div>
+    </div>
 
-<script>
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-    const msg = document.getElementById('message');
+    <div class="main-container">
+        
+        <!-- Admin Panel & Automated Parsers Section -->
+        <div id="adminParserSection" class="panel-card">
+            <h2>🛠️ Admin Panel & Automated Parsers</h2>
+            <p>Upload PDF/HTML mock files containing questions. Select target module section to push generated mock tests straight into the public domain with AI bilingual extraction, PYQ tagging, and individual question timing.</p>
 
-    msg.style.color = '#fff';
-    msg.innerText = 'Logging in...';
+            <div class="dropdown-box">
+                <label>📁 Select Public Domain Module Destination:</label>
+                <select id="targetModuleSelect">
+                    <option value="Comprehensive Syllabus">Comprehensive Syllabus</option>
+                    <option value="Chapter Test Bank">Chapter Test Bank</option>
+                    <option value="Full-Length Tier-1 Mock Suite">Full-Length Tier-1 Mock Suite</option>
+                </select>
+            </div>
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name })
-      });
-      const data = await res.json();
+            <div class="dropdown-box">
+                <label>Upload PDF / HTML Mock File (Supports 70+ Questions):</label>
+                <input type="file" id="mockFileInput" accept=".pdf,.html,.htm" multiple />
+            </div>
 
-      if (data.success) {
-        msg.style.color = '#00ff7f';
-        msg.innerText = 'Login Successful!';
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } else {
-        msg.style.color = '#ff4d4d';
-        msg.innerText = data.message || 'Login failed';
-      }
-    } catch (err) {
-      msg.style.color = '#ff4d4d';
-      msg.innerText = 'Server error. Please try again.';
-    }
-  });
-</script>
+            <button class="btn-primary" onclick="processAndLaunchTest()">Auto-Parse File & Publish to Public Test</button>
+        </div>
 
+        <!-- CBT Exam Screen (Hidden initially until a test is launched) -->
+        <div id="cbtExamScreen" class="hidden">
+            <!-- Top Bar with Top-Left Navigation & Top-Right Language Toggle -->
+            <div class="cbt-top-bar">
+                <div class="cbt-nav-top-left">
+                    <button class="cbt-btn" onclick="prevQuestion()">Previous</button>
+                    <button class="cbt-btn review-btn" onclick="markForReview()">Mark for Review</button>
+                    <button class="cbt-btn next-btn" onclick="nextQuestion()">Next</button>
+                </div>
+                <button class="lang-toggle-btn" onclick="toggleLanguage()">🌐 <span id="langLabel">Hindi</span></button>
+            </div>
+
+            <!-- Question Card Header -->
+            <div class="question-meta">
+                <span id="qNumberIndicator">Question 1 of 50</span>
+                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO 2024 (PYQ)</span>
+            </div>
+
+            <!-- Question Content -->
+            <div class="question-text" id="questionTextContainer">
+                Loading question content...
+            </div>
+
+            <!-- Options List -->
+            <div class="options-list" id="optionsContainer">
+                <!-- Dynamically injected options -->
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
+
+            <!-- Question Palette Navigator -->
+            <div class="palette-container">
+                <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette:</div>
+                <div class="palette-grid" id="paletteGrid">
+                    <!-- Palette buttons injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Scorecard Screen -->
+        <div id="resultScreen" class="panel-card hidden" style="text-align: center;">
+            <h2 style="justify-content: center; color: #34d399;">🎉 Test Submitted Successfully!</h2>
+            <p>Here is your detailed performance scorecard breakdown:</p>
+            
+            <div style="background: #1f2937; padding: 15px; border-radius: 6px; margin: 15px 0; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                <div><strong>Total Correct Answers:</strong> <span id="resCorrect" style="color: #34d399;">0</span></div>
+                <div><strong>Total Incorrect Answers:</strong> <span id="resIncorrect" style="color: #ef4444;">0</span></div>
+                <div><strong>Total Unattempted:</strong> <span id="resUnattempted" style="color: #9ca3af;">0</span></div>
+                <div><strong>Total Time Taken:</strong> <span id="resTime" style="color: #38bdf8;">00:00</span></div>
+                <div><strong>Final Score / Percentage:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
+            </div>
+
+            <button class="btn-primary" onclick="location.reload()">Back to Dashboard / Upload Another</button>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-tab active"><span>✏️</span>TEST</a>
+        <a class="nav-tab"><span>🏆</span>LEADERBOARD</a>
+        <a class="nav-tab"><span>🔥</span>CHALLENGE</a>
+        <a class="nav-tab"><span>🔖</span>SAVED</a>
+        <a class="nav-tab"><span>💬</span>DOUBTS</a>
+    </div>
+
+    <script>
+        // CBT Test Engine State Data
+        let currentLang = 'en'; // 'en' or 'hi'
+        let currentQIndex = 0;
+        let globalTimerSeconds = 0;
+        let timerInterval = null;
+        
+        // Mock sample questions generated dynamically from parser simulation
+        let activeTestQuestions = [
+            {
+                en: {
+                    q: "Which article of the Indian Constitution deals with the establishment and constitution of Supreme Court?",
+                    options: ["Article 124", "Article 324", "Article 280", "Article 356"],
+                    correct: 0,
+                    explanation: "Article 124 of the Indian Constitution provides for the establishment and constitution of the Supreme Court."
+                },
+                hi: {
+                    q: "भारतीय संविधान का कौन सा अनुच्छेद उच्चतम न्यायालय की स्थापना और गठन से संबंधित है?",
+                    options: ["अनुच्छेद 124", "अनुच्छेद 324", "अनुच्छेद 280", "अनुच्छेद 356"],
+                    correct: 0,
+                    explanation: "भारतीय संविधान का अनुच्छेद 124 उच्चतम न्यायालय की स्थापना और गठन का प्रावधान करता है।"
+                },
+                pyq: "SSC CPO 2023 (Shift 1)",
+                status: "not_visited", // not_visited, not_answered, answered, marked
+                selectedOption: null,
+                timeSpent: 0
+            },
+            {
+                en: {
+                    q: "What is the standard unit of electric current in the International System of Units (SI)?",
+                    options: ["Volt", "Ampere", "Ohm", "Watt"],
+                    correct: 1,
+                    explanation: "The Ampere is the SI unit of electric current, named after André-Marie Ampère."
+                },
+                hi: {
+                    q: "अंतर्राष्ट्रीय इकाई प्रणाली (SI) में विद्युत धारा की मानक इकाई क्या है?",
+                    options: ["वोल्ट", "एम्पीयर", "ओम", "वाट"],
+                    correct: 1,
+                    explanation: "एम्पीयर विद्युत धारा की एसआई इकाई है, जिसका नाम आंद्रे-मारी एम्पीयर के नाम पर रखा गया है।"
+                },
+                pyq: "SSC CPO 2024 (PYQ)",
+                status: "not_visited",
+                selectedOption: null,
+                timeSpent: 0
+            }
+        ];
+
+        let questionStartTime = Date.now();
+
+        function processAndLaunchTest() {
+            const fileInput = document.getElementById('mockFileInput');
+            const targetSection = document.getElementById('targetModuleSelect').value;
+
+            if(fileInput.files.length === 0) {
+                alert("Please select at least one PDF or HTML file to parse!");
+                return;
+            }
+
+            // Hide admin parser and show CBT exam interface
+            document.getElementById('adminParserSection').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.remove('hidden');
+
+            // Initialize test session
+            globalTimerSeconds = 0;
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                globalTimerSeconds++;
+                let mins = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
+                let secs = (globalTimerSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `Time: ${mins}:${secs}`;
+            }, 1000);
+
+            loadQuestion(0);
+            buildPalette();
+        }
+
+        function loadQuestion(index) {
+            // Save time spent on previous question
+            let now = Date.now();
+            if(activeTestQuestions[currentQIndex]) {
+                activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
+            }
+
+            currentQIndex = index;
+            questionStartTime = Date.now();
+
+            let qData = activeTestQuestions[currentQIndex];
+            if(qData.status === 'not_visited') {
+                qData.status = 'not_answered';
+            }
+
+            // Update UI indicators
+            document.getElementById('qNumberIndicator').innerText = `Question ${currentQIndex + 1} of ${activeTestQuestions.length}`;
+            document.getElementById('pyqTagDisplay').innerText = qData.pyqTag;
+
+            // Render text based on active language
+            const localized = qData[currentLang];
+            document.getElementById('questionTextContainer').innerText = localized.q;
+
+            let optHTML = '';
+            localized.options.forEach((opt, idx) => {
+                let checked = qData.selectedOption === idx ? 'checked' : '';
+                optHTML += `
+                    <label class="option-item">
+                        <input type="radio" name="examOption" value="${idx}" ${checked} onchange="selectOption(${idx})">
+                        <span>(${String.fromCharCode(65 + idx)}) ${opt}</span>
+                    </label>
+                `;
+            });
+            document.getElementById('optionsContainer').innerHTML = optHTML;
+            updatePaletteUI();
+        }
+
+        function selectOption(idx) {
+            activeTestQuestions[currentQIndex].selectedOption = idx;
+            activeTestQuestions[currentQIndex].status = 'answered';
+            updatePaletteUI();
+        }
+
+        function nextQuestion() {
+            if(currentQIndex < activeTestQuestions.length - 1) {
+                loadQuestion(currentQIndex + 1);
+            }
+        }
+
+        function prevQuestion() {
+            if(currentQIndex > 0) {
+                loadQuestion(currentQIndex - 1);
+            }
+        }
+
+        function markForReview() {
+            activeTestQuestions[currentQIndex].status = 'marked';
+            updatePaletteUI();
+            if(currentQIndex < activeTestQuestions.length - 1) {
+                loadQuestion(currentQIndex + 1);
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'Hindi' : 'English';
+            loadQuestion(currentQIndex);
+        }
+
+        function buildPalette() {
+            let gridHTML = '';
+            activeTestQuestions.forEach((q, idx) => {
+                gridHTML += `<button class="palette-btn" id="palBtn_${idx}" onclick="loadQuestion(${idx})">${idx + 1}</button>`;
+            });
+            document.getElementById('paletteGrid').innerHTML = gridHTML;
+            updatePaletteUI();
+        }
+
+        function updatePaletteUI() {
+            activeTestQuestions.forEach((q, idx) => {
+                let btn = document.getElementById(`palBtn_${idx}`);
+                if(!btn) return;
+                btn.className = 'palette-btn';
+                if(idx === currentQIndex) btn.classList.add('current');
+                if(q.status === 'answered') btn.classList.add('answered');
+                if(q.status === 'marked') btn.classList.add('marked');
+            });
+        }
+
+        function confirmSubmitTest() {
+            if(confirm("Are you sure you want to submit your test?")) {
+                submitTest();
+            }
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            // Record final active question time
+            let now = Date.now();
+            activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
+
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unattemptedCount = 0;
+
+            activeTestQuestions.forEach(q => {
+                if(q.selectedOption === null) {
+                    unattemptedCount++;
+                } else if(q.selectedOption === q.en.correct) {
+                    correctCount++;
+                } else {
+                    incorrectCount++;
+                }
+            });
+
+            let totalScore = ((correctCount / activeTestQuestions.length) * 100).toFixed(1);
+            let mins = Math.floor(globalTimerSeconds / 60);
+            let secs = globalTimerSeconds % 60;
+
+            // Show result screen
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('resCorrect').innerText = correctCount;
+            document.getElementById('resIncorrect').innerText = incorrectCount;
+            document.getElementById('resUnattempted').innerText = unattemptedCount;
+            document.getElementById('resTime').innerText = `${mins}m ${secs}s`;
+            document.getElementById('resScore').innerText = `${totalScore}% (${correctCount}/${activeTestQuestions.length})`;
+        }
+    </script>
 </body>
 </html>
