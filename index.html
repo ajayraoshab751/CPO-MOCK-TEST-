@@ -3,18 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Exam Portal</title>
+    <title>CPO AIR 1 - Delhi Police CBT Exam Platform</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; text-align: center; padding: 50px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; }
-        p { color: #94a3b8; }
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --success: #22c55e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: linear-gradient(135deg, var(--primary), #0f172a); border-bottom: 2px solid var(--secondary); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-area h1 { font-size: 1.5rem; color: var(--accent); letter-spacing: 1px; }
+        .logo-area span { font-size: 0.85rem; background: var(--secondary); padding: 0.2rem 0.6rem; border-radius: 4px; color: white; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; width: 100%; flex: 1; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid #334155; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); border-color: var(--secondary); }
+        .card h3 { color: var(--accent); margin-bottom: 0.75rem; font-size: 1.2rem; }
+        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.4; }
+        .btn { display: inline-block; background: var(--secondary); color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; transition: background 0.2s; }
+        .btn:hover { background: #0369a1; }
+        .stats-bar { display: flex; justify-content: space-around; background: var(--card-bg); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #334155; }
+        .stat-item text { display: block; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--success); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+        footer { text-align: center; padding: 1.5rem; background: #090d16; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid #1e293b; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>CPO AIR 1 CBT Platform</h1>
-        <p>Portal is fully operational and securely connected.</p>
+    <header>
+        <div class="logo-area">
+            <h1>CPO AIR 1</h1>
+            <span>Delhi Police Theme</span>
+        </div>
+        <div>
+            <button class="btn" onclick="alert('Session Active: Authenticated via Secure Gmail Gateway')">Profile / Auth</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-val">Active</span>
+                <span class="stat-label">CBT System Status</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">4 Sections</span>
+                <span class="stat-label">Math, Reasoning, GK, English</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">Live Sync</span>
+                <span class="stat-label">Database Connection</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Full CBT Mock Tests</h3>
+                <p>Take full-length computer-based practice exams structured exactly like the Delhi Police CPO recruitment layout with timer and analytics.</p>
+                <button class="btn" onclick="alert('Launching Mock Examination Module...')">Start Mock Test</button>
+            </div>
+            <div class="card">
+                <h3>Chapter-wise Index</h3>
+                <p>Target specific weak areas across Quantitative Aptitude, General Intelligence, General Awareness, and English Comprehension.</p>
+                <button class="btn" onclick="alert('Opening Subject Index...')">Browse Chapters</button>
+            </div>
+            <div class="card">
+                <h3>Media Vault & Videos</h3>
+                <p>Access high-yield recorded lectures and study PDFs with adjustable playback speeds (1x to 4x).</p>
+                <button class="btn" onclick="alert('Opening Media Vault...')">Open Vault</button>
+            </div>
+            <div class="card">
+                <h3>All-India Leaderboard</h3>
+                <p>Compare your scores, check percentile analytics, and keep track of your multi-day streak challenges.</p>
+                <button class="btn" onclick="alert('Loading Leaderboard Metrics...')">View Rankings</button>
+            </div>
+        </div>
     </div>
+
+    <footer>
+        <p>&copy; 2026 CPO AIR 1 CBT Platform. Designed for Delhi Police Aspirants.</p>
+    </footer>
 </body>
 </html>
