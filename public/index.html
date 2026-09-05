@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Mock Test Portal</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal (v2.5 Final)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
@@ -16,17 +16,17 @@
         .brand-title h1 { font-size: 16px; color: #f59e0b; }
         .brand-title p { font-size: 10px; color: #9ca3af; }
 
-        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
         
-        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 230px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
+        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
         .admin-dropdown-menu.show { display: block; }
-        .admin-dropdown-item { padding: 10px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .admin-dropdown-item { padding: 12px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .admin-dropdown-item:hover { background: #374151; color: #f59e0b; }
 
         .main-container { padding: 15px; max-width: 850px; margin: 0 auto; }
         
         .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
-        .panel-card h2 { font-size: 16px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .panel-card h2 { font-size: 15px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
         
         .form-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -43,7 +43,7 @@
         .test-item-row { background: #1f2937; padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
         .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
-        /* CBT Exam Interface Container */
+        /* CBT Exam Screen */
         #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
         .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
         .cbt-nav-top-left { display: flex; gap: 8px; }
@@ -92,57 +92,60 @@
 
         <!-- Admin Secret Dropdown Menu -->
         <div id="adminDropdownMenu" class="admin-dropdown-menu">
-            <div class="admin-dropdown-item" onclick="openAdminSection('activityView')">📊 1. User Activity & Logins</div>
-            <div class="admin-dropdown-item" onclick="openAdminSection('chapterParserView')">📂 2 & 3. Chapter & Bulk PDFs</div>
-            <div class="admin-dropdown-item" onclick="openAdminSection('codeConverterView')">💻 4. Code-to-Mock Converter</div>
+            <div class="admin-dropdown-item" onclick="verifyAdminAccess()">🛠️ Open Master Admin Dashboard</div>
             <div class="admin-dropdown-item" onclick="showStudentDashboard()">📁 View Student Portal</div>
         </div>
     </div>
 
     <div class="main-container">
         
-        <!-- ================= ADMIN PANEL ROOT ================= -->
+        <!-- ================= MASTER ADMIN DASHBOARD (4 BUTTON FEATURES) ================= -->
         <div id="adminPanelRoot" class="hidden">
             
+            <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
+                <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite (Active)</h2>
+                <p>Full control center with User Activity & Gmail login logs, Chapter-Wise section selectors, Bulk 10-PDF Parallel AI Parsers, and HTML/JS Code-to-Mock Compilers.</p>
+            </div>
+
             <!-- Button 1: User Activity & Gmail Login Records -->
-            <div id="sectionActivity" class="panel-card">
+            <div class="panel-card">
                 <h2>📊 1. User Activity & Gmail Login Records</h2>
-                <p>Monitor real-time user engagement, session logs, individual investments/purchases, and Gmail authentication records.</p>
-                <div style="background: #1f2937; border-radius: 6px; padding: 12px; overflow-x: auto;">
+                <p>Track real-time student engagement, individual investment/plan purchases, and Gmail authentication records.</p>
+                <div style="background: #1f2937; border-radius: 6px; padding: 10px; overflow-x: auto;">
                     <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 1px solid #374151; color: #f59e0b;">
                                 <th style="padding: 8px;">User Gmail Account</th>
-                                <th style="padding: 8px;">Login Timestamp</th>
-                                <th style="padding: 8px;">Investment / Plan</th>
-                                <th style="padding: 8px;">Tests Attempted</th>
+                                <th style="padding: 8px;">Login Time</th>
+                                <th style="padding: 8px;">Investment Plan</th>
+                                <th style="padding: 8px;">Activity Status</th>
                             </tr>
                         </thead>
-                        <tbody id="userActivityTableBody">
-                            <tr>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #2d3748;">
                                 <td style="padding: 8px;">aspirant.delhipolice@gmail.com</td>
-                                <td style="padding: 8px;">2026-09-05 10:30 AM</td>
+                                <td style="padding: 8px;">Today, 10:30 AM</td>
                                 <td style="color: #34d399; padding: 8px;">₹499 (Tier-1 Master Pass)</td>
-                                <td style="padding: 8px;">4 Mocks</td>
+                                <td style="padding: 8px;">Active (4 Mocks Done)</td>
                             </tr>
                             <tr>
                                 <td style="padding: 8px;">cpo.aspirant2026@gmail.com</td>
-                                <td style="padding: 8px;">2026-09-05 09:15 AM</td>
+                                <td style="padding: 8px;">Today, 09:15 AM</td>
                                 <td style="color: #34d399; padding: 8px;">₹199 (Maths Special)</td>
-                                <td style="padding: 8px;">2 Mocks</td>
+                                <td style="padding: 8px;">Active (2 Mocks Done)</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Button 2 & 3: Chapter Section Selector, Test Name Box, and Bulk PDF AI Parsers -->
-            <div id="sectionParser" class="panel-card">
-                <h2>📂 2 & 3. Chapter-Wise Section & Bulk PDF AI Parser (Up to 10 Files)</h2>
-                <p>Select chapter category, assign test name, upload up to 10 PDF files in parallel, and track automated AI conversion timing.</p>
+            <!-- Button 2 & 3: Chapter Selector, Test Name Box, & Bulk PDF Parallel Parser -->
+            <div class="panel-card">
+                <h2>📂 2 & 3. Chapter-Wise Section & Bulk Parallel PDF Parser</h2>
+                <p>Select chapter category, type custom test name, and upload up to 10 PDF files simultaneously to auto-convert them into active mock tests.</p>
 
                 <div class="form-row">
-                    <!-- Button 2: Chapter Selection & Test Name Input -->
+                    <!-- Button 2: Chapter Selection -->
                     <div class="form-group">
                         <label>2. Select Chapter Test Section:</label>
                         <select id="chapterSectionSelect">
@@ -154,36 +157,37 @@
                             <option value="Reasoning Section">Reasoning: Chapter-Wise Test</option>
                         </select>
                     </div>
+                    <!-- Custom Mock Test Name Input (Right Box) -->
                     <div class="form-group">
                         <label>Custom Mock Test Name (Right Box):</label>
                         <input type="text" id="customTestNameInput" placeholder="e.g., CPO Target Batch Set 1" />
                     </div>
                 </div>
 
-                <!-- Button 3: Bulk PDF Multi-Parser (Up to 10 Files Parallel) -->
+                <!-- Button 3: Bulk PDF Multi-Parser (Up to 10 Files) -->
                 <div class="form-group" style="margin-bottom: 14px;">
-                    <label>3. Upload Multiple PDFs (Select up to 10 files simultaneously):</label>
-                    <input type="file" id="bulkPdfInput" multiple accept="application/pdf,.pdf" />
+                    <label>3. Upload Multiple PDFs (Select up to 10 files in parallel):</label>
+                    <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
                 </div>
 
                 <div id="conversionTimerBox" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px;" class="hidden">
-                    ⚡ AI Parallel Conversion Time: <span id="timerOutput">0.00</span>s
+                    ⚡ AI Parallel PDF Conversion Completed in: <span id="timerOutput">0.00</span>s
                 </div>
 
                 <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parallel PDF-to-Mock Parser</button>
             </div>
 
-            <!-- Button 4: Direct JavaScript / HTML Code Converter -->
-            <div id="sectionCodeConverter" class="panel-card">
+            <!-- Button 4: Code-to-Mock Converter -->
+            <div class="panel-card">
                 <h2>💻 4. Code-to-Mock Converter (HTML / JS Code Parser)</h2>
-                <p>Directly paste JavaScript or HTML code block snippets below to convert them into an active chapter mock test based on the section selected above.</p>
+                <p>Paste raw HTML or JavaScript code snippets below to instantly compile and publish them into the chapter section selected in Button 2.</p>
                 
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>Paste Raw HTML/JS Coding Structure:</label>
-                    <textarea id="rawCodeInput" rows="5" placeholder="// Paste JavaScript array questions or HTML structure here..."></textarea>
+                    <textarea id="rawCodeInput" rows="4" placeholder="// Paste JavaScript array questions or HTML structure here..."></textarea>
                 </div>
 
-                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Convert Code to Mock Test</button>
+                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Code Mock Test</button>
             </div>
 
         </div>
@@ -263,7 +267,7 @@
         let activeTestTitle = '';
         let activeSectionName = '';
 
-        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules')) || {
+        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v2')) || {
             "Number System": [
                 { title: "Number System - Divisibility & Remainder Master Test", date: "2026-09-05", questions: getDefaultQuestions() }
             ],
@@ -288,13 +292,13 @@
             return [
                 {
                     en: {
-                        q: "What is the unit digit of the expression $(7^{95} - 3^{58})$?",
+                        q: "What is the unit digit of the expression (7^95 - 3^58)?",
                         options: ["4", "6", "2", "8"],
                         correct: 0,
                         explanation: "Power cycles for 7 and 3 help determine the unit digits as 3 and 9, giving 13 - 9 = 4."
                     },
                     hi: {
-                        q: "व्यंजक $(7^{95} - 3^{58})$ का इकाई अंक क्या है?",
+                        q: "व्यंजक (7^95 - 3^58) का इकाई अंक क्या है?",
                         options: ["4", "6", "2", "8"],
                         correct: 0,
                         explanation: "घातांक चक्र के अनुसार 7 और 3 के इकाई अंक क्रमशः 3 और 9 हैं, जिससे 13 - 9 = 4 प्राप्त होता है।"
@@ -310,20 +314,13 @@
         renderPublicModules();
 
         function toggleAdminMenu() {
-            let menu = document.getElementById('adminDropdownMenu');
-            menu.classList.toggle('show');
+            document.getElementById('adminDropdownMenu').classList.toggle('show');
         }
 
-        function openAdminSection(sectionId) {
+        function verifyAdminAccess() {
             document.getElementById('adminDropdownMenu').classList.remove('show');
             let pass = prompt("Enter Admin Secret Passcode:");
             if (pass === ADMIN_PASSCODE) {
                 document.getElementById('studentPublicPortal').classList.add('hidden');
                 document.getElementById('adminPanelRoot').classList.remove('hidden');
-                alert("Admin Access Granted Successfully!");
-            } else if (pass !== null) {
-                alert("Incorrect Passcode!");
-            }
-        }
-
-        func
+                alert("Master Admin Access Granted Successfully!")
