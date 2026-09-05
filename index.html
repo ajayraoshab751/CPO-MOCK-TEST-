@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Mock Test Portal (v3.0 Bulletproof Fix)</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
@@ -34,7 +34,7 @@
         .form-group label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 6px; font-weight: bold; }
         .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #111827; color: #fff; border: 1px solid #4b5563; border-radius: 4px; font-size: 13px; }
         
-        .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
+        .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; margin-top: 10px; }
         .btn-primary:hover { background: #0ea5e9; }
 
         /* Student View Sections */
@@ -46,7 +46,7 @@
         /* CBT Exam Screen */
         #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
         .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
-        .cbt-nav-top-left { display: flex; gap: 8px; }
+        .cbt-nav-top-left { display: flex; gap: 8px; flex-wrap: wrap; }
         .cbt-btn { background: #374151; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .cbt-btn.review-btn { background: #7c3aed; }
         .cbt-btn.next-btn { background: #2563eb; }
@@ -102,16 +102,13 @@
         
         <!-- ================= MASTER ADMIN DASHBOARD ================= -->
         <div id="adminPanelRoot" class="hidden">
-            
             <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
                 <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite</h2>
-                <p>Bulletproof unlimited question compiler active.</p>
+                <p>Bulk PDF parser & Code-to-Mock compiler active.</p>
             </div>
 
             <div class="panel-card">
                 <h2>📂 Chapter-Wise Section & Bulk PDF Parser</h2>
-                <p>Select chapter category, type custom test name, and upload questions.</p>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label>Select Chapter Test Section:</label>
@@ -129,28 +126,21 @@
                         <input type="text" id="customTestNameInput" placeholder="e.g., CPO Mega Test" />
                     </div>
                 </div>
-
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>Upload Files / PDFs:</label>
                     <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
                 </div>
-
                 <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parser</button>
             </div>
 
-            <!-- Code-to-Mock Converter -->
             <div class="panel-card">
-                <h2>💻 Code-to-Mock Converter (Unlimited Questions)</h2>
-                <p>Paste any JavaScript array or JSON containing unlimited questions.</p>
-                
+                <h2>💻 Code-to-Mock Converter</h2>
                 <div class="form-group" style="margin-bottom: 14px;">
                     <label>Paste Raw Questions JSON or JavaScript Array:</label>
-                    <textarea id="rawCodeInput" rows="6" placeholder="[ { en: { q: 'Question 1?', options: ['A','B','C','D'], correct: 0, explanation: 'Exp' }, hi: { q: 'प्रश्नोत्तरी 1?', options: ['A','B','C','D'], correct: 0, explanation: 'स्पष्टीकरण' } } ]"></textarea>
+                    <textarea id="rawCodeInput" rows="6" placeholder="[ { en: { q: 'Question?', options: ['A','B','C','D'], correct: 0, explanation: 'Exp' }, hi: { q: 'प्रश्न?', options: ['A','B','C','D'], correct: 0, explanation: 'स्पष्टीकरण' } } ]"></textarea>
                 </div>
-
-                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Unlimited Mock Test</button>
+                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Test</button>
             </div>
-
         </div>
 
         <!-- ================= STUDENT PUBLIC PORTAL ================= -->
@@ -158,6 +148,8 @@
             <div class="panel-card" style="border-color: #38bdf8;">
                 <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & Chapter-Wise CBT Suite</h2>
                 <p>Full Mock Tests, Chapter Drills, and Unlimited AI-Generated Tests.</p>
+                <!-- Direct visible reset button to guarantee easy clearing -->
+                <button class="btn-primary" style="background: #ef4444; color: white; font-size: 13px; padding: 8px;" onclick="resetLocalStorageData()">🔄 Click Here to Reset & Load Default Modules</button>
             </div>
 
             <div id="modulesContainer"></div>
@@ -182,7 +174,7 @@
             <div class="question-text" id="questionTextContainer">Loading question...</div>
             <div class="options-list" id="optionsContainer"></div>
 
-            <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
+            <button class="btn-primary" style="background: #16a34a; color: white;" onclick="confirmSubmitTest()">Submit Test</button>
 
             <div class="palette-container">
                 <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette:</div>
@@ -230,89 +222,91 @@
 
         const defaultModulesData = {
             "Number System": [
-                { title: "Number System - Master Test", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Number System") }
+                { title: "Number System - Master Test", date: "2026-09-05", questions: getSampleQuestions("Number System") }
             ],
             "Percentage": [
-                { title: "Percentage Calculation Drills", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Percentage") }
+                { title: "Percentage Calculation Drills", date: "2026-09-05", questions: getSampleQuestions("Percentage") }
             ],
             "English Synonym": [
-                { title: "Vocabulary Booster Drills", date: "2026-09-05", questions: getSampleUnlimitedQuestions("English") }
+                { title: "Vocabulary Booster Drills", date: "2026-09-05", questions: getSampleQuestions("English") }
             ],
             "English Voice": [
-                { title: "Active & Passive Voice Set", date: "2026-09-05", questions: getSampleUnlimitedQuestions("English Voice") }
+                { title: "Active & Passive Voice Set", date: "2026-09-05", questions: getSampleQuestions("English Voice") }
             ],
             "General Studies & Science": [
-                { title: "Static GK & Polity Session", date: "2026-09-05", questions: getSampleUnlimitedQuestions("GK") }
+                { title: "Static GK & Polity Session", date: "2026-09-05", questions: getSampleQuestions("GK") }
             ],
             "Reasoning Section": [
-                { title: "Reasoning Master Drill", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Reasoning") }
+                { title: "Reasoning Master Drill", date: "2026-09-05", questions: getSampleQuestions("Reasoning") }
             ]
         };
 
-        let publicModules = loadModulesSafely();
+        function getSampleQuestions(topic) {
+            let list = [];
+            for (let i = 1; i <= 5; i++) {
+                list.push({
+                    en: { q: `[${topic}] Question ${i}: Sample test question text for CPO preparation.`, options: ["Option A", "Option B", "Option C", "Option D"], correct: 0, explanation: "Standard explanation." },
+                    hi: { q: `[${topic}] प्रश्न ${i}: सीपीओ तैयारी के लिए नमूना प्रश्न पाठ।`, options: ["विकल्प A", "विकल्प B", "विकल्प C", "विकल्प D"], correct: 0, explanation: "मानक स्पष्टीकरण।" },
+                    pyqTag: `SSC CPO Exam`, status: "not_visited", selectedOption: null, timeSpent: 0
+                });
+            }
+            return list;
+        }
 
-        function loadModulesSafely() {
+        // Safe Storage Loader
+        let publicModules = (() => {
             try {
-                let saved = localStorage.getItem('cpo_public_modules_v8');
+                let saved = localStorage.getItem('cpo_public_modules_v11');
                 if (!saved) return defaultModulesData;
                 let parsed = JSON.parse(saved);
-                return (parsed && typeof parsed === 'object') ? parsed : defaultModulesData;
+                return (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) ? parsed : defaultModulesData;
             } catch (e) {
-                console.error("Storage corruption caught, falling back to defaults.", e);
-                localStorage.removeItem('cpo_public_modules_v8');
                 return defaultModulesData;
             }
-        }
+        })();
 
         function resetLocalStorageData() {
             if (confirm("Reset all test modules and clear cache?")) {
                 localStorage.clear();
-                alert("Cache cleared successfully! Reloading portal.");
+                alert("Cache successfully wiped! Reloading portal.");
                 location.reload();
             }
-        }
-
-        function getSampleUnlimitedQuestions(topic) {
-            let list = [];
-            for (let i = 1; i <= 5; i++) {
-                list.push({
-                    en: { q: `[${topic}] Question ${i}: Sample question text for testing unlimited compilation.`, options: ["Option A", "Option B", "Option C", "Option D"], correct: 0, explanation: "Standard explanation." },
-                    hi: { q: `[${topic}] प्रश्न ${i}: असीमित संकलन के लिए नमूना प्रश्न पाठ।`, options: ["विकल्प A", "विकल्प B", "विकल्प C", "विकल्प D"], correct: 0, explanation: "मानक स्पष्टीकरण।" },
-                    pyqTag: `SSC CPO 2026`, status: "not_visited", selectedOption: null, timeSpent: 0
-                });
-            }
-            return list;
         }
 
         window.onload = function() {
             try {
                 renderPublicModules();
             } catch (e) {
-                console.error("Window onload render error:", e);
-                document.getElementById('modulesContainer').innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading modules. Please use Admin Panel to Reset Cache.</div>';
+                let container = document.getElementById('modulesContainer');
+                if (container) {
+                    container.innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center;">Error loading modules. Tap the red Reset button above.</div>';
+                }
             }
         };
 
         function toggleAdminMenu() {
-            document.getElementById('adminDropdownMenu').classList.toggle('show');
+            let menu = document.getElementById('adminDropdownMenu');
+            if (menu) menu.classList.toggle('show');
         }
 
         function verifyAdminAccess() {
-            document.getElementById('adminDropdownMenu').classList.remove('show');
+            let menu = document.getElementById('adminDropdownMenu');
+            if (menu) menu.classList.remove('show');
             let pass = prompt("Enter Admin Secret Passcode:");
             if (pass === ADMIN_PASSCODE) {
                 document.getElementById('studentPublicPortal').classList.add('hidden');
                 document.getElementById('cbtExamScreen').classList.add('hidden');
                 document.getElementById('resultScreen').classList.add('hidden');
                 document.getElementById('adminPanelRoot').classList.remove('hidden');
-                alert("Master Admin Access Granted Successfully!");
+                alert("Master Admin Access Granted!");
             } else if (pass !== null) {
                 alert("Incorrect Passcode!");
             }
         }
 
         function showStudentDashboard() {
-            document.getElementById('adminDropdownMenu').classList.remove('show');
+            let menu = document.getElementById('adminDropdownMenu');
+            if (menu) menu.classList.remove('show');
             document.getElementById('adminPanelRoot').classList.add('hidden');
             document.getElementById('cbtExamScreen').classList.add('hidden');
             document.getElementById('resultScreen').classList.add('hidden');
@@ -337,4 +331,5 @@
                     html += `
                         <div class="test-item-row">
                             <div>
-                                <div style="font-weight: bold; color: #f3f4f6;">${tes
+                                <div style="font-weight: bold; color: #f3f4f6;">${test.title}</div>
+                                <div style="font-size: 11px; color: #9ca3af;">Published: ${test
