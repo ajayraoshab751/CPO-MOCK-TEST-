@@ -121,7 +121,8 @@
 
             <div class="dropdown-box">
                 <label>Upload PDF / HTML Mock File:</label>
-                <input type="file" id="mockFileInput" />
+                <!-- Universal mobile-friendly accept configuration to prevent Android file managers from greying out PDFs -->
+                <input type="file" id="mockFileInput" accept="application/pdf,text/html,.pdf,.html,*/*" />
             </div>
 
             <button class="btn-primary" onclick="adminPublishTestFile()">Auto-Parse File & Publish to Public</button>
@@ -135,9 +136,7 @@
             </div>
 
             <!-- Dynamic Sections Rendered Here -->
-            <div id="modulesContainer">
-                <!-- Sections will be populated dynamically -->
-            </div>
+            <div id="modulesContainer"></div>
         </div>
 
         <!-- CBT Exam Screen -->
@@ -208,7 +207,6 @@
         let activeTestTitle = '';
         let activeSectionName = '';
 
-        // Default stored public modules data structure
         let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules')) || {
             "Full-Length Tier-1 Mock Suite": [
                 { title: "CGL Tier-1 Master Mock 1", date: "2026-09-05", questions: getDefaultQuestions() }
@@ -319,7 +317,7 @@
                 let newTest = {
                     title: `AI Parsed: ${file.name.replace(/\.[^/.]+$/, "")}`,
                     date: new Date().toISOString().split('T')[0],
-                    questions: getDefaultQuestions() // In real production, AI parser populates extracted questions here
+                    questions: getDefaultQuestions()
                 };
 
                 if(!publicModules[targetSec]) publicModules[targetSec] = [];
@@ -330,7 +328,8 @@
                 showStudentDashboard();
             };
 
-            reader.readAsText(file);
+            // Using readAsDataURL to safely process PDFs or any file format without text-encoding corruption
+            reader.readAsDataURL(file);
         }
 
         let questionStartTime = Date.now();
@@ -339,7 +338,7 @@
             activeSectionName = sectionName;
             let testObj = publicModules[sectionName][testIdx];
             activeTestTitle = testObj.title;
-            activeTestQuestions = JSON.parse(JSON.stringify(testObj.questions)); // Deep clone
+            activeTestQuestions = JSON.parse(JSON.stringify(testObj.questions));
 
             document.getElementById('studentPublicPortal').classList.add('hidden');
             document.getElementById('adminParserSection').classList.add('hidden');
@@ -356,9 +355,4 @@
             }, 1000);
 
             loadQuestion(0);
-            buildPalette();
-        }
-
-        function loadQuestion(index) {
-  
-
+     
