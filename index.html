@@ -91,11 +91,11 @@
         <button class="menu-icon" onclick="toggleMenu()">&#8942;</button>
         
         <div id="dropdownMenu" class="dropdown-menu">
-            <div class="dropdown-item" onclick="openModal('profileModal'); toggleMenu();">👤 Profile & Gmail OTP</div>
-            <div class="dropdown-item" onclick="switchView('targetBoard'); toggleMenu();">🎯 Target Board & Checklists</div>
+            <div class="dropdown-item" onclick="openModalWithHistory('profileModal'); toggleMenu();">👤 Profile & Gmail OTP</div>
+            <div class="dropdown-item" onclick="switchView('targetBoard', true); toggleMenu();">🎯 Target Board & Checklists</div>
             <div class="dropdown-item" onclick="location.reload();">🔄 Refresh App Data</div>
-            <div class="dropdown-item" onclick="switchView('studyVault'); toggleMenu();">📚 Study Vault, PDFs & Video</div>
-            <div class="dropdown-item" onclick="switchView('adminPanel'); toggleMenu();">🛠️ Admin & Parser Panel</div>
+            <div class="dropdown-item" onclick="switchView('studyVault', true); toggleMenu();">📚 Study Vault, PDFs & Video</div>
+            <div class="dropdown-item" onclick="switchView('adminPanel', true); toggleMenu();">🛠️ Admin & Parser Panel</div>
             <div class="dropdown-item" onclick="logoutUser();" style="color: var(--danger);">🚪 Logout</div>
         </div>
     </header>
@@ -235,7 +235,7 @@
 
     </div>
 
-    <!-- CBT EXAM MODAL (Pro Max UI with Timer & Question Palette) -->
+    <!-- CBT EXAM MODAL -->
     <div id="examModal" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-dark); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
@@ -246,7 +246,6 @@
             </div>
 
             <div class="cbt-container">
-                <!-- Question View Area -->
                 <div class="cbt-main">
                     <div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
@@ -266,7 +265,6 @@
                     </div>
                 </div>
 
-                <!-- Question Palette Sidebar -->
                 <div class="cbt-sidebar">
                     <h3 style="font-size: 0.95rem; color: var(--police-gold);">Question Palette</h3>
                     <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.75rem; color: var(--text-muted);">
@@ -288,7 +286,7 @@
             <div id="resultContentSummary" style="font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5; background: var(--bg-dark); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-dark);"></div>
             <h3 style="font-size: 1rem; color: var(--accent-blue); margin-bottom: 0.5rem;">Question-by-Question Solution Breakdown:</h3>
             <div id="detailedSolutionsContainer" style="display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; max-height: 45vh; padding-right: 4px;"></div>
-            <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="closeModal('resultModal'); switchView('leaderboardView');">View on Leaderboard</button>
+            <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="closeModalWithHistory('resultModal'); switchView('leaderboardView', true);">View on Leaderboard</button>
         </div>
     </div>
 
@@ -297,29 +295,29 @@
         <div class="modal-content" style="max-width: 450px;">
             <h2 style="color: var(--accent-blue); margin-bottom: 1rem;">User Profile & Gmail Verification</h2>
             <p style="margin-bottom: 0.75rem;">Registered Gmail: <span style="color: var(--police-gold);">aspirant@gmail.com</span></p>
-            <button class="btn btn-secondary" onclick="closeModal('profileModal')" style="width: 100%; margin-top: 0.5rem;">Close</button>
+            <button class="btn btn-secondary" onclick="closeModalWithHistory('profileModal')" style="width: 100%; margin-top: 0.5rem;">Close</button>
         </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchView('testView'); setActiveNav(this);">
+        <button class="nav-btn active" id="nav_testView" onclick="switchView('testView', true); setActiveNav(this);">
             <span class="icon">📝</span>
             <span>TEST</span>
         </button>
-        <button class="nav-btn" onclick="switchView('leaderboardView'); setActiveNav(this);">
+        <button class="nav-btn" id="nav_leaderboardView" onclick="switchView('leaderboardView', true); setActiveNav(this);">
             <span class="icon">🏆</span>
             <span>LEADERBOARD</span>
         </button>
-        <button class="nav-btn" onclick="switchView('challengeView'); setActiveNav(this);">
+        <button class="nav-btn" id="nav_challengeView" onclick="switchView('challengeView', true); setActiveNav(this);">
             <span class="icon">🔥</span>
             <span>CHALLENGE</span>
         </button>
-        <button class="nav-btn" onclick="switchView('savedView'); setActiveNav(this);">
+        <button class="nav-btn" id="nav_savedView" onclick="switchView('savedView', true); setActiveNav(this);">
             <span class="icon">🔖</span>
             <span>SAVED</span>
         </button>
-        <button class="nav-btn" onclick="switchView('doubtView'); setActiveNav(this);">
+        <button class="nav-btn" id="nav_doubtView" onclick="switchView('doubtView', true); setActiveNav(this);">
             <span class="icon">💬</span>
             <span>DOUBTS</span>
         </button>
@@ -328,11 +326,11 @@
     <script>
         let activeExamTitle = '';
         let activeQuestions = [];
-        let userResponses = {}; // questionIndex -> selectedOptionIndex
-        let questionStatuses = {}; // questionIndex -> 'unanswered' | 'answered' | 'marked'
+        let userResponses = {}; 
+        let questionStatuses = {}; 
         let currentQIndex = 0;
         let timerInterval = null;
-        let timeLeftSeconds = 7200; // 120 minutes
+        let timeLeftSeconds = 7200; 
 
         const fallbackQuestions = [
             { q: "If 20% of a number is 120, what is 120% of that number?", options: ["600", "720", "800", "900"], ans: 1, explanation: "20% = 120, so 100% = 600. 120% of 600 = 720." },
@@ -345,22 +343,66 @@
             renderPublishedMocks();
             renderLeaderboardScores();
             renderSavedQuestions();
+
+            // Initialize browser history state
+            if (!history.state) {
+                history.replaceState({ view: 'testView' }, '', '');
+            }
+
+            // Restore active state if page was refreshed
+            restoreActiveSession();
+        });
+
+        // Handle Browser Back/Forward buttons smoothly
+        window.addEventListener('popstate', (event) => {
+            // Close any open modals first if back button is pressed
+            const openModals = document.querySelectorAll('.modal.active');
+            if (openModals.length > 0) {
+                openModals.forEach(m => m.classList.remove('active'));
+                return;
+            }
+
+            if (event.state && event.state.view) {
+                switchView(event.state.view, false);
+            } else {
+                switchView('testView', false);
+            }
         });
 
         function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
-        function switchView(viewId) {
+        
+        function switchView(viewId, pushHistory = true) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
+            
+            // Sync bottom nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeNavBtn = document.getElementById('nav_' + viewId);
+            if(activeNavBtn) activeNavBtn.classList.add('active');
+
+            if (pushHistory) {
+                history.pushState({ view: viewId }, '', '');
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        function setActiveNav(btn) {
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
+
+        function openModalWithHistory(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            history.pushState({ modal: modalId }, '', '');
         }
-        function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+        function closeModalWithHistory(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (history.state && history.state.modal === modalId) {
+                history.back();
+            }
+        }
+
         function logoutUser() {
-            if(confirm('Are you sure you want to log out?')) { location.reload(); }
+            if(confirm('Are you sure you want to log out?')) { 
+                localStorage.clear();
+                location.reload(); 
+            }
         }
 
         function initChallenge(days) {
@@ -378,7 +420,6 @@
             }
         }
 
-        // --- HTML Parser Engine (Extracts 70-80+ Questions) ---
         function parseAndPublishHtmlFile() {
             const fileInput = document.getElementById('htmlMockFile');
             const targetModule = document.getElementById('targetModuleSelect').value;
@@ -399,17 +440,11 @@
                 const doc = parser.parseFromString(htmlContent, 'text/html');
 
                 let extracted = [];
-
-                // Strategy 1: Look for standard question blocks (.question, .test-question, div containing q)
-                let qElements = doc.querySelectorAll('.question, .quiz-question, .q-block, p, li');
-                
-                // If structured elements found, parse them
                 let currentQ = null;
                 let currentOpts = [];
                 
                 doc.querySelectorAll('*').forEach(node => {
                     let txt = node.textContent.trim();
-                    // Detect question patterns like Q1, Question 1, or ending with ?
                     if((txt.match(/^Q[\.\:\d]+/i) || txt.match(/^Question\s*\d+/i) || (txt.length > 15 && txt.endsWith('?'))) && node.children.length < 3) {
                         if(currentQ && currentOpts.length >= 2) {
                             extracted.push({ q: currentQ, options: currentOpts, ans: 0, explanation: "Correct answer verified from parsed HTML test key." });
@@ -427,7 +462,6 @@
                     extracted.push({ q: currentQ, options: currentOpts, ans: 0, explanation: "Correct answer verified from parsed HTML test key." });
                 }
 
-                // Fallback if generic DOM parser finds fewer than 3 questions: generate structured dummy array based on file length
                 if(extracted.length < 3) {
                     let baseTitle = file.name.replace(/\.[^/.]+$/, "");
                     for(let i=1; i<=75; i++) {
@@ -473,7 +507,7 @@
             });
         }
 
-        // --- CBT Examination Control & Navigation ---
+        // --- CBT Examination Control & Auto-Save Session Storage ---
         function startDefaultMock(title, section) {
             activeExamTitle = title;
             activeQuestions = fallbackQuestions;
@@ -503,7 +537,10 @@
             buildPalette();
             loadQuestion(0);
             startTimer();
-            openModal('examModal');
+            
+            document.getElementById('examModal').classList.add('active');
+            history.pushState({ modal: 'examModal', activeExam: activeExamTitle }, '', '');
+            saveActiveSessionState();
         }
 
         function startTimer() {
@@ -513,8 +550,11 @@
                 let hrs = Math.floor(timeLeftSeconds / 3600);
                 let mins = Math.floor((timeLeftSeconds % 3600) / 60);
                 let secs = timeLeftSeconds % 60;
-                document.getElementById('examTimerDisplaytitle') || (document.getElementById('examTimerDisplay').innerText = 
-                    `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`);
+                let timerElem = document.getElementById('examTimerDisplay');
+                if(timerElem) {
+                    timerElem.innerText = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+                }
+                saveActiveSessionState();
                 
                 if(timeLeftSeconds <= 0) {
                     clearInterval(timerInterval);
@@ -525,6 +565,7 @@
 
         function buildPalette() {
             const grid = document.getElementById('paletteGridContainer');
+            if(!grid) return;
             grid.innerHTML = '';
             activeQuestions.forEach((_, idx) => {
                 let btn = document.createElement('button');
@@ -573,12 +614,14 @@
                 `;
             });
             updatePaletteUI();
+            saveActiveSessionState();
         }
 
         function selectOption(oIdx) {
             userResponses[currentQIndex] = oIdx;
             questionStatuses[currentQIndex] = 'answered';
             updatePaletteUI();
+            saveActiveSessionState();
         }
 
         function jumpToQuestion(index) { loadQuestion(index); }
@@ -589,18 +632,58 @@
             questionStatuses[currentQIndex] = 'marked';
             updatePaletteUI();
             if(currentQIndex < activeQuestions.length - 1) loadQuestion(currentQIndex + 1);
+            saveActiveSessionState();
         }
 
         function confirmFinalSubmit() {
             if(confirm('Are you sure you want to submit your test?')) {
                 clearInterval(timerInterval);
+                localStorage.removeItem('cpo_active_exam_session');
                 submitExamAnswers();
+            }
+        }
+
+        function saveActiveSessionState() {
+            if(!activeExamTitle || activeQuestions.length === 0) return;
+            let sessionState = {
+                activeExamTitle,
+                activeQuestions,
+                userResponses,
+                questionStatuses,
+                currentQIndex,
+                timeLeftSeconds
+            };
+            localStorage.setItem('cpo_active_exam_session', JSON.stringify(sessionState));
+        }
+
+        function restoreActiveSession() {
+            let saved = localStorage.getItem('cpo_active_exam_session');
+            if(!saved) return;
+            try {
+                let session = JSON.parse(saved);
+                if(session && session.activeExamTitle && session.timeLeftSeconds > 0) {
+                    activeExamTitle = session.activeExamTitle;
+                    activeQuestions = session.activeQuestions;
+                    userResponses = session.userResponses || {};
+                    questionStatuses = session.questionStatuses || {};
+                    currentQIndex = session.currentQIndex || 0;
+                    timeLeftSeconds = session.timeLeftSeconds;
+
+                    document.getElementById('examModalTitle').innerText = 'Resumed: ' + activeExamTitle;
+                    buildPalette();
+                    loadQuestion(currentQIndex);
+                    startTimer();
+                    document.getElementById('examModal').classList.add('active');
+                }
+            } catch(e) {
+                console.error("Could not restore session", e);
             }
         }
 
         function submitExamAnswers() {
             if(timerInterval) clearInterval(timerInterval);
-            closeModal('examModal');
+            localStorage.removeItem('cpo_active_exam_session');
+            document.getElementById('examModal').classList.remove('active');
 
             let correctCount = 0;
             let incorrectCount = 0;
@@ -636,13 +719,12 @@
                     `;
                 } else {
                     incorrectCount++;
-                    let incorrectRecord = {
+                    incorrectSavedList.push({
                         q: item.q,
                         userAnswer: item.options[userAns],
                         correctAnswer: item.options[item.ans],
                         explanation: item.explanation
-                    };
-                    incorrectSavedList.push(incorrectRecord);
+                    });
 
                     detailedHtml += `
                         <div style="background:var(--bg-dark); padding:0.75rem; border-radius:6px; border:1px solid var(--border-dark);">
@@ -656,10 +738,10 @@
             });
 
             let totalMarks = (correctCount * 1.0) - (incorrectCount * 0.25);
-            let timeTakenSecs = (activeQuestions.length > 50 ? 7200 : 3600) - timeLeftSeconds;
+            let totalExamTimeSecs = activeQuestions.length > 50 ? 7200 : 3600;
+            let timeTakenSecs = totalExamTimeSecs - timeLeftSeconds;
             let timeTakenFormatted = `${Math.floor(timeTakenSecs / 60)} mins ${timeTakenSecs % 60} secs`;
 
-            // Save to Leaderboard History
             let scoresHistory = JSON.parse(localStorage.getItem('cpo_scores_history') || '[]');
             scoresHistory.unshift({
                 title: activeExamTitle,
@@ -673,7 +755,6 @@
             });
             localStorage.setItem('cpo_scores_history', JSON.stringify(scoresHistory));
 
-            // Save Incorrect to Saved Bank
             let savedQs = JSON.parse(localStorage.getItem('cpo_saved_questions') || '[]');
             incorrectSavedList.forEach(item => savedQs.unshift(item));
             localStorage.setItem('cpo_saved_questions', JSON.stringify(savedQs));
@@ -691,7 +772,7 @@
             `;
 
             document.getElementById('detailedSolutionsContainer').innerHTML = detailedHtml;
-            openModal('resultModal');
+            openModalWithHistory('resultModal');
 
             renderLeaderboardScores();
             renderSavedQuestions();
