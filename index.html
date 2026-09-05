@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPO AIR 1 - CBT Mock Test Portal (v2.7 Multi-Q Fixed)</title>
+    <title>CPO AIR 1 - CBT Mock Test Portal (v2.8 Unlimited Questions)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background: #0b0f19; color: #fff; padding-bottom: 70px; }
@@ -61,8 +61,8 @@
         .option-item input { accent-color: #f59e0b; }
 
         .palette-container { margin-top: 15px; border-top: 1px solid #374151; padding-top: 10px; }
-        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 100px; overflow-y: auto; }
-        .palette-btn { width: 28px; height: 28px; border-radius: 4px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; background: #374151; color: #fff; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 120px; overflow-y: auto; }
+        .palette-btn { width: 32px; height: 32px; border-radius: 4px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; background: #374151; color: #fff; }
         .palette-btn.answered { background: #16a34a; }
         .palette-btn.marked { background: #9333ea; }
         .palette-btn.current { border: 2px solid #f59e0b; }
@@ -104,13 +104,13 @@
             
             <div class="panel-card" style="border-color: #f59e0b; background: #172033;">
                 <h2 style="color: #f59e0b; font-size: 16px;">🔐 Secure Admin Master Suite</h2>
-                <p>Full control center with User Activity logs, Chapter-Wise section selectors, Bulk 10-PDF Parallel AI Parsers, and Code-to-Mock Compilers.</p>
+                <p>Unlimited Question Compiler & Bulk Parallel AI Parsers active.</p>
             </div>
 
             <!-- Button 1: User Activity & Gmail Login Records -->
             <div class="panel-card">
                 <h2>📊 1. User Activity & Gmail Login Records</h2>
-                <p>Track real-time student engagement, plan investments, and Gmail authentication records.</p>
+                <p>Track real-time student engagement and Gmail authentication records.</p>
                 <div style="background: #1f2937; border-radius: 6px; padding: 10px; overflow-x: auto;">
                     <table style="width: 100%; font-size: 12px; text-align: left; border-collapse: collapse;">
                         <thead>
@@ -128,24 +128,17 @@
                                 <td style="color: #34d399; padding: 8px;">₹499 (Tier-1 Master Pass)</td>
                                 <td style="padding: 8px;">Active (4 Mocks Done)</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px;">cpo.aspirant2026@gmail.com</td>
-                                <td style="padding: 8px;">Today, 09:15 AM</td>
-                                <td style="color: #34d399; padding: 8px;">₹199 (Maths Special)</td>
-                                <td style="padding: 8px;">Active (2 Mocks Done)</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Button 2 & 3: Chapter Selector, Test Name Box, & Bulk PDF Parallel Parser -->
+            <!-- Button 2 & 3: Chapter Selector & Bulk PDF Parallel Parser -->
             <div class="panel-card">
-                <h2>📂 2 & 3. Chapter-Wise Section & Bulk Parallel PDF Parser</h2>
-                <p>Select chapter category, type custom test name, and upload up to 10 PDF files simultaneously.</p>
+                <h2>📂 2 & 3. Chapter-Wise Section & Bulk PDF Parser (Unlimited Qs)</h2>
+                <p>Select chapter category, type custom test name, and upload PDF files for unlimited question extraction.</p>
 
                 <div class="form-row">
-                    <!-- Button 2: Chapter Selection -->
                     <div class="form-group">
                         <label>2. Select Chapter Test Section:</label>
                         <select id="chapterSectionSelect">
@@ -157,37 +150,35 @@
                             <option value="Reasoning Section">Reasoning: Chapter-Wise Test</option>
                         </select>
                     </div>
-                    <!-- Custom Mock Test Name Input -->
                     <div class="form-group">
                         <label>Custom Mock Test Name:</label>
-                        <input type="text" id="customTestNameInput" placeholder="e.g., CPO Target Batch Set 1" />
+                        <input type="text" id="customTestNameInput" placeholder="e.g., CPO Mega Test 50 Questions" />
                     </div>
                 </div>
 
-                <!-- Button 3: Bulk PDF Multi-Parser -->
                 <div class="form-group" style="margin-bottom: 14px;">
-                    <label>3. Upload Multiple PDFs (Select up to 10 files in parallel):</label>
+                    <label>3. Upload Multiple PDFs (Unlimited files):</label>
                     <input type="file" id="bulkPdfInput" multiple accept="application/pdf,text/html,.pdf,.html,*/*" />
                 </div>
 
                 <div id="conversionTimerBox" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px;" class="hidden">
-                    ⚡ AI Parallel PDF Conversion Completed in: <span id="timerOutput">0.00</span>s
+                    ⚡ Unlimited AI PDF Conversion Completed in: <span id="timerOutput">0.00</span>s
                 </div>
 
-                <button class="btn-primary" onclick="processBulkPdfParser()">Run AI Parallel PDF-to-Mock Parser</button>
+                <button class="btn-primary" onclick="processBulkPdfParser()">Run Unlimited AI PDF-to-Mock Parser</button>
             </div>
 
-            <!-- Button 4: Code-to-Mock Converter -->
+            <!-- Button 4: Code-to-Mock Converter (Unlimited Questions) -->
             <div class="panel-card">
-                <h2>💻 4. Code-to-Mock Converter (HTML / JS Code Parser)</h2>
-                <p>Paste raw HTML or JavaScript code snippets below to instantly compile into a full 5-question mock test.</p>
+                <h2>💻 4. Code-to-Mock Converter (Unlimited Questions Parser)</h2>
+                <p>Paste any JavaScript array or JSON containing <strong>unlimited questions</strong> (`[{en: {q: '...', options: [...]}, ...}]`) to instantly compile them.</p>
                 
                 <div class="form-group" style="margin-bottom: 14px;">
-                    <label>Paste Raw HTML/JS Coding Structure:</label>
-                    <textarea id="rawCodeInput" rows="4" placeholder="// Paste JavaScript array questions or HTML structure here..."></textarea>
+                    <label>Paste Raw Questions JSON or JavaScript Array:</label>
+                    <textarea id="rawCodeInput" rows="6" placeholder="[ { en: { q: 'Question 1?', options: ['A','B','C','D'], correct: 0, explanation: 'Exp' }, hi: { q: 'प्रश्नोत्तरी 1?', options: ['A','B','C','D'], correct: 0, explanation: 'स्पष्टीकरण' } }, ... ]"></textarea>
                 </div>
 
-                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Code Mock Test</button>
+                <button class="btn-primary" style="background: #10b981; color: white;" onclick="convertCodeToMockTest()">Compile & Publish Unlimited Mock Test</button>
             </div>
 
         </div>
@@ -196,10 +187,9 @@
         <div id="studentPublicPortal">
             <div class="panel-card" style="border-color: #38bdf8;">
                 <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & Chapter-Wise CBT Suite</h2>
-                <p>Full Mock Tests, Chapter Drills (Number System, Percentage, English Synonym/Voice, GK/GS, Reasoning), and AI-Generated Tests.</p>
+                <p>Full Mock Tests, Chapter Drills, and Unlimited AI-Generated Tests.</p>
             </div>
 
-            <!-- Dynamic Modules Render Target -->
             <div id="modulesContainer"></div>
         </div>
 
@@ -216,7 +206,7 @@
 
             <div class="question-meta">
                 <span id="qNumberIndicator">Question 1 of 1</span>
-                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO PYQ Drill</span>
+                <span id="pyqTagDisplay" class="pyq-badge">SSC CPO Exam</span>
             </div>
 
             <div class="question-text" id="questionTextContainer">Loading question...</div>
@@ -225,7 +215,7 @@
             <button class="btn-primary" style="background: #16a34a; color: white; margin-top: 10px;" onclick="confirmSubmitTest()">Submit Test</button>
 
             <div class="palette-container">
-                <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette:</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">Question Navigator Palette (Unlimited):</div>
                 <div class="palette-grid" id="paletteGrid"></div>
             </div>
         </div>
@@ -270,39 +260,63 @@
 
         let defaultModulesData = {
             "Number System": [
-                { title: "Number System - Divisibility & Remainder Master Test", date: "2026-09-05", questions: getMultiQuestions("Number System") }
+                { title: "Number System - Master Test", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Number System") }
             ],
             "Percentage": [
-                { title: "Percentage Advanced Calculation Drills", date: "2026-09-05", questions: getMultiQuestions("Percentage") }
+                { title: "Percentage Calculation Drills", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Percentage") }
             ],
             "English Synonym": [
-                { title: "Vocabulary Booster: Synonyms & Antonyms", date: "2026-09-05", questions: getMultiQuestions("English Synonym") }
+                { title: "Vocabulary Booster Drills", date: "2026-09-05", questions: getSampleUnlimitedQuestions("English") }
             ],
             "English Voice": [
-                { title: "Active & Passive Voice Practice Set", date: "2026-09-05", questions: getMultiQuestions("English Voice") }
+                { title: "Active & Passive Voice Set", date: "2026-09-05", questions: getSampleUnlimitedQuestions("English Voice") }
             ],
             "General Studies & Science": [
-                { title: "Static GK & Indian Polity PYQ Session", date: "2026-09-05", questions: getMultiQuestions("General Studies") }
+                { title: "Static GK & Polity Session", date: "2026-09-05", questions: getSampleUnlimitedQuestions("GK") }
             ],
             "Reasoning Section": [
-                { title: "Coding-Decoding & Analogy Master Drill", date: "2026-09-05", questions: getMultiQuestions("Reasoning") }
+                { title: "Reasoning Master Drill", date: "2026-09-05", questions: getSampleUnlimitedQuestions("Reasoning") }
             ]
         };
 
-        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v4')) || defaultModulesData;
+        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules_v6')) || defaultModulesData;
 
-        function getMultiQuestions(topic) {
-            return [
-                {
-                    en: { q: `[${topic}] Q1: What is the fundamental concept or primary formula applicable here?`, options: ["Option A (Standard)", "Option B (Alternate)", "Option C (Advanced)", "Option D (Invalid)"], correct: 0, explanation: "Standard formula applied for core derivation." },
-                    hi: { q: `[${topic}] प्रश्न 1: यहाँ लागू होने वाली मूल अवधारणा या प्राथमिक सूत्र क्या है?`, options: ["विकल्प A", "विकल्प B", "विकल्प C", "विकल्प D"], correct: 0, explanation: "मूल व्युत्पत्ति के लिए मानक सूत्र लागू किया गया।" },
-                    pyqTag: "SSC CPO 2024 PYQ", status: "not_visited", selectedOption: null, timeSpent: 0
-                },
-                {
-                    en: { q: `[${topic}] Q2: Calculate the resulting value given standard parameter constraints.`, options: ["124", "145", "156", "172"], correct: 1, explanation: "Solving step-by-step yields 145." },
-                    hi: { q: `[${topic}] प्रश्न 2: मानक पैरामीटर बाधाओं को देखते हुए परिणामी मूल्य की गणना करें।`, options: ["124", "145", "156", "172"], correct: 1, explanation: "चरण-दर-चरण हल करने पर 145 प्राप्त होता है।" },
-                    pyqTag: "SSC CPO 2023 PYQ", status: "not_visited", selectedOption: null, timeSpent: 0
-                },
-                {
-                    en: { q: `[${topic}] Q3: Which of the following conditions satisfies the given equation?`, options: ["Only 1", "Only 2", "Both 1 and 2", "Neither 1 nor 2"], correct: 2, explanation: "Both conditions satisfy the statement perfectly." },
-           
+        function getSampleUnlimitedQuestions(topic) {
+            let list = [];
+            for (let i = 1; i <= 10; i++) {
+                list.push({
+                    en: { q: `[${topic}] Question ${i}: What is the detailed solution and evaluation for problem statement ${i}?`, options: [`Option A for Q${i}`, `Option B for Q${i}`, `Option C for Q${i}`, `Option D for Q${i}`], correct: (i % 4), explanation: `Detailed step-by-step explanation for question ${i}.` },
+                    hi: { q: `[${topic}] प्रश्न ${i}: समस्या कथन ${i} के लिए विस्तृत समाधान क्या है?`, options: [`विकल्प A - ${i}`, `विकल्प B - ${i}`, `विकल्प C - ${i}`, `विकल्प D - ${i}`], correct: (i % 4), explanation: `प्रश्न ${i} के लिए विस्तृत चरण-दर-चरण स्पष्टीकरण।` },
+                    pyqTag: `SSC CPO 2026 Set ${i}`, status: "not_visited", selectedOption: null, timeSpent: 0
+                });
+            }
+            return list;
+        }
+
+        window.onload = function() {
+            renderPublicModules();
+        };
+
+        function toggleAdminMenu() {
+            document.getElementById('adminDropdownMenu').classList.toggle('show');
+        }
+
+        function verifyAdminAccess() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            let pass = prompt("Enter Admin Secret Passcode:");
+            if (pass === ADMIN_PASSCODE) {
+                document.getElementById('studentPublicPortal').classList.add('hidden');
+                document.getElementById('cbtExamScreen').classList.add('hidden');
+                document.getElementById('resultScreen').classList.add('hidden');
+                document.getElementById('adminPanelRoot').classList.remove('hidden');
+                alert("Master Admin Access Granted Successfully!");
+            } else if (pass !== null) {
+                alert("Incorrect Passcode!");
+            }
+        }
+
+        function showStudentDashboard() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            document.getElementById('adminPanelRoot').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hi
