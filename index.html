@@ -22,7 +22,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 80px; }
         
-        /* Header */
         header { background: linear-gradient(135deg, var(--police-navy), #1e293b); border-bottom: 2px solid var(--police-gold); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .brand { display: flex; align-items: center; gap: 0.75rem; }
         .badge-logo { width: 42px; height: 42px; background: radial-gradient(circle, #fcd34d, var(--police-gold)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--police-navy); font-size: 1rem; border: 2px solid white; box-shadow: 0 0 12px rgba(245,158,11,0.6); }
@@ -58,11 +57,9 @@
         
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card-dark); border: 1px solid var(--accent-blue); width: 100%; max-width: 700px; border-radius: 12px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--card-dark); border: 1px solid var(--accent-blue); width: 100%; max-width: 750px; border-radius: 12px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
         
         .dynamic-mock-item { background: rgba(56,189,248,0.08); border: 1px dashed var(--accent-blue); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* CBT Exam Screen Styles */
         .option-label { display: block; background: var(--bg-dark); border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; }
         .option-label:hover { border-color: var(--accent-blue); }
         .option-label input { margin-right: 0.75rem; }
@@ -136,9 +133,9 @@
                 <h2>All-India Leaderboard & Exam Scores</h2>
                 <p>Real-time rank monitoring, recent test scores, and performance analytics.</p>
                 <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
-                    <p style="color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🏆 Your Best Rank: AIR 1 (Top 0.1%)</p>
+                    <p style="color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🏆 Your Rank Status: Active Aspirant</p>
                     <div id="leaderboardScoresList" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet. Complete a test to see your live score log here!</p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet. Attempt a test to populate your score logs!</p>
                     </div>
                 </div>
             </div>
@@ -148,11 +145,11 @@
         <div id="challengeView" class="view-section">
             <div class="card">
                 <h2>Habit & Streak Challenge Tracker</h2>
-                <p>Select challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent. Max 3 circles in 100-day, 2 in 60-day, and 1 in 30-day challenge.</p>
+                <p>Select challenge duration. Enter <strong>P</strong> for Present and <strong>A</strong> for Absent.</p>
                 <div style="display: flex; gap: 0.75rem; margin: 1rem 0;">
-                    <button class="btn" onclick="initChallenge(30)">30-Day (1 Circle)</button>
-                    <button class="btn" onclick="initChallenge(60)">60-Day (2 Circles)</button>
-                    <button class="btn" onclick="initChallenge(100)">100-Day (3 Circles)</button>
+                    <button class="btn" onclick="initChallenge(30)">30-Day</button>
+                    <button class="btn" onclick="initChallenge(60)">60-Day</button>
+                    <button class="btn" onclick="initChallenge(100)">100-Day</button>
                 </div>
                 <div id="challengeGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 6px; margin-top: 1rem;"></div>
             </div>
@@ -162,7 +159,7 @@
         <div id="savedView" class="view-section">
             <div class="card">
                 <h2>Saved & Incorrect Questions Bank</h2>
-                <p>Review questions you bookmarked or answered incorrectly during your mock attempts.</p>
+                <p>Review questions you answered incorrectly during your mock attempts.</p>
                 <div id="savedQuestionsContainer" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
                     <p style="color: var(--text-muted);">No bookmarked or incorrect questions recorded yet.</p>
                 </div>
@@ -212,15 +209,6 @@
                     <button class="btn" onclick="parsePdfOrText()">Auto-Detect Pages & Publish to Public</button>
                     <div id="pdfParserStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
                 </div>
-
-                <div style="margin-top: 1rem; border-top: 1px solid var(--border-dark); padding-top: 1rem;">
-                    <h3 style="font-size: 1rem; color: var(--police-gold); margin-bottom: 0.5rem;">User Interaction & Call Access Control</h3>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                        <input type="text" id="targetUserEmail" placeholder="user@gmail.com" style="flex: 1; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.5rem; border-radius: 6px;">
-                        <button class="btn" onclick="toggleUserCallPermission()">Toggle Call Access</button>
-                    </div>
-                    <p id="totalLoginsDisplay" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--success);">📊 Total Gmail Logins Tracked: <span id="loginCountVal">1</span></p>
-                </div>
             </div>
         </div>
 
@@ -228,21 +216,7 @@
         <div id="targetBoard" class="view-section">
             <div class="card">
                 <h2>🎯 Daily Target Board & Command Checklists</h2>
-                <p>Complete daily targets published by command. Mark tasks with 👍 or ❌.</p>
-                <div style="margin: 1rem 0; display: flex; gap: 0.5rem;">
-                    <a href="https://youtube.com" target="_blank" class="btn btn-secondary">YouTube</a>
-                    <a href="https://telegram.org" target="_blank" class="btn btn-secondary">Telegram</a>
-                    <a href="https://whatsapp.com" target="_blank" class="btn btn-secondary">WhatsApp</a>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-                    <label style="display: flex; justify-content: space-between; background: var(--bg-dark); padding: 0.75rem; border-radius: 6px;">
-                        <span>1. Attempt Daily Quantitative Aptitude Section</span>
-                        <select onchange="updateChecklist(this)" style="background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.2rem; border-radius: 4px;">
-                            <option value="pending">❌ Not Completed</option>
-                            <option value="done">👍 Completed</option>
-                        </select>
-                    </label>
-                </div>
+                <p>Complete daily targets published by command.</p>
             </div>
         </div>
 
@@ -250,16 +224,7 @@
         <div id="studyVault" class="view-section">
             <div class="card">
                 <h2>📚 Study Material, Downloads & Custom Video Player</h2>
-                <p>Stream lectures or download packages. Customize video playback speed smoothly from 1.0x to 4.0x.</p>
-                <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border-dark);">
-                    <div style="background: #000; height: 180px; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-bottom: 0.75rem; color: var(--text-muted);">
-                        [ Video Stream Preview ]
-                    </div>
-                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                        <label>Speed (1x-4x): <input type="number" id="customSpeedInput" value="1.3" step="0.1" min="1" max="4" style="width: 70px; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.3rem; border-radius: 4px;" onchange="changeVideoSpeed(this.value)"></label>
-                        <button class="btn" onclick="alert('Downloading offline package...')">Download Package</button>
-                    </div>
-                </div>
+                <p>Stream lectures or download packages.</p>
             </div>
         </div>
 
@@ -279,7 +244,7 @@
 
     <!-- EXAM RESULTS MODAL -->
     <div id="resultModal" class="modal">
-        <div class="modal-content text-center">
+        <div class="modal-content" style="text-align: center;">
             <h2 style="color: var(--success); margin-bottom: 1rem;">📊 Test Results & Scorecard</h2>
             <div id="resultContentSummary" style="font-size: 1rem; margin-bottom: 1rem; line-height: 1.6;"></div>
             <button class="btn" onclick="closeModal('resultModal'); switchView('leaderboardView');">View on Leaderboard</button>
@@ -289,14 +254,8 @@
     <!-- PROFILE MODAL -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent-blue); margin-bottom: 1rem;">User Profile & Gmail OTP Verification</h2>
+            <h2 style="color: var(--accent-blue); margin-bottom: 1rem;">User Profile & Gmail Verification</h2>
             <p style="margin-bottom: 0.75rem;">Registered Gmail: <span id="userEmailDisplay" style="color: var(--police-gold);">aspirant@gmail.com</span></p>
-            <input type="email" id="newEmailInput" placeholder="Enter new Gmail address..." style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; margin-bottom: 0.75rem;">
-            <button class="btn" onclick="sendOtp()" style="margin-bottom: 0.75rem;">Send OTP to Gmail</button>
-            <div id="otpBox" style="display: none; margin-bottom: 0.75rem;">
-                <input type="text" id="otpInput" placeholder="Enter 6-digit OTP..." style="width: 100%; background: var(--bg-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; margin-bottom: 0.5rem;">
-                <button class="btn" onclick="verifyAndChangeEmail()">Verify OTP & Update</button>
-            </div>
             <button class="btn btn-secondary" onclick="closeModal('profileModal')" style="width: 100%; margin-top: 0.5rem;">Close</button>
         </div>
     </div>
@@ -327,15 +286,10 @@
 
     <script>
         let currentUser = localStorage.getItem('cpo_user') || 'aspirant@gmail.com';
-        let loginCount = parseInt(localStorage.getItem('cpo_login_count') || '1');
-        document.getElementById('loginCountVal').innerText = loginCount;
-        document.getElementById('userEmailDisplay').innerText = currentUser;
-
         let activeExamTitle = '';
         let activeExamQuestions = [];
 
-        // Sample question bank for simulation tests
-        const sampleQuestions = [
+        const defaultQuestionBank = [
             { id: 1, q: "If 20% of a number is 120, what is 120% of that number?", options: ["600", "720", "800", "900"], ans: 1 },
             { id: 2, q: "Find the missing number in series: 4, 9, 19, 39, 79, ?", options: ["149", "159", "169", "139"], ans: 1 },
             { id: 3, q: "Which Article of Indian Constitution deals with Right to Equality?", options: ["Article 14", "Article 19", "Article 21", "Article 32"], ans: 0 },
@@ -371,62 +325,28 @@
             }
         }
 
-        function sendOtp() {
-            const newEmail = document.getElementById('newEmailInput').value;
-            if(!newEmail || !newEmail.includes('@')) { alert('Enter valid Gmail.'); return; }
-            alert('Simulated OTP sent to ' + newEmail);
-            document.getElementById('otpBox').style.display = 'block';
-        }
-
-        function verifyAndChangeEmail() {
-            const otp = document.getElementById('otpInput').value;
-            if(otp.length === 6) {
-                currentUser = document.getElementById('newEmailInput').value;
-                localStorage.setItem('cpo_user', currentUser);
-                document.getElementById('userEmailDisplay').innerText = currentUser;
-                alert('Gmail updated successfully via OTP!');
-                closeModal('profileModal');
-            } else { alert('Enter 6-digit OTP.'); }
-        }
-
         function initChallenge(days) {
             const grid = document.getElementById('challengeGrid');
             grid.innerHTML = '';
-            let maxCircles = days === 100 ? 3 : (days === 60 ? 2 : 1);
-            let circledCount = 0;
-
             for(let i=1; i<=days; i++) {
                 const box = document.createElement('div');
                 box.style.cssText = "background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 6px; padding: 0.4rem; text-align: center; cursor: pointer; font-size: 0.8rem;";
                 box.innerHTML = `D${i}<br><b>-</b>`;
                 box.onclick = function() {
-                    if(box.style.borderColor === 'rgb(245, 158, 11)') {
-                        box.style.borderColor = 'var(--border-dark)';
-                        box.style.background = 'var(--bg-dark)';
-                        circledCount--;
-                    } else {
-                        if(circledCount >= maxCircles) {
-                            alert('Strict Limit: Max ' + maxCircles + ' circles allowed for ' + days + '-day challenge!');
-                            return;
-                        }
-                        box.style.borderColor = 'var(--police-gold)';
-                        box.style.background = 'rgba(245,158,11,0.2)';
-                        circledCount++;
-                    }
+                    box.style.borderColor = box.style.borderColor === 'rgb(245, 158, 11)' ? 'var(--border-dark)' : 'var(--police-gold)';
+                    box.style.background = box.style.background.includes('245') ? 'var(--bg-dark)' : 'rgba(245,158,11,0.2)';
                 };
                 grid.appendChild(box);
             }
-            alert(days + '-Day Challenge loaded. Max circles: ' + maxCircles);
         }
 
-        // --- Mock Testing & Attempt Engine ---
+        // --- CBT Simulation & Attempt Handler ---
         function startMockTest(title, section) {
             activeExamTitle = title;
-            activeExamQuestions = sampleQuestions; // Load sample questions for simulation
+            activeExamQuestions = defaultQuestionBank; 
             
             const container = document.getElementById('examQuestionsContainer');
             container.innerHTML = '';
-            
             document.getElementById('examModalTitle').innerText = 'Attempting: ' + title;
 
             activeExamQuestions.forEach((item, index) => {
@@ -466,24 +386,20 @@
 
             closeModal('examModal');
 
-            // Save to Leaderboard storage
+            // Save to Leaderboard
             let scoresHistory = JSON.parse(localStorage.getItem('cpo_scores_history') || '[]');
             scoresHistory.unshift({ title: activeExamTitle, score: score, total: activeExamQuestions.length, date: new Date().toLocaleDateString() });
             localStorage.setItem('cpo_scores_history', JSON.stringify(scoresHistory));
 
-            // Save incorrect/bookmarked questions to Saved Section storage
+            // Save to Saved Question Bank
             let savedQs = JSON.parse(localStorage.getItem('cpo_saved_questions') || '[]');
-            incorrectList.forEach(inc => {
-                savedQs.unshift(inc);
-            });
+            incorrectList.forEach(inc => { savedQs.unshift(inc); });
             localStorage.setItem('cpo_saved_questions', JSON.stringify(savedQs));
 
-            // Render results modal summary
             document.getElementById('resultContentSummary').innerHTML = `
                 <p style="font-size:1.2rem; color:var(--accent-blue); font-weight:bold;">${activeExamTitle}</p>
                 <p style="margin-top:0.5rem;">Correct Answers: <span style="color:var(--success); font-weight:bold;">${score} / ${activeExamQuestions.length}</span></p>
-                <p>Incorrect / Saved to Vault: <span style="color:var(--danger); font-weight:bold;">${incorrectList.length} questions</span></p>
-                <p style="margin-top:0.5rem; color:var(--police-gold);">Score successfully recorded to All-India Leaderboard!</p>
+                <p>Incorrect / Bookmarked to Saved Bank: <span style="color:var(--danger); font-weight:bold;">${incorrectList.length} questions</span></p>
             `;
             openModal('resultModal');
 
@@ -494,17 +410,15 @@
         function renderLeaderboardScores() {
             const container = document.getElementById('leaderboardScoresList');
             let scoresHistory = JSON.parse(localStorage.getItem('cpo_scores_history') || '[]');
-            
             if(scoresHistory.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet. Complete a test to see your live score log here!</p>`;
+                container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No mock tests attempted yet.</p>`;
                 return;
             }
-
             container.innerHTML = '';
             scoresHistory.forEach(record => {
                 let div = document.createElement('div');
                 div.style.cssText = "background: var(--card-dark); border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;";
-                div.innerHTML = `<div><strong style="color:var(--accent-blue);">${record.title}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">Attempted on: ${record.date}</span></div><div style="text-align:right;"><span style="color:var(--success); font-weight:bold;">Score: ${record.score}/${record.total}</span></div>`;
+                div.innerHTML = `<div><strong style="color:var(--accent-blue);">${record.title}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">Date: ${record.date}</span></div><div style="text-align:right;"><span style="color:var(--success); font-weight:bold;">Score: ${record.score}/${record.total}</span></div>`;
                 container.appendChild(div);
             });
         }
@@ -512,14 +426,12 @@
         function renderSavedQuestions() {
             const container = document.getElementById('savedQuestionsContainer');
             let savedQs = JSON.parse(localStorage.getItem('cpo_saved_questions') || '[]');
-
             if(savedQs.length === 0) {
                 container.innerHTML = `<p style="color: var(--text-muted);">No bookmarked or incorrect questions recorded yet.</p>`;
                 return;
             }
-
             container.innerHTML = '';
-            savedQs.forEach((item, idx) => {
+            savedQs.forEach(item => {
                 let card = document.createElement('div');
                 card.style.cssText = "background: var(--bg-dark); border: 1px solid var(--border-dark); padding: 1rem; border-radius: 8px;";
                 card.innerHTML = `<p style="color:var(--text-main); font-weight:600; margin-bottom:0.5rem;">Q: ${item.q}</p><p style="font-size:0.85rem; color:var(--danger);">Your Answer: ${item.userAnswer}</p><p style="font-size:0.85rem; color:var(--success);">Correct Answer: ${item.correctAnswer}</p>`;
@@ -527,7 +439,7 @@
             });
         }
 
-        // --- Admin Parsers & Public Publishing System ---
+        // --- Admin Parsing Engine ---
         function saveMockToLocalStorage(title, moduleType) {
             let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
             publishedMocks.push({ title: title, section: moduleType, date: new Date().toLocaleDateString() });
@@ -559,17 +471,17 @@
             const statusDiv = document.getElementById('htmlParserStatus');
 
             if(fileInput.files.length === 0) {
-                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Error: Please choose an HTML file first.</span>';
+                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Choose an HTML file first.</span>';
                 return;
             }
 
             const fileName = fileInput.files[0].name.replace(/\.[^/.]+$/, "");
-            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing HTML and publishing to public domain...</span>';
+            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing HTML...</span>';
             
             setTimeout(() => {
                 saveMockToLocalStorage('HTML Mock: ' + fileName, targetModule);
-                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Published! Now live in public domain under <b>${targetModule}</b>.</span>`;
-            }, 1000);
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Published live under <b>${targetModule}</b>!</span>`;
+            }, 800);
         }
 
         function parsePdfOrText() {
@@ -579,48 +491,29 @@
             const statusDiv = document.getElementById('pdfParserStatus');
 
             if(fileInput.files.length === 0 && !text) {
-                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Error: Please upload a PDF file or paste text.</span>';
+                statusDiv.innerHTML = '<span style="color: var(--danger);">❌ Upload PDF or paste text.</span>';
                 return;
             }
 
             const mockTitle = fileInput.files.length > 0 ? 'PDF Mock: ' + fileInput.files[0].name.replace(/\.[^/.]+$/, "") : 'Custom Text CBT Mock';
-            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Auto-detecting pages and publishing to public domain...</span>';
+            statusDiv.innerHTML = '<span style="color: var(--warning);">⏳ Parsing document...</span>';
 
             setTimeout(() => {
                 saveMockToLocalStorage(mockTitle, targetModule);
-                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Successfully Published! Multi-page test live in public domain under <b>${targetModule}</b>.</span>`;
-            }, 1200);
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Published live under <b>${targetModule}</b>!</span>`;
+            }, 1000);
         }
-
-        function toggleUserCallPermission() {
-            const email = document.getElementById('targetUserEmail').value;
-            if(!email) { alert('Enter user email.'); return; }
-            alert('Call access toggled successfully for: ' + email);
-        }
-
-        function updateChecklist(selectEl) {
-            selectEl.style.color = selectEl.value === 'done' ? 'var(--success)' : 'var(--text-muted)';
-        }
-
-        function changeVideoSpeed(speed) { alert('Playback speed set to ' + speed + 'x'); }
 
         function submitDoubt() {
             const text = document.getElementById('doubtInput').value;
-            if(!text) { alert('Enter doubt text.'); return; }
+            if(!text) return;
             const feed = document.getElementById('doubtFeed');
             const post = document.createElement('div');
             post.style.cssText = "background: var(--bg-dark); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-dark);";
-            post.innerHTML = `<b>Q: ${text}</b><br><span style="color: var(--success); font-size: 0.85rem;">🤖 Google AI Instant Solution: Generated successfully.</span>`;
+            post.innerHTML = `<b>Q: ${text}</b><br><span style="color: var(--success); font-size: 0.85rem;">🤖 AI Solution Generated.</span>`;
             feed.prepend(post);
             document.getElementById('doubtInput').value = '';
-            alert('Doubt posted with AI solution!');
         }
-
-        window.addEventListener('click', function(e) {
-            if (!e.target.matches('.menu-icon') && !e.target.closest('.dropdown-menu')) {
-                document.getElementById('dropdownMenu').classList.remove('active');
-            }
-        });
     </script>
 </body>
 </html>
