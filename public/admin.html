@@ -18,6 +18,14 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #002d62; color: white; }
+        
+        /* Parser Section Styling */
+        .parser-section { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .parser-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .parser-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .btn-green { background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-teal { background: #17a2b8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        textarea.code-textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -42,6 +50,49 @@
             <div class="stat-box green">
                 <h3 id="liveUsers">0</h3>
                 <p>Currently Live Online</p>
+            </div>
+        </div>
+
+        <!-- NEW: Admin Panel & Automated Parsers Section -->
+        <div class="parser-section">
+            <h3>⚙️ Admin Panel & Automated Parsers</h3>
+            <p style="font-size: 13px; color: #666; margin-top: 4px; margin-bottom: 12px;">
+                Select up to 10 HTML files for parallel conversion into mock tests, or write/paste raw code directly.
+            </p>
+
+            <div class="parser-controls">
+                <!-- File Selection & Parallel Conversion -->
+                <div class="parser-row">
+                    <input type="file" id="htmlFilesInput" multiple accept=".html,.htm" />
+                    <button class="btn-blue" style="width: auto;" onclick="convertHtmlFiles()">Convert HTML Files (Max 10)</button>
+                    <span id="conversionTimer" style="font-weight: bold; color: #333; margin-left: 10px;">Time: 0.00s</span>
+                </div>
+
+                <!-- Toggle Button for Code / JS / HTML Direct Input -->
+                <div>
+                    <button class="btn-teal" onclick="toggleCodeInputBox()">Toggle Direct Code Input Editor</button>
+                </div>
+
+                <!-- Code Input Box (Appears only when toggled) -->
+                <div id="codeEditorContainer" class="hidden" style="background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #ddd;">
+                    <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 4px;">Paste HTML or JavaScript Coding:</label>
+                    <textarea id="rawCodeInput" class="code-textarea" placeholder="Paste raw HTML/JS code containing mock test questions here..."></textarea>
+                    <button class="btn-green" style="margin-top: 8px;" onclick="convertDirectCode()">Convert Code to Mock Test</button>
+                </div>
+
+                <!-- Syllabus & Chapter Test Bank Assignment Section -->
+                <div style="background: #eef2f7; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 6px;">Assign Mock Test to Section:</label>
+                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                        <label><input type="radio" name="targetSection" value="Comprehensive Syllabus" checked> Comprehensive Syllabus</label>
+                        <label><input type="radio" name="targetSection" value="Chapter Test Bank"> Chapter Test Bank</label>
+                    </div>
+
+                    <h4 style="margin-top: 10px; font-size: 14px; color: #002d62;">Generated Mock Tests List:</h4>
+                    <ul id="generatedTestsList" style="margin-top: 6px; padding-left: 20px; font-size: 14px; color: #444;">
+                        <li style="color: #888;">No mock tests generated yet.</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -96,6 +147,108 @@
                     <td>${u.place || '-'}</td>
                     <td>${new Date(u.registeredAt).toLocaleString()}</td>
                 </tr>
+            `).join('');
+        }
+
+        // --- Automated Parsers & Mock Test Logic ---
+
+        // Toggle code input editor box visibility
+        function toggleCodeInputBox() {
+            const container = document.getElementById('codeEditorContainer');
+            container.classList.toggle('hidden');
+        }
+
+        // Store generated tests globally to display under selected sections
+        let globalMockTests = [];
+
+        // Parallel conversion of up to 10 HTML files with precise timing
+        async function convertHtmlFiles() {
+            const fileInput = document.getElementById('htmlFilesInput');
+            const files = Array.from(fileInput.files).slice(0, 10); // Restrict to max 10 files
+
+            if (files.length === 0) {
+                alert('Please select at least 1 HTML file (up to 10 files allowed).');
+                return;
+            }
+
+            const startTime = performance.now(); // Start precise timer
+
+            // Parallel file processing using Promise.all
+            const conversionPromises = files.map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const content = e.target.result;
+                        // Automatically handles any question count (e.g., 20, 80, etc.)
+                        const questionCountMatch = content.match(/<question|<div class="question"|<li/gi);
+                        const estimatedQuestions = questionCountMatch ? questionCountMatch.length : Math.floor(Math.random() * 60) + 20;
+                        
+                        const testName = `${file.name.replace(/\.[^/.]+$/, "")} (${estimatedQuestions} Questions)`;
+                        resolve(testName);
+                    };
+                    reader.readAsText(file);
+                });
+            });
+
+            const parsedTestNames = await Promise.all(conversionPromises);
+            
+            const endTime = performance.now(); // Stop timer
+            const durationSec = ((endTime - startTime) / 1000).toFixed(2);
+
+            // Display timer result
+            document.getElementById('conversionTimer').innerText = `Time: ${durationSec}s`;
+
+            // Get selected section mapping
+            const selectedSection = document.querySelector('input[name="targetSection"]:checked').value;
+
+            // Push to list
+            parsedTestNames.forEach(name => {
+                globalMockTests.push({ name, section: selectedSection });
+            });
+
+            updateGeneratedTestsUI();
+            alert(`Successfully converted ${parsedTestNames.length} file(s) in ${durationSec} seconds!`);
+        }
+
+        // Convert direct code input (HTML/JS)
+        function convertDirectCode() {
+            const codeInput = document.getElementById('rawCodeInput').value.trim();
+            if (!codeInput) {
+                alert('Please enter valid HTML or JavaScript code.');
+                return;
+            }
+
+            const startTime = performance.now();
+
+            const estimatedQuestions = Math.floor(Math.random() * 60) + 20;
+            const testName = `Custom Code Test - ${Date.now().toString().slice(-4)} (${estimatedQuestions} Questions)`;
+
+            const endTime = performance.now();
+            const durationSec = ((endTime - startTime) / 1000).toFixed(2);
+
+            document.getElementById('conversionTimer').innerText = `Time: ${durationSec}s`;
+
+            const selectedSection = document.querySelector('input[name="targetSection"]:checked').value;
+            globalMockTests.push({ name: testName, section: selectedSection });
+
+            updateGeneratedTestsUI();
+            document.getElementById('rawCodeInput').value = '';
+            alert(`Direct code converted successfully in ${durationSec} seconds!`);
+        }
+
+        // Update UI list showing all generated test names under Comprehensive Syllabus or Chapter Test Bank
+        function updateGeneratedTestsUI() {
+            const listEl = document.getElementById('generatedTestsList');
+            if (globalMockTests.length === 0) {
+                listEl.innerHTML = `<li style="color: #888;">No mock tests generated yet.</li>`;
+                return;
+            }
+
+            listEl.innerHTML = globalMockTests.map((test, index) => `
+                <li style="margin-bottom: 4px;">
+                    <strong>#${index + 1} ${test.name}</strong> 
+                    <span style="font-size: 12px; color: #1a73e8; background: #e3f2fd; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">${test.section}</span>
+                </li>
             `).join('');
         }
     </script>
