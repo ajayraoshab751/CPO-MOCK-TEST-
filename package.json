@@ -1,14 +1,13 @@
 {
   "name": "cpo-mock-test",
   "version": "1.0.0",
-  "description": "CPO AIR 1 Portal",
+  "description": "CPO AIR 1 CBT Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "mongoose": "^8.3.1",
-    "nodemailer": "^6.9.13"
+    "mongoose": "^8.3.1"
   }
 }
