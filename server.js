@@ -119,7 +119,7 @@ app.get('/', (req, res) => {
           <form id="loginForm">
             <input type="email" id="emailInput" placeholder="Enter Gmail Address" required />
             <input type="text" id="nameInput" placeholder="Enter Full Name" required />
-            <button type="submit" class="btn-primary">Secure Login / Register</button>
+            <button type="submit" id="loginBtn" class="btn-primary">Secure Login / Register</button>
           </form>
           <div id="authMsg" style="margin-top:15px; text-align:center; font-weight:bold;"></div>
         </div>
@@ -331,17 +331,27 @@ app.get('/', (req, res) => {
           const email = document.getElementById('emailInput').value;
           const name = document.getElementById('nameInput').value;
           const msg = document.getElementById('authMsg');
+          const loginBtn = document.getElementById('loginBtn');
 
           msg.style.color = '#38bdf8';
-          msg.innerText = 'Authenticating...';
+          msg.innerText = 'Waking up server & logging in (this may take up to 30s if inactive)...';
+          loginBtn.disabled = true;
+
+          // Added a timeout mechanism so it never stays frozen indefinitely
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout')), 35000)
+          );
 
           try {
-            const res = await fetch('/api/auth/login', {
+            const fetchPromise = fetch('/api/auth/login', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email, name })
             });
+
+            const res = await Promise.race([fetchPromise, timeoutPromise]);
             const data = await res.json();
+            
             if (data.success) {
               currentUser = data.user;
               localStorage.setItem('cpo_user', JSON.stringify(currentUser));
@@ -351,10 +361,12 @@ app.get('/', (req, res) => {
             } else {
               msg.style.color = '#ef4444';
               msg.innerText = data.message || 'Login failed';
+              loginBtn.disabled = false;
             }
           } catch (err) {
             msg.style.color = '#ef4444';
-            msg.innerText = 'Connection error.';
+            msg.innerText = 'Server is waking up. Please click "Secure Login / Register" again in 10 seconds.';
+            loginBtn.disabled = false;
           }
         });
 
