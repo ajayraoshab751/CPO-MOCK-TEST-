@@ -1,3 +1,6 @@
+process.on('uncaughtException', (err) => { console.error('Uncaught Exception:', err); });
+process.on('unhandledRejection', (reason, promise) => { console.error('Unhandled Rejection at:', promise, 'reason:', reason); });
+
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
