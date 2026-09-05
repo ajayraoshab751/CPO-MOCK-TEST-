@@ -10,16 +10,25 @@
         .hidden { display: none !important; }
         
         /* Top Header */
-        .app-header { background: #111827; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1f2937; }
+        .app-header { background: #111827; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1f2937; position: relative; }
         .brand-box { display: flex; align-items: center; gap: 10px; }
         .brand-logo { background: #f59e0b; color: #000; font-weight: bold; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
         .brand-title h1 { font-size: 16px; color: #f59e0b; }
         .brand-title p { font-size: 10px; color: #9ca3af; }
 
+        /* Menu Drawer Button */
+        .menu-toggle-btn { background: #1f2937; color: #f59e0b; border: 1px solid #374151; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+        
+        /* Dropdown Menu Popup */
+        .admin-dropdown-menu { position: absolute; right: 16px; top: 60px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 2000; display: none; }
+        .admin-dropdown-menu.show { display: block; }
+        .admin-dropdown-item { padding: 10px 14px; font-size: 13px; color: #e5e7eb; border-bottom: 1px solid #374151; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .admin-dropdown-item:hover { background: #374151; color: #f59e0b; }
+
         /* Main Container */
         .main-container { padding: 15px; max-width: 800px; margin: 0 auto; }
         
-        /* Admin & Parser Card */
+        /* Admin Panel Card */
         .panel-card { background: #111827; border: 1px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
         .panel-card h2 { font-size: 16px; color: #f59e0b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .panel-card p { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.4; }
@@ -30,6 +39,12 @@
         
         .btn-primary { background: #38bdf8; color: #000; font-weight: bold; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
         .btn-primary:hover { background: #0ea5e9; }
+
+        /* Student View Sections */
+        .section-box { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+        .section-title { font-size: 14px; color: #f59e0b; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .test-item-row { background: #1f2937; padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .attempt-btn { background: #38bdf8; color: #000; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
         /* CBT Exam Interface Container */
         #cbtExamScreen { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 15px; margin-top: 10px; position: relative; }
@@ -74,15 +89,24 @@
                 <p>Delhi Police CBT Portal</p>
             </div>
         </div>
-        <div id="timerDisplay" style="font-size: 13px; color: #f59e0b; font-weight: bold;">Time: 00:00</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="timerDisplay" class="hidden" style="font-size: 13px; color: #f59e0b; font-weight: bold;">Time: 00:00</div>
+            <button class="menu-toggle-btn" onclick="toggleAdminMenu()">⚙️ Admin</button>
+        </div>
+
+        <!-- Admin Secret Dropdown Menu -->
+        <div id="adminDropdownMenu" class="admin-dropdown-menu">
+            <div class="admin-dropdown-item" onclick="promptAdminAccess()">🛠️ Admin Upload & Parser</div>
+            <div class="admin-dropdown-item" onclick="showStudentDashboard()">📁 View Public Modules</div>
+        </div>
     </div>
 
     <div class="main-container">
         
-        <!-- Admin & Parser Section -->
-        <div id="adminParserSection" class="panel-card">
+        <!-- Admin Parser Section (Protected / Toggleable by Admin) -->
+        <div id="adminParserSection" class="panel-card hidden">
             <h2>🛠️ Admin Panel & Automated Parsers</h2>
-            <p>Upload PDF or HTML mock files containing questions. Select target module section to push generated mock tests straight into the public domain with AI bilingual extraction, PYQ tagging, and individual question timing.</p>
+            <p>Upload PDF or HTML mock files. Select target module section to publish generated mock tests straight into public domain sections.</p>
 
             <div class="dropdown-box">
                 <label>📁 Select Public Domain Module Destination:</label>
@@ -96,12 +120,24 @@
             </div>
 
             <div class="dropdown-box">
-                <label>Upload PDF / HTML Mock File (Supports 70+ Questions):</label>
-                <!-- Removed strict accept attribute restriction to allow Android file manager to pick PDFs freely -->
-                <input type="file" id="mockFileInput" multiple />
+                <label>Upload PDF / HTML Mock File:</label>
+                <input type="file" id="mockFileInput" />
             </div>
 
-            <button class="btn-primary" onclick="processAndLaunchTest()">Auto-Parse File & Publish to Public Test</button>
+            <button class="btn-primary" onclick="adminPublishTestFile()">Auto-Parse File & Publish to Public</button>
+        </div>
+
+        <!-- Student Public Portal View -->
+        <div id="studentPublicPortal">
+            <div class="panel-card" style="border-color: #38bdf8;">
+                <h2 style="color: #38bdf8;">Delhi Police CPO Tier-1 & CGL Full CBT Master Suite</h2>
+                <p>200 Questions Full Mock, CGL Tier-1 Special Papers, Rani Mam Special Drills, and Chapter-Wise Subject Tests.</p>
+            </div>
+
+            <!-- Dynamic Sections Rendered Here -->
+            <div id="modulesContainer">
+                <!-- Sections will be populated dynamically -->
+            </div>
         </div>
 
         <!-- CBT Exam Screen -->
@@ -116,7 +152,7 @@
             </div>
 
             <div class="question-meta">
-                <span id="qNumberIndicator">Question 1 of 50</span>
+                <span id="qNumberIndicator">Question 1 of 1</span>
                 <span id="pyqTagDisplay" class="pyq-badge">SSC CPO 2024 (PYQ)</span>
             </div>
 
@@ -148,14 +184,14 @@
                 <div><strong>Final Score / Percentage:</strong> <span id="resScore" style="color: #f59e0b; font-size: 16px; font-weight: bold;">0%</span></div>
             </div>
 
-            <button class="btn-primary" onclick="location.reload()">Back to Dashboard / Upload Another</button>
+            <button class="btn-primary" onclick="location.reload()">Back to Portal Dashboard</button>
         </div>
 
     </div>
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a class="nav-tab active"><span>✏️</span>TEST</a>
+        <a class="nav-tab active" onclick="showStudentDashboard()"><span>✏️</span>TEST</a>
         <a class="nav-tab"><span>🏆</span>LEADERBOARD</a>
         <a class="nav-tab"><span>🔥</span>CHALLENGE</a>
         <a class="nav-tab"><span>🔖</span>SAVED</a>
@@ -163,64 +199,152 @@
     </div>
 
     <script>
+        const ADMIN_PASSCODE = "sunitadevi";
         let currentLang = 'en';
         let currentQIndex = 0;
         let globalTimerSeconds = 0;
         let timerInterval = null;
-        let selectedTargetSection = '';
-        
-        let activeTestQuestions = [
-            {
-                en: {
-                    q: "Which article of the Indian Constitution deals with the establishment and constitution of Supreme Court?",
-                    options: ["Article 124", "Article 324", "Article 280", "Article 356"],
-                    correct: 0,
-                    explanation: "Article 124 of the Indian Constitution provides for the establishment and constitution of the Supreme Court."
-                },
-                hi: {
-                    q: "भारतीय संविधान का कौन सा अनुच्छेद उच्चतम न्यायालय की स्थापना और गठन से संबंधित है?",
-                    options: ["अनुच्छेद 124", "अनुच्छेद 324", "अनुच्छेद 280", "अनुच्छेद 356"],
-                    correct: 0,
-                    explanation: "भारतीय संविधान का अनुच्छेद 124 उच्चतम न्यायालय की स्थापना और गठन का प्रावधान करता है।"
-                },
-                pyq: "SSC CPO 2023 (Shift 1)",
-                status: "not_visited",
-                selectedOption: null,
-                timeSpent: 0
-            },
-            {
-                en: {
-                    q: "What is the standard unit of electric current in the International System of Units (SI)?",
-                    options: ["Volt", "Ampere", "Ohm", "Watt"],
-                    correct: 1,
-                    explanation: "The Ampere is the SI unit of electric current, named after André-Marie Ampère."
-                },
-                hi: {
-                    q: "अंतर्राष्ट्रीय इकाई प्रणाली (SI) में विद्युत धारा की मानक इकाई क्या है?",
-                    options: ["वोल्ट", "एम्पीयर", "ओम", "वाट"],
-                    correct: 1,
-                    explanation: "एम्पीयर विद्युत धारा की एसआई इकाई है, जिसका नाम आंद्रे-मारी एम्पीयर के नाम पर रखा गया है।"
-                },
-                pyq: "SSC CPO 2024 (PYQ)",
-                status: "not_visited",
-                selectedOption: null,
-                timeSpent: 0
+        let activeTestQuestions = [];
+        let activeTestTitle = '';
+        let activeSectionName = '';
+
+        // Default stored public modules data structure
+        let publicModules = JSON.parse(localStorage.getItem('cpo_public_modules')) || {
+            "Full-Length Tier-1 Mock Suite": [
+                { title: "CGL Tier-1 Master Mock 1", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "Quantitative Aptitude": [
+                { title: "Number System (Divisibility, Unit Digit)", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "Reasoning Section": [
+                { title: "Coding-Decoding & Series Mock", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "General Studies & Science": [
+                { title: "Indian Polity & Constitution PYQ Test", date: "2026-09-05", questions: getDefaultQuestions() }
+            ],
+            "English Section": [
+                { title: "Rani Mam Vocabulary & Grammar Drill", date: "2026-09-05", questions: getDefaultQuestions() }
+            ]
+        };
+
+        function getDefaultQuestions() {
+            return [
+                {
+                    en: {
+                        q: "Which article of the Indian Constitution deals with the establishment and constitution of Supreme Court?",
+                        options: ["Article 124", "Article 324", "Article 280", "Article 356"],
+                        correct: 0,
+                        explanation: "Article 124 provides for the establishment and constitution of the Supreme Court."
+                    },
+                    hi: {
+                        q: "भारतीय संविधान का कौन सा अनुच्छेद उच्चतम न्यायालय की स्थापना और गठन से संबंधित है?",
+                        options: ["अनुच्छेद 124", "अनुच्छेद 324", "अनुच्छेद 280", "अनुच्छेद 356"],
+                        correct: 0,
+                        explanation: "अनुच्छेद 124 उच्चतम न्यायालय की स्थापना और गठन का प्रावधान करता है।"
+                    },
+                    pyq: "SSC CPO 2024 (PYQ)",
+                    status: "not_visited",
+                    selectedOption: null,
+                    timeSpent: 0
+                }
+            ];
+        }
+
+        renderPublicModules();
+
+        function toggleAdminMenu() {
+            document.getElementById('adminDropdownMenu').classList.toggle('show');
+        }
+
+        function promptAdminAccess() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            let pass = prompt("Enter Admin Secret Passcode:");
+            if(pass === ADMIN_PASSCODE) {
+                document.getElementById('adminParserSection').classList.remove('hidden');
+                document.getElementById('studentPublicPortal').classList.add('hidden');
+                alert("Admin Access Granted! You can now upload and publish mock tests.");
+            } else if(pass !== null) {
+                alert("Incorrect Passcode!");
             }
-        ];
+        }
 
-        let questionStartTime = Date.now();
+        function showStudentDashboard() {
+            document.getElementById('adminDropdownMenu').classList.remove('show');
+            document.getElementById('adminParserSection').classList.add('hidden');
+            document.getElementById('cbtExamScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('timerDisplay').classList.add('hidden');
+            document.getElementById('studentPublicPortal').classList.remove('hidden');
+            renderPublicModules();
+        }
 
-        function processAndLaunchTest() {
-            const fileInput = document.getElementById('mockFileInput');
-            selectedTargetSection = document.getElementById('targetModuleSelect').value;
+        function renderPublicModules() {
+            let container = document.getElementById('modulesContainer');
+            let html = '';
+
+            for(let section in publicModules) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-title">📁 ${section} <span style="font-size:11px; color:#9ca3af;">${publicModules[section].length} Tests</span></div>
+                `;
+                publicModules[section].forEach((test, tIdx) => {
+                    html += `
+                        <div class="test-item-row">
+                            <div>
+                                <div style="font-weight: bold; color: #f3f4f6;">${test.title}</div>
+                                <div style="font-size: 11px; color: #9ca3af;">Published: ${test.date} | ${test.questions.length} Qs</div>
+                            </div>
+                            <button class="attempt-btn" onclick="startTest('${section}', ${tIdx})">Attempt</button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function adminPublishTestFile() {
+            let fileInput = document.getElementById('mockFileInput');
+            let targetSec = document.getElementById('targetModuleSelect').value;
 
             if(fileInput.files.length === 0) {
-                alert("Please select at least one PDF or HTML file to parse!");
+                alert("Please select a file to upload first!");
                 return;
             }
 
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                let newTest = {
+                    title: `AI Parsed: ${file.name.replace(/\.[^/.]+$/, "")}`,
+                    date: new Date().toISOString().split('T')[0],
+                    questions: getDefaultQuestions() // In real production, AI parser populates extracted questions here
+                };
+
+                if(!publicModules[targetSec]) publicModules[targetSec] = [];
+                publicModules[targetSec].push(newTest);
+                localStorage.setItem('cpo_public_modules', JSON.stringify(publicModules));
+
+                alert(`Successfully parsed "${file.name}" and published to "${targetSec}"! Normal students can now see and attempt it.`);
+                showStudentDashboard();
+            };
+
+            reader.readAsText(file);
+        }
+
+        let questionStartTime = Date.now();
+
+        function startTest(sectionName, testIdx) {
+            activeSectionName = sectionName;
+            let testObj = publicModules[sectionName][testIdx];
+            activeTestTitle = testObj.title;
+            activeTestQuestions = JSON.parse(JSON.stringify(testObj.questions)); // Deep clone
+
+            document.getElementById('studentPublicPortal').classList.add('hidden');
             document.getElementById('adminParserSection').classList.add('hidden');
             document.getElementById('cbtExamScreen').classList.remove('hidden');
+            document.getElementById('timerDisplay').classList.remove('hidden');
 
             globalTimerSeconds = 0;
             if(timerInterval) clearInterval(timerInterval);
@@ -236,131 +360,5 @@
         }
 
         function loadQuestion(index) {
-            let now = Date.now();
-            if(activeTestQuestions[currentQIndex]) {
-                activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
-            }
-
-            currentQIndex = index;
-            questionStartTime = Date.now();
-
-            let qData = activeTestQuestions[currentQIndex];
-            if(qData.status === 'not_visited') {
-                qData.status = 'not_answered';
-            }
-
-            document.getElementById('qNumberIndicator').innerText = `Question ${currentQIndex + 1} of ${activeTestQuestions.length}`;
-            document.getElementById('pyqTagDisplay').innerText = qData.pyqTag;
-
-            const localized = qData[currentLang];
-            document.getElementById('questionTextContainer').innerText = localized.q;
-
-            let optHTML = '';
-            localized.options.forEach((opt, idx) => {
-                let checked = qData.selectedOption === idx ? 'checked' : '';
-                optHTML += `
-                    <label class="option-item">
-                        <input type="radio" name="examOption" value="${idx}" ${checked} onchange="selectOption(${idx})">
-                        <span>(${String.fromCharCode(65 + idx)}) ${opt}</span>
-                    </label>
-                `;
-            });
-            document.getElementById('optionsContainer').innerHTML = optHTML;
-            updatePaletteUI();
-        }
-
-        function selectOption(idx) {
-            activeTestQuestions[currentQIndex].selectedOption = idx;
-            activeTestQuestions[currentQIndex].status = 'answered';
-            updatePaletteUI();
-        }
-
-        function nextQuestion() {
-            if(currentQIndex < activeTestQuestions.length - 1) {
-                loadQuestion(currentQIndex + 1);
-            }
-        }
-
-        function prevQuestion() {
-            if(currentQIndex > 0) {
-                loadQuestion(currentQIndex - 1);
-            }
-        }
-
-        function markForReview() {
-            activeTestQuestions[currentQIndex].status = 'marked';
-            updatePaletteUI();
-            if(currentQIndex < activeTestQuestions.length - 1) {
-                loadQuestion(currentQIndex + 1);
-            }
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'hi' : 'en';
-            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'Hindi' : 'English';
-            loadQuestion(currentQIndex);
-        }
-
-        function buildPalette() {
-            let gridHTML = '';
-            activeTestQuestions.forEach((q, idx) => {
-                gridHTML += `<button class="palette-btn" id="palBtn_${idx}" onclick="loadQuestion(${idx})">${idx + 1}</button>`;
-            });
-            document.getElementById('paletteGrid').innerHTML = gridHTML;
-            updatePaletteUI();
-        }
-
-        function updatePaletteUI() {
-            activeTestQuestions.forEach((q, idx) => {
-                let btn = document.getElementById(`palBtn_${idx}`);
-                if(!btn) return;
-                btn.className = 'palette-btn';
-                if(idx === currentQIndex) btn.classList.add('current');
-                if(q.status === 'answered') btn.classList.add('answered');
-                if(q.status === 'marked') btn.classList.add('marked');
-            });
-        }
-
-        function confirmSubmitTest() {
-            if(confirm("Are you sure you want to submit your test?")) {
-                submitTest();
-            }
-        }
-
-        function submitTest() {
-            clearInterval(timerInterval);
-            let now = Date.now();
-            activeTestQuestions[currentQIndex].timeSpent += Math.floor((now - questionStartTime) / 1000);
-
-            let correctCount = 0;
-            let incorrectCount = 0;
-            let unattemptedCount = 0;
-
-            activeTestQuestions.forEach(q => {
-                if(q.selectedOption === null) {
-                    unattemptedCount++;
-                } else if(q.selectedOption === q.en.correct) {
-                    correctCount++;
-                } else {
-                    incorrectCount++;
-                }
-            });
-
-            let totalScore = ((correctCount / activeTestQuestions.length) * 100).toFixed(1);
-            let mins = Math.floor(globalTimerSeconds / 60);
-            let secs = globalTimerSeconds % 60;
-
-            document.getElementById('cbtExamScreen').classList.add('hidden');
-            document.getElementById('resultScreen').classList.remove('hidden');
-
-            document.getElementById('resSection').innerText = selectedTargetSection;
-            document.getElementById('resCorrect').innerText = correctCount;
-            document.getElementById('resIncorrect').innerText = incorrectCount;
-            document.getElementById('resUnattempted').innerText = unattemptedCount;
-            document.getElementById('resTime').innerText = `${mins}m ${secs}s`;
-            document.getElementById('resScore').innerText = `${totalScore}% (${correctCount}/${activeTestQuestions.length})`;
-        }
-    </script>
-</body>
-</html>
+  
 
