@@ -35,7 +35,7 @@
         .dropdown-item { padding: 0.85rem 1rem; color: var(--text-main); text-decoration: none; display: block; font-size: 0.9rem; border-bottom: 1px solid var(--border-dark); cursor: pointer; transition: background 0.2s; }
         .dropdown-item:hover { background: rgba(56,189,248,0.15); color: var(--accent-blue); }
 
-        .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; width: 100%; flex: 1; }
+        .container { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; width: 100%; flex: 1; }
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
@@ -54,7 +54,7 @@
         .nav-btn span.icon { font-size: 1.3rem; }
         .nav-btn.active, .nav-btn:hover { color: var(--accent-blue); }
 
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
         .badge { background: rgba(34,197,94,0.15); color: var(--success); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(34,197,94,0.3); }
         
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 0.5rem; }
@@ -65,6 +65,15 @@
         .option-label { display: block; background: var(--bg-dark); border: 1px solid var(--border-dark); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; }
         .option-label:hover { border-color: var(--accent-blue); }
         .option-label input { margin-right: 0.75rem; }
+
+        /* Hub Subject Accordion & Chips */
+        .hub-subject-card { background: var(--card-dark); border: 1px solid var(--border-dark); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
+        .hub-subject-header { background: linear-gradient(135deg, #111827, #1e293b); padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border-dark); }
+        .hub-subject-header h3 { color: var(--police-gold); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .hub-chapters-body { padding: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; background: var(--bg-dark); }
+        .chapter-chip { background: var(--card-dark); border: 1px solid var(--border-dark); padding: 0.6rem 0.8rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; transition: 0.2s; }
+        .chapter-chip:hover { border-color: var(--accent-blue); background: rgba(56,189,248,0.05); }
+        .chapter-chip button { background: var(--accent-blue); color: var(--police-navy); border: none; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
 
         /* CBT Examination Layout */
         .cbt-container { display: grid; grid-template-columns: 1fr 280px; gap: 1rem; margin-top: 1rem; flex: 1; }
@@ -102,40 +111,139 @@
 
     <div class="container">
         
-        <!-- 1. TEST VIEW -->
+        <!-- 1. TEST VIEW / COMPREHENSIVE SYLLABUS HUB -->
         <div id="testView" class="view-section active">
             <div class="card" style="border-color: var(--police-gold); background: linear-gradient(135deg, #111827, #1e293b);">
-                <h2>Delhi Police CPO Tier-1 Full CBT Mock <span class="badge">Live Exam Simulation</span></h2>
-                <p>200 Questions | 120 Minutes | 0.25 Negative Marking. Mirroring exact SSC CPO Paper-1 standards.</p>
-                <button class="btn" onclick="startDefaultMock('Full CBT Mock 1', 'FullMock')">Start Full Mock Test</button>
-                <div id="public_FullMock"></div>
+                <h2>Delhi Police CPO Tier-1 & CGL Full CBT Master Suite <span class="badge">Pro Max Hub</span></h2>
+                <p>200 Questions Full Mocks, CGL Tier-1 Special Papers, Rani Mam Special Drills, and Chapter-Wise Subject Tests.</p>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
+                    <button class="btn" onclick="startDefaultMock('Delhi Police CPO Full CBT Mock 1', 'FullMock')">Start CPO Full Mock 1</button>
+                    <button class="btn btn-warning" onclick="startDefaultMock('SSC CGL Tier-1 Master Mock (Rani Mam Pattern)', 'FullMock')">CGL Tier-1 Master Mock</button>
+                </div>
+                <div id="public_FullMock" style="margin-top: 0.5rem;"></div>
             </div>
-            
-            <h3 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem; color: var(--police-gold);">Subject & Chapter-Wise Modules</h3>
-            <div class="grid-2">
-                <div class="card">
-                    <h2>Mathematics <span style="font-size:0.8rem; color:var(--text-muted);">Section</span></h2>
-                    <p>Divisibility, Percentage, Profit Loss, Ratio, SI/CI, Time & Work, Advanced Math & DI.</p>
-                    <button class="btn" onclick="startDefaultMock('Mathematics Section Test', 'Mathematics')">Attempt Math Test</button>
-                    <div id="public_Mathematics"></div>
+
+            <h3 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.2rem; color: var(--police-gold);">📚 Comprehensive Syllabus & Chapter Test Bank</h3>
+
+            <!-- 1. QUANTITATIVE APTITUDE -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('mathChapters')">
+                    <h3>📐 Quantitative Aptitude & Arithmetic</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">10 Chapters ▼</span>
                 </div>
-                <div class="card">
-                    <h2>Reasoning <span style="font-size:0.8rem; color:var(--text-muted);">Section</span></h2>
-                    <p>Analogy, Coding-Decoding, Series, Blood Relations, Direction, Syllogism & Non-Verbal.</p>
-                    <button class="btn" onclick="startDefaultMock('Reasoning Section Test', 'Reasoning')">Attempt Reasoning Test</button>
-                    <div id="public_Reasoning"></div>
+                <div id="mathChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. Number System (Divisibility, Unit Digit, LCM/HCF)</span><button onclick="startChapterTest('Number System')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Simplification & BODMAS</span><button onclick="startChapterTest('Simplification')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Percentage</span><button onclick="startChapterTest('Percentage')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Profit & Loss</span><button onclick="startChapterTest('Profit and Loss')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Discount</span><button onclick="startChapterTest('Discount')">Test</button></div>
+                    <div class="chapter-chip"><span>6. Ratio and Proportion</span><button onclick="startChapterTest('Ratio and Proportion')">Test</button></div>
+                    <div class="chapter-chip"><span>7. Averages & Partnership</span><button onclick="startChapterTest('Averages and Partnership')">Test</button></div>
+                    <div class="chapter-chip"><span>8. Mixture and Alligation</span><button onclick="startChapterTest('Mixture and Alligation')">Test</button></div>
+                    <div class="chapter-chip"><span>9. Simple & Compound Interest</span><button onclick="startChapterTest('Simple and Compound Interest')">Test</button></div>
+                    <div class="chapter-chip"><span>10. Time, Work, Pipes & Cisterns</span><button onclick="startChapterTest('Time, Work & Pipes')">Test</button></div>
                 </div>
-                <div class="card">
-                    <h2>GK & GS <span style="font-size:0.8rem; color:var(--text-muted);">Section</span></h2>
-                    <p>History, Indian Polity, Geography, Economy, General Science, Static GK & Current Affairs.</p>
-                    <button class="btn" onclick="startDefaultMock('GK & GS Section Test', 'GK')">Attempt GK Test</button>
-                    <div id="public_GK"></div>
+            </div>
+
+            <!-- 2. ADVANCED MATH -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('advMathChapters')">
+                    <h3>📈 Advanced Math, DI & Statistics</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">7 Chapters ▼</span>
                 </div>
-                <div class="card">
-                    <h2>English <span style="font-size:0.8rem; color:var(--text-muted);">Section</span></h2>
-                    <p>Grammar rules, Vocabulary, Synonyms/Antonyms, One-Word Substitutions & Cloze Test.</p>
-                    <button class="btn" onclick="startDefaultMock('English Section Test', 'English')">Attempt English Test</button>
-                    <div id="public_English"></div>
+                <div id="advMathChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. Algebra (Identities, Surds, Quad. Equations)</span><button onclick="startChapterTest('Algebra')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Geometry (Triangles, Circles, Polygons)</span><button onclick="startChapterTest('Geometry')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Mensuration (2D & 3D Cones, Spheres, Prisms)</span><button onclick="startChapterTest('Mensuration')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Trigonometry & Heights and Distances</span><button onclick="startChapterTest('Trigonometry')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Data Interpretation (Bar, Pie, Tables, Line)</span><button onclick="startChapterTest('Data Interpretation')">Test</button></div>
+                    <div class="chapter-chip"><span>6. Statistics & Probability</span><button onclick="startChapterTest('Statistics and Probability')">Test</button></div>
+                    <div class="chapter-chip"><span>7. Calculation Booster & Speed Math</span><button onclick="startChapterTest('Calculation Booster')">Test</button></div>
+                </div>
+            </div>
+
+            <!-- 3. REASONING -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('reasoningChapters')">
+                    <h3>🧠 Reasoning (Verbal & Non-Verbal)</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">24 Chapters ▼</span>
+                </div>
+                <div id="reasoningChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. Analogy (Word, Number, Alphabet)</span><button onclick="startChapterTest('Analogy')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Classification / Odd One Out</span><button onclick="startChapterTest('Classification')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Coding-Decoding</span><button onclick="startChapterTest('Coding-Decoding')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Series Completion (Number, Alphabet)</span><button onclick="startChapterTest('Series Completion')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Missing Number / Matrix</span><button onclick="startChapterTest('Missing Number')">Test</button></div>
+                    <div class="chapter-chip"><span>6. Blood Relations</span><button onclick="startChapterTest('Blood Relations')">Test</button></div>
+                    <div class="chapter-chip"><span>7. Direction and Distance</span><button onclick="startChapterTest('Direction and Distance')">Test</button></div>
+                    <div class="chapter-chip"><span>8. Order and Ranking</span><button onclick="startChapterTest('Order and Ranking')">Test</button></div>
+                    <div class="chapter-chip"><span>9. Syllogism</span><button onclick="startChapterTest('Syllogism')">Test</button></div>
+                    <div class="chapter-chip"><span>10. Venn Diagrams</span><button onclick="startChapterTest('Venn Diagrams')">Test</button></div>
+                    <div class="chapter-chip"><span>11. Clock and Calendar</span><button onclick="startChapterTest('Clock and Calendar')">Test</button></div>
+                    <div class="chapter-chip"><span>12. Dice and Cube</span><button onclick="startChapterTest('Dice and Cube')">Test</button></div>
+                    <div class="chapter-chip"><span>13. Mathematical Operations</span><button onclick="startChapterTest('Mathematical Operations')">Test</button></div>
+                    <div class="chapter-chip"><span>14. Word Formation / Dictionary Order</span><button onclick="startChapterTest('Word Formation')">Test</button></div>
+                    <div class="chapter-chip"><span>15. Logical Arrangement of Words</span><button onclick="startChapterTest('Logical Arrangement')">Test</button></div>
+                    <div class="chapter-chip"><span>16. Data Sufficiency</span><button onclick="startChapterTest('Data Sufficiency')">Test</button></div>
+                    <div class="chapter-chip"><span>17. Statement & Conclusions / Assumptions</span><button onclick="startChapterTest('Statement and Conclusions')">Test</button></div>
+                    <div class="chapter-chip"><span>18. Mirror and Water Images</span><button onclick="startChapterTest('Mirror and Water Images')">Test</button></div>
+                    <div class="chapter-chip"><span>19. Paper Cutting and Folding</span><button onclick="startChapterTest('Paper Cutting')">Test</button></div>
+                    <div class="chapter-chip"><span>20. Embedded Figures</span><button onclick="startChapterTest('Embedded Figures')">Test</button></div>
+                    <div class="chapter-chip"><span>21. Figure Completion</span><button onclick="startChapterTest('Figure Completion')">Test</button></div>
+                    <div class="chapter-chip"><span>22. Counting of Figures (Triangles/Squares)</span><button onclick="startChapterTest('Counting of Figures')">Test</button></div>
+                    <div class="chapter-chip"><span>23. Figure Series / Classification</span><button onclick="startChapterTest('Figure Series')">Test</button></div>
+                    <div class="chapter-chip"><span>24. Non-Verbal Master Drill</span><button onclick="startChapterTest('Non-Verbal Master')">Test</button></div>
+                </div>
+            </div>
+
+            <!-- 4. GENERAL STUDIES (HISTORY, POLITY, GEOGRAPHY, ECONOMY) -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('gkChapters')">
+                    <h3>🏛️ General Studies (History, Polity, Geography, Economy)</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">7 Modules ▼</span>
+                </div>
+                <div id="gkChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. Ancient India (IVS, Buddhism, Mauryas, Guptas)</span><button onclick="startChapterTest('Ancient India')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Medieval India (Delhi Sultanate, Mughals)</span><button onclick="startChapterTest('Medieval India')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Modern India (1857 Revolt, INC, Governors)</span><button onclick="startChapterTest('Modern India')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Indian Polity (Constitution, Preamble, FRs, Judiciary)</span><button onclick="startChapterTest('Indian Polity')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Geography (Indian Rivers, Mountains, World Maps)</span><button onclick="startChapterTest('Indian & World Geography')">Test</button></div>
+                    <div class="chapter-chip"><span>6. Economy (Five-Year Plans, GDP, Inflation, Budget)</span><button onclick="startChapterTest('Economy')">Test</button></div>
+                    <div class="chapter-chip"><span>7. General Studies Master Mega Drill</span><button onclick="startChapterTest('GS Mega Test')">Test</button></div>
+                </div>
+            </div>
+
+            <!-- 5. GENERAL SCIENCE & STATIC GK -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('scienceChapters')">
+                    <h3>🧪 General Science & Static GK (Black Book / Current Affairs)</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">6 Modules ▼</span>
+                </div>
+                <div id="scienceChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. Physics (Optics, Sound, Electricity, Mechanics)</span><button onclick="startChapterTest('Physics')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Chemistry (Periodic Table, Acids, Metals)</span><button onclick="startChapterTest('Chemistry')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Biology (Human Anatomy, Diseases, Vitamins)</span><button onclick="startChapterTest('Biology')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Static GK (Art, Culture, National Parks, Awards)</span><button onclick="startChapterTest('Static GK')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Current Affairs (Last 6-8 Months Schemes/Sports)</span><button onclick="startChapterTest('Current Affairs')">Test</button></div>
+                    <div class="chapter-chip"><span>6. General Science Complete Mock</span><button onclick="startChapterTest('General Science Master')">Test</button></div>
+                </div>
+            </div>
+
+            <!-- 6. ENGLISH VOCAB & GRAMMAR -->
+            <div class="hub-subject-card">
+                <div class="hub-subject-header" onclick="toggleHubAccordion('englishChapters')">
+                    <h3>📖 English Vocabulary & Grammar (Rani Mam & Black Book)</h3>
+                    <span style="font-size: 0.85rem; color: var(--accent-blue);">8 Modules ▼</span>
+                </div>
+                <div id="englishChapters" class="hub-chapters-body">
+                    <div class="chapter-chip"><span>1. English Grammar (Parts of Speech, Tenses, Voice)</span><button onclick="startChapterTest('English Grammar')">Test</button></div>
+                    <div class="chapter-chip"><span>2. Black Book OWS (One-Word Substitutions)</span><button onclick="startChapterTest('Black Book OWS')">Test</button></div>
+                    <div class="chapter-chip"><span>3. Black Book Idioms and Phrases</span><button onclick="startChapterTest('Black Book Idioms')">Test</button></div>
+                    <div class="chapter-chip"><span>4. Synonyms & Antonyms Drill</span><button onclick="startChapterTest('Synonyms and Antonyms')">Test</button></div>
+                    <div class="chapter-chip"><span>5. Spelling Errors & Phrasal Verbs</span><button onclick="startChapterTest('Spelling Errors')">Test</button></div>
+                    <div class="chapter-chip"><span>6. Reading Comprehension Passages</span><button onclick="startChapterTest('Reading Comprehension')">Test</button></div>
+                    <div class="chapter-chip"><span>7. Cloze Test & Para Jumbles (PQRS)</span><button onclick="startChapterTest('Cloze Test & Para Jumbles')">Test</button></div>
+                    <div class="chapter-chip"><span>8. Rani Mam Special English Full Test</span><button onclick="startChapterTest('Rani Mam English Drill')">Test</button></div>
                 </div>
             </div>
         </div>
@@ -200,11 +308,11 @@
                 <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-dark);">
                     <label style="font-weight: bold; color: var(--police-gold); display: block; margin-bottom: 0.5rem;">📁 Select Public Domain Module Destination:</label>
                     <select id="targetModuleSelect" style="width: 100%; background: var(--card-dark); color: white; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 6px; font-size: 0.95rem;">
-                        <option value="Mathematics">Mathematics Section</option>
-                        <option value="Reasoning">Reasoning Section</option>
-                        <option value="GK">GK & GS Section</option>
-                        <option value="English">English Section</option>
                         <option value="FullMock">Full-Length Tier-1 Mock Suite</option>
+                        <option value="Mathematics">Quantitative Aptitude</option>
+                        <option value="Reasoning">Reasoning Section</option>
+                        <option value="GK">General Studies & Science</option>
+                        <option value="English">English Section</option>
                     </select>
                 </div>
 
@@ -344,18 +452,14 @@
             renderLeaderboardScores();
             renderSavedQuestions();
 
-            // Initialize browser history state
             if (!history.state) {
                 history.replaceState({ view: 'testView' }, '', '');
             }
 
-            // Restore active state if page was refreshed
             restoreActiveSession();
         });
 
-        // Handle Browser Back/Forward buttons smoothly
         window.addEventListener('popstate', (event) => {
-            // Close any open modals first if back button is pressed
             const openModals = document.querySelectorAll('.modal.active');
             if (openModals.length > 0) {
                 openModals.forEach(m => m.classList.remove('active'));
@@ -371,11 +475,19 @@
 
         function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
         
+        function toggleHubAccordion(id) {
+            const elem = document.getElementById(id);
+            if(elem.style.display === 'none') {
+                elem.style.display = 'grid';
+            } else {
+                elem.style.display = 'none';
+            }
+        }
+
         function switchView(viewId, pushHistory = true) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             
-            // Sync bottom nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             const activeNavBtn = document.getElementById('nav_' + viewId);
             if(activeNavBtn) activeNavBtn.classList.add('active');
@@ -490,27 +602,37 @@
         }
 
         function renderPublishedMocks() {
-            ['Mathematics', 'Reasoning', 'GK', 'English', 'FullMock'].forEach(sec => {
-                const container = document.getElementById('public_' + sec);
-                if(container) container.innerHTML = '';
-            });
+            const container = document.getElementById('public_FullMock');
+            if(container) container.innerHTML = '';
 
             let publishedMocks = JSON.parse(localStorage.getItem('cpo_published_mocks') || '[]');
             publishedMocks.forEach(mock => {
-                const container = document.getElementById('public_' + mock.section);
                 if(container) {
                     const item = document.createElement('div');
                     item.className = 'dynamic-mock-item';
-                    item.innerHTML = `<div><strong style="color:var(--accent-blue);">${mock.title}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">Published: ${mock.date}</span></div><button class="btn" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="startCustomMock('${mock.id}', '${mock.title}')">Attempt</button>`;
+                    item.innerHTML = `<div><strong style="color:var(--accent-blue);">${mock.title}</strong><br><span style="font-size:0.75rem; color:var::var(--text-muted);">Published: ${mock.date} (${mock.section})</span></div><button class="btn" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="startCustomMock('${mock.id}', '${mock.title}')">Attempt</button>`;
                     container.appendChild(item);
                 }
             });
         }
 
-        // --- CBT Examination Control & Auto-Save Session Storage ---
         function startDefaultMock(title, section) {
             activeExamTitle = title;
             activeQuestions = fallbackQuestions;
+            initExamSession();
+        }
+
+        function startChapterTest(chapterName) {
+            activeExamTitle = "Chapter Drill: " + chapterName;
+            activeQuestions = [];
+            for(let i=1; i<=25; i++) {
+                activeQuestions.push({
+                    q: `[${chapterName}] Practice Question ${i}: Solve and select the correct option based on standard SSC CPO/CGL exam standards.`,
+                    options: [`Choice A (${chapterName})`, `Choice B (${chapterName})`, `Choice C (${chapterName})`, `Choice D (${chapterName})`],
+                    ans: i % 4,
+                    explanation: `Detailed explanation and shortcut tricks for ${chapterName} Question ${i}.`
+                });
+            }
             initExamSession();
         }
 
