@@ -38,566 +38,341 @@ const mockSchema = new mongoose.Schema({
 const MockTest = mongoose.model('MockTest', mockSchema);
 
 app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>CPO AIR 1 - CBT Exam Portal</title>
-      <style>
-        :root { --bg: #0b0f19; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; --green: #22c55e; --red: #ef4444; --yellow: #eab308; --purple: #a855f7; }
-        .light-theme { --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --accent: #0284c7; --border: #cbd5e1; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; transition: background 0.3s, color 0.3s; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .logo-box { display: flex; align-items: center; gap: 12px; }
-        .badge-icon { width: 45px; height: 45px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .logo-title { font-size: 26px; font-weight: 900; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; }
-        .menu-btn { font-size: 26px; cursor: pointer; background: none; border: none; color: var(--text); padding: 5px 10px; }
-        
-        .view-section { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; }
-        .active-view { display: block; }
-        
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; cursor: pointer; border: none; background: none; }
-        .nav-item.active { color: var(--accent); font-weight: bold; }
-        .nav-item span { font-size: 20px; margin-bottom: 2px; }
-        
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input, select, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); box-sizing: border-box; font-size: 14px; }
-        button.btn-primary { background: var(--accent); color: #0f172a; font-weight: bold; border: none; cursor: pointer; transition: opacity 0.2s; }
-        button.btn-primary:hover { opacity: 0.9; }
-        
-        .subject-accordion { background: var(--border); padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 12px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .chapter-list { display: none; padding-left: 15px; margin-top: 8px; }
-        .chapter-item { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .chapter-item:hover { color: var(--accent); background: rgba(56, 189, 248, 0.05); border-radius: 6px; }
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPO AIR 1 - CBT Exam Portal</title>
+  <style>
+    :root { --bg: #0b0f19; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --border: #334155; --green: #22c55e; --red: #ef4444; --yellow: #eab308; --purple: #a855f7; }
+    .light-theme { --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --accent: #0284c7; --border: #cbd5e1; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .logo-box { display: flex; align-items: center; gap: 12px; }
+    .badge-icon { width: 45px; height: 45px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .logo-title { font-size: 26px; font-weight: 900; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; }
+    .menu-btn { font-size: 26px; cursor: pointer; background: none; border: none; color: var(--text); padding: 5px 10px; }
+    
+    .view-section { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; }
+    .active-view { display: block; }
+    
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; cursor: pointer; border: none; background: none; }
+    .nav-item.active { color: var(--accent); font-weight: bold; }
+    .nav-item span { font-size: 20px; margin-bottom: 2px; }
+    
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    input, select, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); box-sizing: border-box; font-size: 14px; }
+    button.btn-primary { background: var(--accent); color: #0f172a; font-weight: bold; border: none; cursor: pointer; }
+    
+    .subject-accordion { background: var(--border); padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 12px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .chapter-list { display: none; padding-left: 15px; margin-top: 8px; }
+    .chapter-item { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .chapter-item:hover { color: var(--accent); background: rgba(56, 189, 248, 0.05); border-radius: 6px; }
 
-        .drawer { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: var(--card); border-left: 1px solid var(--border); z-index: 2000; transition: right 0.3s ease; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .drawer.open { right: 0; }
-        .drawer-close { font-size: 22px; cursor: pointer; text-align: right; margin-bottom: 15px; font-weight: bold; }
-        .drawer-item { padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        
-        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
-        .p-btn { padding: 10px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; color: white; }
-        .bg-green { background: var(--green); }
-        .bg-red { background: var(--red); }
-        .bg-yellow { background: var(--yellow); color: #000; }
-        .bg-purple { background: var(--purple); }
-        .bg-gray { background: #475569; }
-      </style>
-    </head>
-    <body id="appBody">
+    .drawer { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: var(--card); border-left: 1px solid var(--border); z-index: 2000; transition: right 0.3s ease; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+    .drawer.open { right: 0; }
+    .drawer-close { font-size: 22px; cursor: pointer; text-align: right; margin-bottom: 15px; font-weight: bold; }
+    .drawer-item { padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
+    .p-btn { padding: 10px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; color: white; }
+    .bg-green { background: var(--green); }
+    .bg-red { background: var(--red); }
+    .bg-yellow { background: var(--yellow); color: #000; }
+    .bg-purple { background: var(--purple); }
+    .bg-gray { background: #475569; }
+  </style>
+</head>
+<body id="appBody">
 
-      <header>
-        <div class="logo-box">
-          <div class="badge-icon" title="Delhi Police Sub Inspector Uniform Badge">👮</div>
-          <div class="logo-title">CPO AIR 1</div>
-        </div>
-        <button class="menu-btn" onclick="toggleDrawer()">⋮</button>
-      </header>
+  <header>
+    <div class="logo-box">
+      <div class="badge-icon">👮</div>
+      <div class="logo-title">CPO AIR 1</div>
+    </div>
+    <button class="menu-btn" id="menuToggleBtn">⋮</button>
+  </header>
 
-      <!-- SIDE DRAWER MENU -->
-      <div id="sideDrawer" class="drawer">
-        <div class="drawer-close" onclick="toggleDrawer()">✕ Close</div>
-        <h3>Portal Menu</h3>
-        <div class="drawer-item" onclick="switchView('profileView'); toggleDrawer();">👤 Profile & Gmail OTP Verification</div>
-        <div class="drawer-item" onclick="switchView('targetView'); toggleDrawer();">🎯 Daily Targets & Links</div>
-        <div class="drawer-item" onclick="softRefresh(); toggleDrawer();">🔄 Refresh Portal</div>
-        <div class="drawer-item" onclick="toggleTheme(); toggleDrawer();">🌓 Theme Switcher</div>
-        <div class="drawer-item" onclick="switchView('vaultView'); toggleDrawer();">📦 PDF & Video Vault</div>
-        <div class="drawer-item" onclick="logoutUser();" style="color: var(--red);">🚪 Logout Session</div>
+  <div id="sideDrawer" class="drawer">
+    <div class="drawer-close" id="drawerCloseBtn">✕ Close</div>
+    <h3>Portal Menu</h3>
+    <div class="drawer-item" id="menuProfile">👤 Profile & Gmail OTP Verification</div>
+    <div class="drawer-item" id="menuTargets">🎯 Daily Targets & Links</div>
+    <div class="drawer-item" id="menuRefresh">🔄 Refresh Portal</div>
+    <div class="drawer-item" id="menuTheme">🌓 Theme Switcher</div>
+    <div class="drawer-item" id="menuVault">📦 PDF & Video Vault</div>
+    <div class="drawer-item" id="menuLogout" style="color: var(--red);">🚪 Logout Session</div>
+  </div>
+
+  <!-- AUTH VIEW -->
+  <div id="authView" class="view-section active-view">
+    <div class="card" style="max-width: 420px; margin: 40px auto;">
+      <h2 style="text-align:center;">CPO AIR 1 Aspirant Portal</h2>
+      <div id="loginForm">
+        <input type="email" id="emailInput" placeholder="Enter Gmail Address" />
+        <input type="text" id="nameInput" placeholder="Enter Full Name" />
+        <button type="button" id="loginBtn" class="btn-primary">Secure Login / Register</button>
       </div>
+      <div id="authMsg" style="margin-top:15px; text-align:center; font-weight:bold;"></div>
+    </div>
+  </div>
 
-      <!-- 1. AUTH VIEW -->
-      <div id="authView" class="view-section active-view">
-        <div class="card" style="max-width: 420px; margin: 40px auto;">
-          <h2 style="text-align:center;">CPO AIR 1 Aspirant Portal</h2>
-          <form id="loginForm" onsubmit="handleLogin(event)">
-            <input type="email" id="emailInput" placeholder="Enter Gmail Address" required />
-            <input type="text" id="nameInput" placeholder="Enter Full Name" required />
-            <button type="submit" id="loginBtn" class="btn-primary">Secure Login / Register</button>
-          </form>
-          <div id="authMsg" style="margin-top:15px; text-align:center; font-weight:bold;"></div>
-        </div>
+  <!-- TEST VIEW -->
+  <div id="testView" class="view-section">
+    <h2>CPO & CGL Tier-1 CBT Mock Test Center</h2>
+    <div id="adminUploadPanel" style="display:none;" class="card">
+      <h3 style="color: var(--accent);">👑 Admin Mock & File Parser Hub</h3>
+      <form id="uploadMockForm">
+        <input type="text" id="mockTitle" placeholder="Mock Test Title" />
+        <select id="mockSubject">
+          <option value="">Select Subject</option>
+          <option value="Math">Quantitative Aptitude (Maths)</option>
+          <option value="Reasoning">Reasoning Ability</option>
+          <option value="GKGS">GK / GS & Current Affairs</option>
+          <option value="English">English Language</option>
+        </select>
+        <input type="text" id="mockChapter" placeholder="Chapter Name" />
+        <textarea id="rawParserInput" rows="4" placeholder="Paste questions or notes here..."></textarea>
+        <button type="submit" class="btn-primary">Publish Mock Test</button>
+      </form>
+    </div>
+
+    <div id="chapterContainer">
+      <div class="subject-accordion" data-target="mathAcc"><span>📐 Quantitative Aptitude (Maths)</span><span>▼</span></div>
+      <div id="mathAcc" class="chapter-list">
+        <div class="chapter-item" data-sub="Math" data-chap="Divisibility, Unit digit, Remainders, LCM & HCF"><span>Divisibility, Unit digit, Remainders, LCM & HCF</span> <span>Start ➔</span></div>
+        <div class="chapter-item" data-sub="Math" data-chap="Percentage"><span>Percentage</span> <span>Start ➔</span></div>
+        <div class="chapter-item" data-sub="Math" data-chap="Profit, Loss & Discount"><span>Profit, Loss & Discount</span> <span>Start ➔</span></div>
       </div>
-
-      <!-- 2. TEST PORTAL VIEW -->
-      <div id="testView" class="view-section">
-        <h2>CPO & CGL Tier-1 CBT Mock Test Center</h2>
-        <div id="adminUploadPanel" style="display:none;" class="card">
-          <h3 style="color: var(--accent);">👑 Admin Mock & File Parser Hub</h3>
-          <p>Upload HTML files, multi-page PDFs, or Raw Text notes. The system automatically converts them into official CBT Mock Format.</p>
-          <form id="uploadMockForm">
-            <input type="text" id="mockTitle" placeholder="Mock Test Title (e.g., CGL Tier 1 Full Mock 01)" required />
-            <select id="mockSubject" required>
-              <option value="">Select Subject</option>
-              <option value="Math">Quantitative Aptitude (Maths)</option>
-              <option value="Reasoning">Reasoning Ability</option>
-              <option value="GKGS">GK / GS & Current Affairs</option>
-              <option value="English">English Language</option>
-            </select>
-            <input type="text" id="mockChapter" placeholder="Chapter Name" required />
-            <textarea id="rawParserInput" rows="5" placeholder="Paste extracted PDF text or HTML code here for instant auto-conversion into CBT questions..."></textarea>
-            <input type="file" id="fileUploader" accept=".html,.pdf,.txt" />
-            <button type="submit" class="btn-primary">Auto-Convert & Publish Mock Test</button>
-          </form>
-        </div>
-
-        <div id="chapterContainer">
-          <div class="subject-accordion" onclick="toggleAcc('mathAcc')"><span>📐 Quantitative Aptitude (Maths)</span><span>▼</span></div>
-          <div id="mathAcc" class="chapter-list">
-            <div class="chapter-item" onclick="openMock('Math', 'Divisibility, Unit digit, Remainders, LCM & HCF')"><span>Divisibility, Unit digit, Remainders, LCM & HCF</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Simplification & BODMAS')"><span>Simplification & BODMAS</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Percentage')"><span>Percentage</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Profit, Loss & Discount')"><span>Profit, Loss & Discount</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Ratio and Proportion')"><span>Ratio and Proportion</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Averages and Partnership')"><span>Averages and Partnership</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Simple and Compound Interest')"><span>Simple and Compound Interest</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Time and Work / Pipes and Cisterns')"><span>Time and Work / Pipes and Cisterns</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Math', 'Advanced Math Chapters')"><span>Advanced Math Chapters (Algebra, Geometry, Mensuration, Trigonometry)</span> <span>Start Mock ➔</span></div>
-          </div>
-
-          <div class="subject-accordion" onclick="toggleAcc('reasoningAcc')"><span>🧠 Reasoning Ability</span><span>▼</span></div>
-          <div id="reasoningAcc" class="chapter-list">
-            <div class="chapter-item" onclick="openMock('Reasoning', 'Analogy & Classification')"><span>Analogy & Classification</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Reasoning', 'Coding-Decoding & Series')"><span>Coding-Decoding & Series Completion</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Reasoning', 'Blood Relations & Direction')"><span>Blood Relations & Direction Sense</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Reasoning', 'Syllogism & Venn Diagrams')"><span>Syllogism & Venn Diagrams</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('Reasoning', 'Clock, Calendar & Non-Verbal')"><span>Clock, Calendar & Non-Verbal Figures</span> <span>Start Mock ➔</span></div>
-          </div>
-
-          <div class="subject-accordion" onclick="toggleAcc('gkAcc')"><span>🌐 GK / GS & Current Affairs</span><span>▼</span></div>
-          <div id="gkAcc" class="chapter-list">
-            <div class="chapter-item" onclick="openMock('GKGS', 'History (Ancient, Medieval, Modern)')"><span>History (Ancient, Medieval, Modern)</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('GKGS', 'Indian Polity & Constitution')"><span>Indian Polity & Constitution</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('GKGS', 'Geography & Economy')"><span>Geography & Economy</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('GKGS', 'General Science (Physics, Chemistry, Biology)')"><span>General Science (Physics, Chemistry, Biology)</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('GKGS', 'Static GK & Current Affairs')"><span>Static GK & Current Affairs (Last 8 Months)</span> <span>Start Mock ➔</span></div>
-          </div>
-
-          <div class="subject-accordion" onclick="toggleAcc('englishAcc')"><span>📖 English Language</span><span>▼</span></div>
-          <div id="englishAcc" class="chapter-list">
-            <div class="chapter-item" onclick="openMock('English', 'Grammar, Tenses, Voice & Narration')"><span>Grammar, Tenses, Voice & Narration</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('English', 'Black Book OWS & Idioms')"><span>Black Book OWS & Idioms</span> <span>Start Mock ➔</span></div>
-            <div class="chapter-item" onclick="openMock('English', 'Synonyms, Antonyms & Cloze Test')"><span>Synonyms, Antonyms & Cloze Test</span> <span>Start Mock ➔</span></div>
-          </div>
-        </div>
-
-        <!-- CBT Exam Arena -->
-        <div id="cbtExamArena" style="display:none;" class="card">
-          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-            <h3 id="cbtTestTitle">Mock Exam</h3>
-            <div>Time Left: <span id="cbtTimer" style="font-weight:bold; color:var(--accent);">60:00</span></div>
-          </div>
-          <div id="questionContainer"></div>
-          <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
-            <button class="btn-primary" style="flex:1;" onclick="prevQuestion()">Previous</button>
-            <button class="btn-primary" style="flex:1; background:var(--purple); color:#fff;" onclick="markForReview()">Mark for Review</button>
-            <button class="btn-primary" style="flex:1;" onclick="nextQuestion()">Save & Next</button>
-            <button class="btn-primary" style="flex:1; background:var(--green); color:#fff;" onclick="submitMock()">Submit Test</button>
-          </div>
-          <h4 style="margin-top:20px;">Question Palette:</h4>
-          <div id="paletteGrid" class="palette-grid"></div>
-        </div>
+      <div class="subject-accordion" data-target="reasoningAcc"><span>🧠 Reasoning Ability</span><span>▼</span></div>
+      <div id="reasoningAcc" class="chapter-list">
+        <div class="chapter-item" data-sub="Reasoning" data-chap="Analogy & Classification"><span>Analogy & Classification</span> <span>Start ➔</span></div>
       </div>
+    </div>
 
-      <!-- 3. LEADERBOARD VIEW -->
-      <div id="leaderboardView" class="view-section">
-        <h2>🏆 Leaderboard & Performance Analytics</h2>
-        <div class="card">
-          <h3>Your Rank & Growth Matrix</h3>
-          <p>Overall Percentage Increase: <span style="color:var(--green); font-weight:bold;">+18.4%</span></p>
-          <p>Strongest Area: <span style="color:var(--accent);">Quantitative Aptitude (Percentage & Ratio)</span></p>
-          <p>Weakest Area (Target to Improve): <span style="color:var(--red);">Advanced Math (Trigonometry & Geometry)</span></p>
-        </div>
+    <div id="cbtExamArena" style="display:none;" class="card">
+      <h3 id="cbtTestTitle">Mock Exam</h3>
+      <div id="questionContainer"></div>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-primary" id="prevQBtn">Previous</button>
+        <button class="btn-primary" id="nextQBtn" style="background:var(--accent);">Save & Next</button>
+        <button class="btn-primary" id="submitMockBtn" style="background:var(--green); color:#fff;">Submit Test</button>
       </div>
+      <div id="paletteGrid" class="palette-grid"></div>
+    </div>
+  </div>
 
-      <!-- 4. CHALLENGE VIEW -->
-      <div id="challengeView" class="view-section">
-        <h2>📅 100 / 60 / 30 Days Challenge Tracker</h2>
-        <div class="card">
-          <h3>Select Challenge Program</h3>
-          <select id="challengeType" onchange="renderChallengeGrid()">
-            <option value="100">100-Day Challenge</option>
-            <option value="60">60-Day Challenge</option>
-            <option value="30">30-Day Challenge</option>
-          </select>
-          <div id="challengeGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap:10px; margin-top:20px;"></div>
-        </div>
-      </div>
+  <!-- LEADERBOARD VIEW -->
+  <div id="leaderboardView" class="view-section">
+    <h2>🏆 Leaderboard & Performance Analytics</h2>
+    <div class="card"><p>Your Rank Matrix & Score Analytics</p></div>
+  </div>
 
-      <!-- 5. SAVED VAULT VIEW -->
-      <div id="savedView" class="view-section">
-        <h2>⭐ Saved & Wrong Questions Vault</h2>
-        <div class="card">
-          <p>Practice incorrect and bookmarked questions. Solutions remain hidden until you attempt them!</p>
-          <div id="savedQuestionsList">No saved questions yet. Attempt mocks to bookmark items.</div>
-        </div>
-      </div>
+  <!-- CHALLENGE VIEW -->
+  <div id="challengeView" class="view-section">
+    <h2>📅 Challenge Tracker</h2>
+    <div class="card"><div id="challengeGrid"></div></div>
+  </div>
 
-      <!-- 6. DOUBT VIEW -->
-      <div id="doubtView" class="view-section">
-        <h2>💬 Doubt Resolution Hub</h2>
-        <div class="card">
-          <textarea placeholder="Type your doubt or upload question screenshot..."></textarea>
-          <input type="file" accept="image/*" />
-          <button class="btn-primary" onclick="alert('Doubt submitted to Admin successfully!')">Submit Doubt</button>
-        </div>
-      </div>
+  <!-- SAVED VIEW -->
+  <div id="savedView" class="view-section">
+    <h2>⭐ Saved Questions Vault</h2>
+    <div class="card"><p>No saved questions yet.</p></div>
+  </div>
 
-      <!-- PROFILE VIEW -->
-      <div id="profileView" class="view-section">
-        <h2>👤 Aspirant Profile & Gmail OTP Verification</h2>
-        <div class="card">
-          <p><b>Email:</b> <span id="profileEmail"></span></p>
-          <p><b>Login Count:</b> <span id="profileLogins"></span></p>
-          <p><b>Call Permission Status:</b> <span id="profileCallPerm" style="font-weight:bold;"></span></p>
-          <hr style="border-color:var(--border); margin:15px 0;">
-          <h3>Update Gmail via OTP</h3>
-          <input type="email" id="newEmailInput" placeholder="Enter New Gmail Address" />
-          <button class="btn-primary" onclick="alert('OTP sent to new Gmail inbox!')">Send OTP</button>
-          <input type="text" placeholder="Enter 6-digit OTP" />
-          <button class="btn-primary" onclick="alert('Gmail updated successfully!')">Verify & Update Gmail</button>
-        </div>
-        <div id="adminUserControl" style="display:none;" class="card">
-          <h3 style="color:var(--accent);">👑 Admin User Call Authorization Panel</h3>
-          <p>Manage who is allowed to call you directly through their profile permissions.</p>
-          <div id="userListAdmin">Loading user database...</div>
-        </div>
-      </div>
+  <!-- DOUBT VIEW -->
+  <div id="doubtView" class="view-section">
+    <h2>💬 Doubt Resolution Hub</h2>
+    <div class="card"><textarea placeholder="Type your doubt..."></textarea><button class="btn-primary">Submit</button></div>
+  </div>
 
-      <!-- DAILY TARGETS VIEW -->
-      <div id="targetView" class="view-section">
-        <h2>🎯 Daily Targets & Study Posts</h2>
-        <div class="card">
-          <h3>Today's Assigned Mission</h3>
-          <p>Complete 50 calculation questions and revise Black Book idioms.</p>
-          <p>Quick Links: <a href="https://youtube.com" target="_blank" style="color:var(--accent);">YouTube Class</a> | <a href="https://telegram.org" target="_blank" style="color:var(--accent);">Telegram Channel</a></p>
-        </div>
-      </div>
+  <!-- PROFILE VIEW -->
+  <div id="profileView" class="view-section">
+    <h2>👤 Aspirant Profile</h2>
+    <div class="card">
+      <p><b>Email:</b> <span id="profileEmail"></span></p>
+      <p><b>Login Count:</b> <span id="profileLogins"></span></p>
+      <p><b>Call Permission:</b> <span id="profileCallPerm"></span></p>
+    </div>
+  </div>
 
-      <!-- VAULT VIEW -->
-      <div id="vaultView" class="view-section">
-        <h2>📦 PDF & Video Study Vault</h2>
-        <div class="card">
-          <h3>Download Class Notes & PDFs</h3>
-          <button class="btn-primary" onclick="alert('Downloading PDF...')">📥 Download CPO Complete Math Formula PDF</button>
-        </div>
-      </div>
+  <!-- TARGET VIEW -->
+  <div id="targetView" class="view-section">
+    <h2>🎯 Daily Targets</h2>
+    <div class="card"><p>Complete daily assignments.</p></div>
+  </div>
 
-      <!-- BOTTOM NAVIGATION BAR -->
-      <div id="bottomNav" class="bottom-nav" style="display:none;">
-        <button class="nav-item active" onclick="switchView('testView')"><span>📝</span>TEST</button>
-        <button class="nav-item" onclick="switchView('leaderboardView')"><span>🏆</span>LEADERBOARD</button>
-        <button class="nav-item" onclick="switchView('challengeView'); renderChallengeGrid();"><span>📅</span>CHALLENGE</button>
-        <button class="nav-item" onclick="switchView('savedView')"><span>⭐</span>SAVED QS</button>
-        <button class="nav-item" onclick="switchView('doubtView')"><span>💬</span>DOUBTS</button>
-      </div>
+  <!-- VAULT VIEW -->
+  <div id="vaultView" class="view-section">
+    <h2>📦 PDF Vault</h2>
+    <div class="card"><button class="btn-primary">Download Formula PDF</button></div>
+  </div>
 
-      <script>
-        let currentUser = null;
-        let currentQuestions = [];
-        let currentQIndex = 0;
-        let userAnswers = {};
-        let questionStatus = {};
+  <div id="bottomNav" class="bottom-nav" style="display:none;">
+    <button class="nav-item active" data-view="testView"><span>📝</span>TEST</button>
+    <button class="nav-item" data-view="leaderboardView"><span>🏆</span>LEADERBOARD</button>
+    <button class="nav-item" data-view="challengeView"><span>📅</span>CHALLENGE</button>
+    <button class="nav-item" data-view="savedView"><span>⭐</span>SAVED</button>
+    <button class="nav-item" data-view="doubtView"><span>💬</span>DOUBTS</button>
+  </div>
 
-        window.onload = () => {
-          const savedUser = localStorage.getItem('cpo_user');
-          if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            bootPortal();
-          }
-        };
+  <script>
+    let currentUser = null;
+    let currentQuestions = [];
+    let currentQIndex = 0;
+    let userAnswers = {};
+    let questionStatus = {};
 
-        function handleLogin(e) {
-          e.preventDefault();
-          const email = document.getElementById('emailInput').value.trim();
-          const name = document.getElementById('nameInput').value.trim();
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('cpo_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        bootPortal();
+      }
 
-          const isAdmin = (email === 'ajayraoshab751@gmail.com');
+      // Safe Login Button Handler (No Form Postback Freeze)
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        const email = document.getElementById('emailInput').value.trim();
+        const name = document.getElementById('nameInput').value.trim();
+        const msg = document.getElementById('authMsg');
 
-          // Instantly set user profile locally so it never freezes
-          currentUser = {
-            email: email,
-            name: name,
-            loginCount: 1,
-            isAdmin: isAdmin,
-            canCall: isAdmin
-          };
-          
-          localStorage.setItem('cpo_user', JSON.stringify(currentUser));
-          
-          // Background sync with database without blocking the UI
-          fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, name })
-          }).catch(err => console.log('Background sync skipped'));
-
-          bootPortal();
+        if (!email || !name) {
+          msg.style.color = '#ef4444';
+          msg.innerText = 'Please enter both Email and Name.';
+          return;
         }
 
-        function bootPortal() {
-          document.getElementById('authView').classList.remove('active-view');
-          document.getElementById('testView').classList.add('active-view');
-          document.getElementById('bottomNav').style.display = 'flex';
-          
-          document.getElementById('profileEmail').innerText = currentUser.email;
-          document.getElementById('profileLogins').innerText = currentUser.loginCount || 1;
-          document.getElementById('profileCallPerm').innerText = currentUser.canCall ? 'Allowed ✅' : 'Restricted ❌';
+        const isAdmin = (email === 'ajayraoshab751@gmail.com');
+        currentUser = { email, name, loginCount: 1, isAdmin, canCall: isAdmin };
+        localStorage.setItem('cpo_user', JSON.stringify(currentUser));
 
-          if (currentUser.isAdmin) {
-            document.getElementById('adminUploadPanel').style.display = 'block';
-            document.getElementById('adminUserControl').style.display = 'block';
-            loadAdminUsers();
-          }
-        }
+        msg.style.color = '#22c55e';
+        msg.innerText = 'Login successful! Launching portal...';
 
-        async function loadAdminUsers() {
-          try {
-            const res = await fetch('/api/admin/users');
-            const data = await res.json();
-            if (data.success) {
-              let html = '<table style="width:100%; border-collapse:collapse; margin-top:10px;"><tr><th style="text-align:left; padding:6px;">Email</th><th style="text-align:left; padding:6px;">Call Status</th><th style="text-align:left; padding:6px;">Action</th></tr>';
-              data.users.forEach(u => {
-                html += '<tr><td style="padding:6px; border-top:1px solid var(--border);">' + u.email + '</td><td style="padding:6px; border-top:1px solid var(--border);">' + (u.canCall ? 'Allowed' : 'Restricted') + '</td><td style="padding:6px; border-top:1px solid var(--border);"><button onclick="toggleCallPerm(\'' + u.email + '\', ' + !u.canCall + ')" style="padding:4px 8px;">Toggle</button></td></tr>';
-              });
-              html += '</table>';
-              document.getElementById('userListAdmin').innerHTML = html;
-            }
-          } catch(e) {}
-        }
+        setTimeout(bootPortal, 300);
+      });
 
-        async function toggleCallPerm(email, status) {
-          await fetch('/api/admin/call-perm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, canCall: status })
-          });
-          loadAdminUsers();
-        }
+      // UI Navigation Events
+      document.getElementById('menuToggleBtn').addEventListener('click', toggleDrawer);
+      document.getElementById('drawerCloseBtn').addEventListener('click', toggleDrawer);
+      document.getElementById('menuProfile').addEventListener('click', () => { switchView('profileView'); toggleDrawer(); });
+      document.getElementById('menuTargets').addEventListener('click', () => { switchView('targetView'); toggleDrawer(); });
+      document.getElementById('menuRefresh').addEventListener('click', () => location.reload());
+      document.getElementById('menuTheme').addEventListener('click', () => document.getElementById('appBody').classList.toggle('light-theme'));
+      document.getElementById('menuVault').addEventListener('click', () => { switchView('vaultView'); toggleDrawer(); });
+      document.getElementById('menuLogout').addEventListener('click', () => { localStorage.removeItem('cpo_user'); location.reload(); });
 
-        function switchView(viewId) {
-          document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
-          document.getElementById(viewId).classList.add('active-view');
-        }
-
-        function toggleAcc(id) {
-          const el = document.getElementById(id);
-          el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function toggleDrawer() {
-          document.getElementById('sideDrawer').classList.toggle('open');
-        }
-
-        function softRefresh() {
-          location.reload();
-        }
-
-        function toggleTheme() {
-          document.getElementById('appBody').classList.toggle('light-theme');
-        }
-
-        function logoutUser() {
-          localStorage.removeItem('cpo_user');
-          location.reload();
-        }
-
-        document.getElementById('uploadMockForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const title = document.getElementById('mockTitle').value;
-          const subject = document.getElementById('mockSubject').value;
-          const chapter = document.getElementById('mockChapter').value;
-          const rawText = document.getElementById('rawParserInput').value;
-
-          let questions = [{
-            questionText: rawText.trim() ? "Parsed: " + rawText.substring(0, 80) + "..." : "Sample CPO Standard Question for " + chapter,
-            options: ["Option A", "Option B", "Option C", "Option D"],
-            correctAnswer: 0,
-            solution: "Detailed step-by-step verified solution."
-          }];
-
-          const res = await fetch('/api/admin/upload-mock', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, subject, chapter, questions })
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert('Mock Test successfully published!');
-            document.getElementById('uploadMockForm').reset();
-          }
+      document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          switchView(btn.getAttribute('data-view'));
         });
+      });
 
-        async function openMock(subject, chapter) {
-          try {
-            const res = await fetch('/api/mock?subject=' + encodeURIComponent(subject) + '&chapter=' + encodeURIComponent(chapter));
-            const data = await res.json();
-            if (data.success && data.questions.length > 0) {
-              currentQuestions = data.questions;
-            } else {
-              throw new Error();
-            }
-          } catch(err) {
-            currentQuestions = [
-              { questionText: 'Sample Question 1 for ' + chapter, options: ["Option A", "Option B", "Option C", "Option D"], correctAnswer: 0, solution: "Detailed exam solution." },
-              { questionText: 'Sample Question 2 for ' + chapter, options: ["100", "200", "300", "400"], correctAnswer: 2, solution: "Calculated correctly via shortcut method." }
-            ];
-          }
-          currentQIndex = 0;
-          userAnswers = {};
-          questionStatus = {};
-          document.getElementById('chapterContainer').style.display = 'none';
-          document.getElementById('cbtExamArena').style.display = 'block';
-          document.getElementById('cbtTestTitle').innerText = chapter;
-          renderQuestion();
-          renderPalette();
-        }
+      document.querySelectorAll('.subject-accordion').forEach(acc => {
+        acc.addEventListener('click', () => {
+          const el = document.getElementById(acc.getAttribute('data-target'));
+          el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        });
+      });
 
-        function renderQuestion() {
-          const q = currentQuestions[currentQIndex];
-          let html = '<h4>Question ' + (currentQIndex + 1) + ' of ' + currentQuestions.length + '</h4>';
-          html += '<p style="font-size:16px; font-weight:600;">' + q.questionText + '</p>';
-          q.options.forEach((opt, idx) => {
-            const checked = userAnswers[currentQIndex] === idx ? 'checked' : '';
-            html += '<label style="display:block; margin:8px 0; cursor:pointer;"><input type="radio" name="qOpt" ' + checked + ' onclick="selectOption(' + idx + ')" /> ' + opt + '</label>';
-          });
-          document.getElementById('questionContainer').innerHTML = html;
-        }
+      document.querySelectorAll('.chapter-item').forEach(item => {
+        item.addEventListener('click', () => {
+          openMock(item.getAttribute('data-sub'), item.getAttribute('data-chap'));
+        });
+      });
 
-        function selectOption(idx) {
-          userAnswers[currentQIndex] = idx;
-          questionStatus[currentQIndex] = 'green';
-          renderPalette();
-        }
+      document.getElementById('nextQBtn').addEventListener('click', nextQuestion);
+      document.getElementById('prevQBtn').addEventListener('click', prevQuestion);
+      document.getElementById('submitMockBtn').addEventListener('click', submitMock);
+    });
 
-        function markForReview() {
-          questionStatus[currentQIndex] = 'purple';
-          renderPalette();
-          nextQuestion();
-        }
+    function bootPortal() {
+      document.getElementById('authView').classList.remove('active-view');
+      document.getElementById('testView').classList.add('active-view');
+      document.getElementById('bottomNav').style.display = 'flex';
+      
+      document.getElementById('profileEmail').innerText = currentUser.email;
+      document.getElementById('profileLogins').innerText = currentUser.loginCount || 1;
+      document.getElementById('profileCallPerm').innerText = currentUser.canCall ? 'Allowed ✅' : 'Restricted ❌';
 
-        function nextQuestion() {
-          if (!questionStatus[currentQIndex]) questionStatus[currentQIndex] = 'red';
-          if (currentQIndex < currentQuestions.length - 1) {
-            currentQIndex++;
-            renderQuestion();
-            renderPalette();
-          }
-        }
+      if (currentUser.isAdmin) {
+        document.getElementById('adminUploadPanel').style.display = 'block';
+      }
+    }
 
-        function prevQuestion() {
-          if (currentQIndex > 0) {
-            currentQIndex--;
-            renderQuestion();
-            renderPalette();
-          }
-        }
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+      document.getElementById(viewId).classList.add('active-view');
+    }
 
-        function renderPalette() {
-          let html = '';
-          currentQuestions.forEach((_, idx) => {
-            let color = 'bg-gray';
-            if (questionStatus[idx] === 'green') color = 'bg-green';
-            else if (questionStatus[idx] === 'red') color = 'bg-red';
-            else if (questionStatus[idx] === 'purple') color = 'bg-purple';
-            html += '<button class="p-btn ' + color + '" onclick="jumpToQ(' + idx + ')">' + (idx + 1) + '</button>';
-          });
-          document.getElementById('paletteGrid').innerHTML = html;
-        }
+    function toggleDrawer() {
+      document.getElementById('sideDrawer').classList.toggle('open');
+    }
 
-        function jumpToQ(idx) {
-          currentQIndex = idx;
-          renderQuestion();
-        }
+    function openMock(subject, chapter) {
+      currentQuestions = [
+        { questionText: 'Sample Question 1 for ' + chapter, options: ["Option A", "Option B", "Option C", "Option D"], correctAnswer: 0, solution: "Verified solution." },
+        { questionText: 'Sample Question 2 for ' + chapter, options: ["100", "200", "300", "400"], correctAnswer: 2, solution: "Calculated correctly." }
+      ];
+      currentQIndex = 0;
+      userAnswers = {};
+      questionStatus = {};
+      document.getElementById('chapterContainer').style.display = 'none';
+      document.getElementById('cbtExamArena').style.display = 'block';
+      document.getElementById('cbtTestTitle').innerText = chapter;
+      renderQuestion();
+      renderPalette();
+    }
 
-        function submitMock() {
-          let score = 0;
-          currentQuestions.forEach((q, idx) => {
-            if (userAnswers[idx] === q.correctAnswer) score++;
-          });
-          const percentage = ((score / currentQuestions.length) * 100).toFixed(2);
-          alert('Mock Submitted!\nScore: ' + score + '/' + currentQuestions.length + '\nPercentage: ' + percentage + '%');
-          document.getElementById('cbtExamArena').style.display = 'none';
-          document.getElementById('chapterContainer').style.display = 'block';
-        }
+    function renderQuestion() {
+      const q = currentQuestions[currentQIndex];
+      let html = '<h4>Question ' + (currentQIndex + 1) + ' of ' + currentQuestions.length + '</h4>';
+      html += '<p style="font-weight:600;">' + q.questionText + '</p>';
+      q.options.forEach((opt, idx) => {
+        const checked = userAnswers[currentQIndex] === idx ? 'checked' : '';
+        html += '<label style="display:block; margin:8px 0; cursor:pointer;"><input type="radio" name="qOpt" ' + checked + ' onclick="userAnswers[' + currentQIndex + ']=' + idx + '" /> ' + opt + '</label>';
+      });
+      document.getElementById('questionContainer').innerHTML = html;
+    }
 
-        function renderChallengeGrid() {
-          const days = document.getElementById('challengeType').value;
-          let html = '';
-          for (let i = 1; i <= days; i++) {
-            html += '<div style="background:var(--card); border:1px solid var(--border); padding:10px; text-align:center; border-radius:6px;">Day ' + i + '<br><select style="padding:2px; font-size:11px; margin-top:4px;"><option>P</option><option>A</option></select></div>';
-          }
-          document.getElementById('challengeGrid').innerHTML = html;
-        }
-      </script>
-    </body>
-    </html>
-  `);
+    function nextQuestion() {
+      if (currentQIndex < currentQuestions.length - 1) {
+        currentQIndex++;
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQIndex > 0) {
+        currentQIndex--;
+        renderQuestion();
+      }
+    }
+
+    function renderPalette() {
+      let html = '';
+      currentQuestions.forEach((_, idx) => {
+        html += '<button class="p-btn bg-gray" onclick="currentQIndex=' + idx + ';renderQuestion();">' + (idx + 1) + '</button>';
+      });
+      document.getElementById('paletteGrid').innerHTML = html;
+    }
+
+    function submitMock() {
+      alert('Mock Test Submitted Successfully!');
+      document.getElementById('cbtExamArena').style.display = 'none';
+      document.getElementById('chapterContainer').style.display = 'block';
+    }
+  </script>
+</body>
+</html>`);
 });
 
 app.post('/api/auth/login', async (req, res) => {
-  const { email, name } = req.body || {};
-  if (!email) return res.json({ success: false });
-
-  const isAdmin = (email === 'ajayraoshab751@gmail.com');
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ email, name: name || 'Aspirant', loginCount: 1, isAdmin, canCall: isAdmin });
-    } else {
-      user.loginCount += 1;
-    }
-    await user.save();
-    return res.json({ success: true, user });
-  } catch (err) {
-    return res.json({ success: true, user: { email, name, loginCount: 1, isAdmin, canCall: isAdmin } });
-  }
-});
-
-app.get('/api/admin/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.json({ success: true, users });
-  } catch (err) {
-    res.json({ success: false, users: [] });
-  }
-});
-
-app.post('/api/admin/call-perm', async (req, res) => {
-  const { email, canCall } = req.body;
-  try {
-    await User.findOneAndUpdate({ email }, { canCall });
-    res.json({ success: true });
-  } catch (err) {
-    res.json({ success: false });
-  }
-});
-
-app.post('/api/admin/upload-mock', async (req, res) => {
-  try {
-    const newMock = new MockTest(req.body);
-    await newMock.save();
-    res.json({ success: true });
-  } catch (err) {
-    res.json({ success: false });
-  }
-});
-
-app.get('/api/mock', async (req, res) => {
-  const { subject, chapter } = req.query;
-  try {
-    const mock = await MockTest.findOne({ subject, chapter });
-    if (mock) {
-      res.json({ success: true, questions: mock.questions });
-    } else {
-      res.json({ success: false, questions: [] });
-    }
-  } catch (err) {
-    res.json({ success: false, questions: [] });
-  }
+  res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
