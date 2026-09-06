@@ -41,6 +41,7 @@ function decodeBuffer(buffer, originalname) {
 }
 
 app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
+    const startTime = Date.now(); // Start conversion timer
     const { section, title } = req.body;
     const mockTitle = title || (req.file ? req.file.originalname : "Uploaded Mock");
     
@@ -64,27 +65,18 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
         // --- DOM PARSING FOR HTML FILES USING CHEERIO ---
         if (!isPdf && (fileText.includes('<html') || fileText.includes('<body') || fileText.includes('<div'))) {
             const $ = cheerio.load(fileText);
-            
-            // Remove unwanted tags
             $('script, style, noscript').remove();
 
-            // Target common question blocks in exported test HTMLs
-            // We look for blocks, paragraphs, or divs that contain question patterns
             let questionNodes = [];
-            
-            // Search various possible selectors used in test portals
             $('.question, .quiz-question, .test-question, div[id*="q"], div[class*="question"], p, tr').each((i, el) => {
                 let text = $(el).text().trim();
-                // Check if text looks like a question (contains Q., question number, or question marks)
                 if (/^(?:Q\.?\s*\d+|Question\s*\d+|\d{1,3}[\.\)]\s+)/i.test(text) || text.length > 20) {
                     questionNodes.push(text);
                 }
             });
 
-            // If selector-based nodes found, process them
             if (questionNodes.length > 0) {
                 questionNodes.forEach((nodeText, idx) => {
-                    // Clean lines
                     let lines = nodeText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                     if (lines.length === 0) return;
 
@@ -172,15 +164,18 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
         });
     }
 
+    const durationSec = ((Date.now() - startTime) / 1000).toFixed(2); // Calculate time taken
+
     const newMock = {
         id: Date.now(),
         section: section || 'GKGS',
         title: mockTitle,
+        conversionTime: `${durationSec} seconds`,
         questions: extractedQuestions
     };
 
     customMocks.push(newMock);
-    res.json({ success: true, mock: newMock });
+    res.json({ success: true, mock: newMock, conversionTime: `${durationSec} seconds` });
 });
 
 app.post('/api/admin/target', (req, res) => {
