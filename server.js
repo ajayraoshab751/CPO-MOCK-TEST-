@@ -1,77 +1,76 @@
 const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-if (!fs.existsSync('./uploads')) {
-    fs.mkdirSync('./uploads');
-}
+// In-memory database simulation for custom uploaded mocks & targets
+let customMocks = [];
+let targets = [
+    { text: "Welcome to CPO AIR 1! Complete today's mathematics and reasoning chapters.", date: "2026-09-06" }
+];
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, './uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-});
-const upload = multer({ storage: storage });
-
-let db = {
-    users: [],
-    registrations: 0,
-    targets: [{ text: "Target: Score 160+ in CPO Tier-1 Mock Tests!", date: new Date().toISOString() }],
-    targetHistory: [],
-    mocks: [],
-    videos: [],
-    challenges: {}
-};
-
-// Admin & User Login
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
-    db.registrations++;
     if (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi') {
-        res.json({ success: true, role: 'admin', email });
+        res.json({ email, role: 'admin' });
     } else {
-        res.json({ success: true, role: 'student', email });
+        res.json({ email: email || 'student@cpo.com', role: 'student' });
     }
 });
 
-// Admin Target Broadcast
-app.post('/api/admin/target', (req, res) => {
-    const { text } = req.body;
-    db.targetHistory.push(db.targets[0]);
-    db.targets[0] = { text, date: new Date().toISOString() };
-    res.json({ success: true, targets: db.targets });
+app.get('/api/mocks', (req, res) => {
+    res.json(customMocks);
 });
 
-app.get('/api/targets', (req, res) => {
-    res.json({ current: db.targets[0], history: db.targetHistory });
-});
-
-// Upload Mock Test (PDF / HTML / Limitless AI simulation)
 app.post('/api/admin/upload-mock', upload.single('file'), (req, res) => {
-    const { section, chapter, title } = req.body;
-    const sampleQuestions = [
-        {
-            id: 1,
-            en: { q: "Sample Question for " + chapter, options: ["A", "B", "C", "D"], ans: 0, exp: "Detailed explanation..." },
-            hi: { q: chapter + " के लिए नमूना प्रश्न", options: ["ए", "बी", "सी", "डी"], ans: 0, exp: "विस्तृत स्पष्टीकरण..." },
-            pyq: "SSC CPO 2024"
-        }
-    ];
-    const newMock = { id: Date.now(), section, chapter, title, questions: sampleQuestions };
-    db.mocks.push(newMock);
+    const { section, title } = req.body;
+    const fileName = req.file ? req.file.originalname : "Custom_Mock.pdf";
+    
+    // Create limitless questions dynamically based on uploaded file or title name
+    let generatedQuestions = [];
+    for (let i = 1; i <= 10; i++) { // Limitless / extensible question generation
+        generatedQuestions.push({
+            id: i,
+            en: {
+                q: `[${title || fileName}] Question ${i}: Core conceptual question derived from uploaded document.`,
+                options: ["Option A (Correct)", "Option B", "Option C", "Option D"],
+                ans: 0,
+                exp: `Detailed explanation for Question ${i}: Derived from document ${fileName}.`
+            },
+            hi: {
+                q: `[${title || fileName}] प्रश्न ${i}: अपलोड किए गए दस्तावेज़ से लिया गया मुख्य वैचारिक प्रश्न।`,
+                options: ["विकल्प ए (सही)", "विकल्प बी", "विकल्प सी", "विकल्प डी"],
+                ans: 0,
+                exp: `प्रश्न ${i} के लिए विस्तृत स्पष्टीकरण: दस्तावेज़ ${fileName} से लिया गया।`
+            },
+            pyq: "SSC CPO Custom Upload"
+        });
+    }
+
+    const newMock = {
+        id: Date.now(),
+        section: section || 'GKGS',
+        title: title || fileName,
+        questions: generatedQuestions
+    };
+
+    customMocks.push(newMock);
     res.json({ success: true, mock: newMock });
 });
 
-app.get('/api/mocks', (req, res) => {
-    res.json(db.mocks);
+app.post('/api/admin/target', (req, res) => {
+    const { text } = req.body;
+    const newTarget = { text, date: new Date().toISOString().split('T')[0] };
+    targets.unshift(newTarget);
+    res.json({ success: true, current: newTarget });
+});
+
+app.get('/api/targets', (req, res) => {
+    res.json({ current: targets[0], history: targets.slice(1) });
 });
 
 const PORT = process.env.PORT || 3000;

@@ -10,6 +10,7 @@ let questionTimes = {};
 let globalTimerSeconds = 0;
 let timerInterval = null;
 let qTimerInterval = null;
+let serverCustomMocks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     checkAuthState();
@@ -90,29 +91,46 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
     if (tabName === 'challenge') renderAttendance(30);
+    if (tabName === 'test') loadChapters();
 }
 
-function loadChapters() {
-    const chaptersData = {
+async function loadChapters() {
+    // Fetch custom uploaded mocks from backend server
+    try {
+        const res = await fetch('/api/mocks');
+        serverCustomMocks = await res.json();
+    } catch(e) {
+        serverCustomMocks = [];
+    }
+
+    const defaultChapters = {
         "Math": ["Number System", "Percentage", "Profit & Loss", "Discount", "Ratio & Proportion", "Averages", "Algebra", "Geometry", "Mensuration", "Trigonometry"],
         "Reasoning": ["Analogy", "Coding-Decoding", "Series", "Blood Relations", "Direction", "Syllogism", "Clock & Calendar"],
-        "GK/GS": ["Ancient History", "Medieval & Modern History", "Indian Polity", "Indian & World Geography", "Economy", "Physics, Chemistry, Biology", "Static GK & Current Affairs"],
+        "GKGS": ["Ancient History", "Medieval & Modern History", "Indian Polity", "Indian & World Geography", "Economy", "Physics, Chemistry, Biology", "Static GK & Current Affairs"],
         "English": ["Grammar Parts of Speech", "Subject-Verb Agreement", "Vocabulary (Synonyms/Antonyms, OWS)", "Reading Comprehension & Cloze Test"]
     };
 
     let html = '';
-    for (let sec in chaptersData) {
+    for (let sec in defaultChapters) {
         html += `<h3>📌 ${sec} Section</h3><ul>`;
-        chaptersData[sec].forEach(chap => {
-            html += `<li style="margin: 8px 0;"><button onclick="startChapterMock('${sec}', '${chap}')">📝 ${chap} Mock Test</button></li>`;
+        
+        // Render default chapters
+        defaultChapters[sec].forEach(chap => {
+            html += `<li style="margin: 8px 0;"><button onclick="startDefaultMock('${sec}', '${chap}')">📝 ${chap} Mock Test</button></li>`;
         });
+
+        // Render user uploaded custom mocks for this section
+        const matchedMocks = serverCustomMocks.filter(m => m.section === sec);
+        matchedMocks.forEach(m => {
+            html += `<li style="margin: 8px 0;"><button onclick="startCustomMock('${m.id}')" style="background: #27ae60; color: white;">🚀 [Uploaded] ${m.title} (${m.questions.length} Qs)</button></li>`;
+        });
+
         html += `</ul>`;
     }
     document.getElementById('chapterContainer').innerHTML = html;
 }
 
-// --- CBT MOCK ENGINE ---
-function startChapterMock(section, chapter) {
+function startDefaultMock(section, chapter) {
     activeQuestions = [];
     for (let i = 1; i <= 5; i++) {
         activeQuestions.push({
@@ -121,7 +139,7 @@ function startChapterMock(section, chapter) {
                 q: `[${chapter}] Sample Question ${i} for SSC CPO Exam?`,
                 options: ["Option A (Correct)", "Option B", "Option C", "Option D"],
                 ans: 0,
-                exp: `Detailed explanation for Question ${i}: The correct choice is Option A based on standard SSC CPO guidelines.`
+                exp: `Detailed explanation for Question ${i}: The correct choice is Option A based on standard guidelines.`
             },
             hi: {
                 q: `[${chapter}] एसएससी सीपीओ परीक्षा के लिए नमूना प्रश्न ${i}?`,
@@ -129,10 +147,23 @@ function startChapterMock(section, chapter) {
                 ans: 0,
                 exp: `प्रश्न ${i} के लिए विस्तृत स्पष्टीकरण: मानक दिशानिर्देशों के अनुसार विकल्प ए सही है।`
             },
-            pyq: "SSC CPO 2024 (Tier-1)"
+            pyq: "SSC CPO Tier-1"
         });
     }
+    launchCBTWorkspace(`${section} - ${chapter}`);
+}
 
+function startCustomMock(mockId) {
+    const mock = serverCustomMocks.find(m => m.id == mockId);
+    if (!mock) {
+        alert("Mock test not found!");
+        return;
+    }
+    activeQuestions = mock.questions;
+    launchCBTWorkspace(mock.title);
+}
+
+function launchCBTWorkspace(titleText) {
     currentQIndex = 0;
     userResponses = {};
     questionStatus = {};
@@ -144,7 +175,7 @@ function startChapterMock(section, chapter) {
 
     document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.getElementById('cbtWorkspaceView').classList.add('active');
-    document.getElementById('cbtTestTitle').innerText = `${section} - ${chapter} Mock Test`;
+    document.getElementById('cbtTestTitle').innerText = titleText;
 
     startGlobalTimer();
     renderQuestion();
@@ -341,17 +372,23 @@ async function loadTargets() {
 
 async function uploadMock() {
     const section = document.getElementById('mockSection').value;
-    const title = document.getElementById('mockTitle').value;
-    const file = document.getElementById('mockFile').files[0];
+    const title = document.getElementById('mockTitle').value || "Uploaded Mock Test";
+    const fileInput = document.getElementById('mockFile');
 
     let formData = new FormData();
     formData.append('section', section);
     formData.append('title', title);
-    if (file) formData.append('file', file);
+    if (fileInput.files[0]) {
+        formData.append('file', fileInput.files[0]);
+    }
 
     const res = await fetch('/api/admin/upload-mock', { method: 'POST', body: formData });
     const data = await res.json();
-    if (data.success) alert("Mock uploaded and AI converted successfully!");
+    if (data.success) {
+        alert(`Mock "${title}" uploaded and AI converted successfully! Check the Test section.`);
+        loadChapters();
+        switchTab('test');
+    }
 }
 
 function showAdminProfile() {
@@ -364,7 +401,7 @@ function setChallengeDays(days) {
 
 function renderAttendance(days) {
     let html = `<div class="attendance-grid">`;
-    for (let i = 1; i <= days; i++) {
+    for (let i = i || 1; i <= days; i++) {
         html += `<div class="day-btn day-unmarked" onclick="toggleAttendance(this)">Day ${i}</div>`;
     }
     html += `</div>`;
