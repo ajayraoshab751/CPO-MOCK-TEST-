@@ -26,6 +26,25 @@ app.get('/api/mocks', (req, res) => {
     res.json(customMocks);
 });
 
+// Helper to decode buffer safely across multiple character encodings
+function decodeBuffer(buffer, mimetype, originalname) {
+    // Check if it's UTF-16LE / UTF-16BE by looking at BOM or extension
+    if (originalname.endsWith('.html') || originalname.endsWith('.txt')) {
+        let textUtf8 = buffer.toString('utf8');
+        // If there are too many replacement characters, try latin1 / binary conversion
+        let replacementCount = (textUtf8.match(/\ufffd/g) || []).length;
+        if (replacementCount > 5) {
+            try {
+                return buffer.toString('latin1');
+            } catch (e) {
+                return textUtf8;
+            }
+        }
+        return textUtf8;
+    }
+    return buffer.toString('utf8');
+}
+
 app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
     const { section, title } = req.body;
     const mockTitle = title || (req.file ? req.file.originalname : "Uploaded Mock");
@@ -40,36 +59,40 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
                 fileText = pdfData.text;
             } catch (err) {
                 console.error("PDF Parse Error:", err);
-                fileText = req.file.buffer.toString('utf8');
+                fileText = decodeBuffer(req.file.buffer, req.file.mimetype, req.file.originalname);
             }
         } else {
-            fileText = req.file.buffer.toString('utf8');
+            fileText = decodeBuffer(req.file.buffer, req.file.mimetype, req.file.originalname);
         }
 
-        // Clean HTML tags if it's an HTML file
-        let cleanContent = fileText.replace(/<[^>]*>?/gm, '\n');
-        
-        // Intelligent Question Splitter: looks for Q1., Q. 1, Question 1, or numbers followed by question symbols
+        // Clean up weird encoding artifacts, non-printable characters, and HTML tags
+        let cleanContent = fileText
+            .replace(/<[^>]*>?/gm, '\n')
+            .replace(/\u0000/g, '')
+            .replace(/[\ufffd\uFFFE\uFFFF]/g, ' ');
+
+        // Intelligent Question Splitter: looks for Q, Question, or numbered markers like 1., 2)
         let rawBlocks = cleanContent.split(/(?:Q\.?\s*\d+|Question\s*\d+|\b\d{1,3}\[?[\.\)]\s+)/i);
         
         if (rawBlocks.length > 1) {
             rawBlocks.forEach((block, idx) => {
-                if (idx === 0) return; // Skip preamble/intro text
+                if (idx === 0) return; // Skip title/preamble
                 
                 let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 if (lines.length > 0) {
-                    let qText = lines[0];
-                    // Look for options in subsequent lines (e.g. starting with A., B., C., D. or brackets)
+                    let qText = lines[0].replace(/^[^\w\s]+/g, '').trim();
+                    if (qText.length < 3) return; // Skip empty header fragments
+
                     let options = [];
                     let optionLines = lines.slice(1);
                     
                     optionLines.forEach(line => {
-                        if (/^[A-Da-d][\.\)]/.test(line) || options.length < 4) {
-                            options.push(line.replace(/^[A-Da-d][\.\)]\s*/, ''));
+                        let cleanedLine = line.replace(/^[A-Da-d][\.\)]\s*/, '').replace(/^[^\w\s]+/g, '').trim();
+                        if (cleanedLine.length > 0 && options.length < 4) {
+                            options.push(cleanedLine);
                         }
                     });
 
-                    // Ensure we always have 4 choices
                     while (options.length < 4) {
                         options.push(`Option ${String.fromCharCode(65 + options.length)}`);
                     }
@@ -80,13 +103,13 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `Parsed from document: ${mockTitle}`
+                            exp: `Parsed from file: ${mockTitle}`
                         },
                         hi: {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `दस्तावेज़ से पार्स किया गया: ${mockTitle}`
+                            exp: `फ़ाइल से पार्स किया गया: ${mockTitle}`
                         },
                         pyq: "Uploaded Document"
                     });
@@ -94,27 +117,27 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
             });
         }
 
-        // Fallback Paragraph/Sentence Chunking if specific question markers weren't matched
+        // Fallback Paragraph Chunking if regular markers weren't caught
         if (extractedQuestions.length === 0) {
             let sentences = cleanContent.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+/g) || [cleanContent];
-            for (let i = 0; i < sentences.length && extractedQuestions.length < 50; i += 2) {
-                let questionText = sentences[i].trim();
-                let optionHint = sentences[i+1] ? sentences[i+1].trim() : "Detailed context statement";
+            for (let i = 0; i < sentences.length && extractedQuestions.length < 100; i += 2) {
+                let questionText = sentences[i].replace(/^[^\w\s]+/g, '').trim();
+                let optionHint = sentences[i+1] ? sentences[i+1].replace(/^[^\w\s]+/g, '').trim() : "Standard context option";
                 
                 if (questionText.length > 5) {
                     extractedQuestions.push({
                         id: extractedQuestions.length + 1,
                         en: {
                             q: questionText,
-                            options: [optionHint.substring(0, 60), "Alternative Choice B", "Alternative Choice C", "Alternative Choice D"],
+                            options: [optionHint.substring(0, 60), "Option B", "Option C", "Option D"],
                             ans: 0,
-                            exp: `Auto-extracted content from ${mockTitle}`
+                            exp: `Extracted from ${mockTitle}`
                         },
                         hi: {
                             q: questionText,
-                            options: [optionHint.substring(0, 60), "वैकल्पिक विकल्प बी", "वैकल्पिक विकल्प सी", "वैकल्पिक विकल्प डी"],
+                            options: [optionHint.substring(0, 60), "विकल्प बी", "विकल्प सी", "विकल्प डी"],
                             ans: 0,
-                            exp: `${mockTitle} से स्वतः निकाली गई सामग्री`
+                            exp: `${mockTitle} से निकाला गया`
                         },
                         pyq: "Custom File"
                     });
@@ -126,8 +149,8 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
     if (extractedQuestions.length === 0) {
         extractedQuestions.push({
             id: 1,
-            en: { q: `File uploaded successfully: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Parsed content." },
-            hi: { q: `फ़ाइल सफलतापूर्वक अपलोड हुई: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "पार्स की गई सामग्री।" },
+            en: { q: `Successfully uploaded: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Loaded." },
+            hi: { q: `सफलतापूर्वक अपलोड किया गया: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "लोड किया गया।" },
             pyq: "Custom"
         });
     }
