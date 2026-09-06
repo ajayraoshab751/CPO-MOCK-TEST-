@@ -27,21 +27,32 @@ app.get('/api/mocks', (req, res) => {
     res.json(customMocks);
 });
 
-// Advanced multi-encoding buffer decoder
-function decodeBuffer(buffer, originalname) {
-    let utf16Text = buffer.toString('utf16le');
-    if (utf16Text.includes('<html') || utf16Text.includes('<body') || utf16Text.includes('Q.') || utf16Text.includes('प्रश्न') || (utf16Text.match(/[\u0900-\u097F]/g) || []).length > 0) {
-        return utf16Text.replace(/\u0000/g, '');
+// Robust multi-encoding cleaner
+function cleanAndDecode(buffer, originalname) {
+    let text = "";
+    try {
+        if (originalname.endsWith('.html') || originalname.endsWith('.txt')) {
+            let utf16 = buffer.toString('utf16le');
+            if (utf16.includes('<') || utf16.includes('html') || utf16.includes('प्रश्न')) {
+                text = utf16;
+            } else {
+                text = buffer.toString('utf8');
+            }
+        } else {
+            text = buffer.toString('utf8');
+        }
+    } catch (e) {
+        text = buffer.toString('latin1');
     }
-    let utf8Text = buffer.toString('utf8');
-    if ((utf8Text.match(/\ufffd/g) || []).length > 3) {
-        try { return buffer.toString('latin1'); } catch (e) { return utf8Text; }
-    }
-    return utf8Text;
+
+    // Remove null bytes and excessive replacement chars
+    return text
+        .replace(/\u0000/g, '')
+        .replace(/[\ufffd\uFFFE\uFFFF]/g, ' ');
 }
 
 app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
-    const startTime = Date.now(); // Start conversion timer
+    const startTime = Date.now();
     const { section, title } = req.body;
     const mockTitle = title || (req.file ? req.file.originalname : "Uploaded Mock");
     
@@ -56,115 +67,110 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
                 const pdfData = await pdfParse(req.file.buffer);
                 fileText = pdfData.text;
             } catch (err) {
-                fileText = decodeBuffer(req.file.buffer, req.file.originalname);
+                fileText = cleanAndDecode(req.file.buffer, req.file.originalname);
             }
         } else {
-            fileText = decodeBuffer(req.file.buffer, req.file.originalname);
+            let rawText = cleanAndDecode(req.file.buffer, req.file.originalname);
+            if (rawText.includes('<html') || rawText.includes('<body') || rawText.includes('<div')) {
+                const $ = cheerio.load(rawText);
+                $('script, style, noscript').remove();
+                fileText = $.text();
+            } else {
+                fileText = rawText;
+            }
         }
 
-        // --- DOM PARSING FOR HTML FILES USING CHEERIO ---
-        if (!isPdf && (fileText.includes('<html') || fileText.includes('<body') || fileText.includes('<div'))) {
-            const $ = cheerio.load(fileText);
-            $('script, style, noscript').remove();
+        // Clean formatting whitespace
+        fileText = fileText.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ');
 
-            let questionNodes = [];
-            $('.question, .quiz-question, .test-question, div[id*="q"], div[class*="question"], p, tr').each((i, el) => {
-                let text = $(el).text().trim();
-                if (/^(?:Q\.?\s*\d+|Question\s*\d+|\d{1,3}[\.\)]\s+)/i.test(text) || text.length > 20) {
-                    questionNodes.push(text);
-                }
-            });
+        // --- SMART LINE-BY-LINE STRUCTURAL PARSER ---
+        let lines = fileText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+        let currentQ = null;
+        let currentOptions = [];
 
-            if (questionNodes.length > 0) {
-                questionNodes.forEach((nodeText, idx) => {
-                    let lines = nodeText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    if (lines.length === 0) return;
-
-                    let qText = lines[0];
-                    let options = lines.slice(1, 5);
-
-                    while (options.length < 4) {
-                        options.push(`Option ${String.fromCharCode(65 + options.length)}`);
+        lines.forEach(line => {
+            // Detect question start (e.g. 1., 2), Q.1, Question 1)
+            if (/^(\d{1,3}[\.\)]|Q\.?\s*\d+|Question\s*\d+)/i.test(line)) {
+                if (currentQ && currentQ.length > 5) {
+                    while (currentOptions.length < 4) {
+                        currentOptions.push(`Option ${String.fromCharCode(65 + currentOptions.length)}`);
                     }
+                    extractedQuestions.push({
+                        id: extractedQuestions.length + 1,
+                        en: { q: currentQ, options: currentOptions.slice(0, 4), ans: 0, exp: `Source: ${mockTitle}` },
+                        hi: { q: currentQ, options: currentOptions.slice(0, 4), ans: 0, exp: `स्रोत: ${mockTitle}` },
+                        pyq: "Uploaded Mock"
+                    });
+                }
+                currentQ = line.replace(/^(\d{1,3}[\.\)]|Q\.?\s*\d+|Question\s*\d+)\s*/i, '').trim();
+                currentOptions = [];
+            } 
+            // Detect option lines (A., B., C., D. or a), b), c), d))
+            else if (/^[A-Da-d][\.\)]/.test(line)) {
+                let optText = line.replace(/^[A-Da-d][\.\)]\s*/, '').trim();
+                if (optText) currentOptions.push(optText);
+            } 
+            // Continuation of question or options
+            else {
+                if (currentQ && currentOptions.length === 0) {
+                    currentQ += " " + line;
+                } else if (currentOptions.length > 0 && currentOptions.length < 4) {
+                    currentOptions[currentOptions.length - 1] += " " + line;
+                } else if (!currentQ) {
+                    currentQ = line;
+                }
+            }
+        });
 
+        // Push final question
+        if (currentQ && currentQ.length > 5) {
+            while (currentOptions.length < 4) {
+                currentOptions.push(`Option ${String.fromCharCode(65 + currentOptions.length)}`);
+            }
+            extractedQuestions.push({
+                id: extractedQuestions.length + 1,
+                en: { q: currentQ, options: currentOptions.slice(0, 4), ans: 0, exp: `Source: ${mockTitle}` },
+                hi: { q: currentQ, options: currentOptions.slice(0, 4), ans: 0, exp: `स्रोत: ${mockTitle}` },
+                pyq: "Uploaded Mock"
+            });
+        }
+
+        // --- PARAGRAPH FALLBACK IF NO STRICT MARKERS MATCHED ---
+        if (extractedQuestions.length === 0) {
+            let paragraphs = fileText.split(/\n\s*\n/).map(p => p.trim()).filter(p => p.length > 15);
+            paragraphs.forEach((para, idx) => {
+                if (idx < 100) {
                     extractedQuestions.push({
                         id: extractedQuestions.length + 1,
                         en: {
-                            q: qText,
-                            options: options.slice(0, 4),
+                            q: para,
+                            options: ["Option A Statement", "Option B Statement", "Option C Statement", "Option D Statement"],
                             ans: 0,
-                            exp: `Parsed from HTML: ${mockTitle}`
+                            exp: `Extracted from ${mockTitle}`
                         },
                         hi: {
-                            q: qText,
-                            options: options.slice(0, 4),
+                            q: para,
+                            options: ["विकल्प ए विवरण", "विकल्प बी विवरण", "विकल्प सी विवरण", "विकल्प डी विवरण"],
                             ans: 0,
-                            exp: `HTML से पार्स किया गया: ${mockTitle}`
+                            exp: `${mockTitle} से निकाला गया`
                         },
-                        pyq: "Custom HTML Upload"
-                    });
-                });
-            }
-        }
-
-        // --- FALLBACK / PDF CLEAN TEXT PARSING ---
-        if (extractedQuestions.length === 0) {
-            let cleanContent = fileText
-                .replace(/<[^>]*>?/gm, '\n')
-                .replace(/\r/g, '');
-
-            let rawBlocks = cleanContent.split(/(?:Q\.?\s*\d+|Question\s*\d+|\b\d{1,3}\[?[\.\)]\s+)/i);
-            
-            if (rawBlocks.length > 1) {
-                rawBlocks.forEach((block, idx) => {
-                    if (idx === 0) return;
-                    let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    if (lines.length > 0) {
-                        let qText = lines[0];
-                        let options = lines.slice(1, 5);
-                        while (options.length < 4) {
-                            options.push(`Option ${String.fromCharCode(65 + options.length)}`);
-                        }
-                        extractedQuestions.push({
-                            id: extractedQuestions.length + 1,
-                            en: { q: qText, options: options.slice(0, 4), ans: 0, exp: `Source: ${mockTitle}` },
-                            hi: { q: qText, options: options.slice(0, 4), ans: 0, exp: `स्रोत: ${mockTitle}` },
-                            pyq: "Document Upload"
-                        });
-                    }
-                });
-            }
-        }
-
-        // Final fallback text chunking if nothing else matched
-        if (extractedQuestions.length === 0) {
-            let cleanRaw = fileText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
-            let sentences = cleanRaw.match(/[^.!?]+[.!?]+/g) || [cleanRaw];
-            for (let i = 0; i < sentences.length && extractedQuestions.length < 100; i += 2) {
-                let qText = sentences[i].trim();
-                let optHint = sentences[i+1] ? sentences[i+1].trim() : "Standard option";
-                if (qText.length > 5) {
-                    extractedQuestions.push({
-                        id: extractedQuestions.length + 1,
-                        en: { q: qText, options: [optHint.substring(0, 50), "Option B", "Option C", "Option D"], ans: 0, exp: `Extracted from ${mockTitle}` },
-                        hi: { q: qText, options: [optHint.substring(0, 50), "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: `${mockTitle} से निकाला गया` },
-                        pyq: "Custom File"
+                        pyq: "Document Extract"
                     });
                 }
-            }
+            });
         }
     }
 
     if (extractedQuestions.length === 0) {
         extractedQuestions.push({
             id: 1,
-            en: { q: `Mock file uploaded: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Loaded." },
-            hi: { q: `मॉक फ़ाइल अपलोड की गई: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "लोड किया गया।" },
+            en: { q: `Successfully parsed mock: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Ready." },
+            hi: { q: `सफलतापूर्वक पार्स किया गया मॉक: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "तैयार है।" },
             pyq: "Custom"
         });
     }
 
-    const durationSec = ((Date.now() - startTime) / 1000).toFixed(2); // Calculate time taken
+    const durationSec = ((Date.now() - startTime) / 1000).toFixed(2);
 
     const newMock = {
         id: Date.now(),
