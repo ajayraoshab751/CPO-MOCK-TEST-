@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
+const cheerio = require('cheerio');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
@@ -26,24 +27,15 @@ app.get('/api/mocks', (req, res) => {
     res.json(customMocks);
 });
 
-// Robust multi-encoding text decoder (handles UTF-16LE, UTF-8, and Latin1)
-function decodeTextBuffer(buffer, originalname) {
-    // Check for UTF-16LE BOM or try decoding as utf16le first if file looks like a Windows HTML export
+// Advanced multi-encoding buffer decoder
+function decodeBuffer(buffer, originalname) {
     let utf16Text = buffer.toString('utf16le');
-    // If utf16le produces normal looking words without excessive control characters, use it
-    if (utf16Text.includes('Q.') || utf16Text.includes('प्रश्न') || utf16Text.includes('html') || utf16Text.includes('<') || (utf16Text.match(/[\u0900-\u097F]/g) || []).length > 0) {
-        // Clean up null bytes if any
+    if (utf16Text.includes('<html') || utf16Text.includes('<body') || utf16Text.includes('Q.') || utf16Text.includes('प्रश्न') || (utf16Text.match(/[\u0900-\u097F]/g) || []).length > 0) {
         return utf16Text.replace(/\u0000/g, '');
     }
-
     let utf8Text = buffer.toString('utf8');
-    let replacementCount = (utf8Text.match(/\ufffd/g) || []).length;
-    if (replacementCount > 3) {
-        try {
-            return buffer.toString('latin1');
-        } catch (e) {
-            return utf8Text;
-        }
+    if ((utf8Text.match(/\ufffd/g) || []).length > 3) {
+        try { return buffer.toString('latin1'); } catch (e) { return utf8Text; }
     }
     return utf8Text;
 }
@@ -56,44 +48,48 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
     let fileText = "";
 
     if (req.file) {
-        if (req.file.mimetype === 'application/pdf' || req.file.originalname.endsWith('.pdf')) {
+        const isPdf = req.file.mimetype === 'application/pdf' || req.file.originalname.endsWith('.pdf');
+        
+        if (isPdf) {
             try {
                 const pdfData = await pdfParse(req.file.buffer);
                 fileText = pdfData.text;
             } catch (err) {
-                console.error("PDF Parse Error:", err);
-                fileText = decodeTextBuffer(req.file.buffer, req.file.originalname);
+                fileText = decodeBuffer(req.file.buffer, req.file.originalname);
             }
         } else {
-            fileText = decodeTextBuffer(req.file.buffer, req.file.originalname);
+            fileText = decodeBuffer(req.file.buffer, req.file.originalname);
         }
 
-        // Clean HTML tags and weird artifacts
-        let cleanContent = fileText
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-            .replace(/<[^>]*>?/gm, '\n')
-            .replace(/\r/g, '');
+        // --- DOM PARSING FOR HTML FILES USING CHEERIO ---
+        if (!isPdf && (fileText.includes('<html') || fileText.includes('<body') || fileText.includes('<div'))) {
+            const $ = cheerio.load(fileText);
+            
+            // Remove unwanted tags
+            $('script, style, noscript').remove();
 
-        // Split text by Question boundaries (e.g. Q.1, Q 1, Question 1, or number followed by period/bracket)
-        let rawBlocks = cleanContent.split(/(?:Q\.?\s*\d+|Question\s*\d+|\b\d{1,3}\[?[\.\)]\s+)/i);
-        
-        if (rawBlocks.length > 1) {
-            rawBlocks.forEach((block, idx) => {
-                if (idx === 0) return; // Skip header preamble
-                
-                let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                if (lines.length > 0) {
+            // Target common question blocks in exported test HTMLs
+            // We look for blocks, paragraphs, or divs that contain question patterns
+            let questionNodes = [];
+            
+            // Search various possible selectors used in test portals
+            $('.question, .quiz-question, .test-question, div[id*="q"], div[class*="question"], p, tr').each((i, el) => {
+                let text = $(el).text().trim();
+                // Check if text looks like a question (contains Q., question number, or question marks)
+                if (/^(?:Q\.?\s*\d+|Question\s*\d+|\d{1,3}[\.\)]\s+)/i.test(text) || text.length > 20) {
+                    questionNodes.push(text);
+                }
+            });
+
+            // If selector-based nodes found, process them
+            if (questionNodes.length > 0) {
+                questionNodes.forEach((nodeText, idx) => {
+                    // Clean lines
+                    let lines = nodeText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length === 0) return;
+
                     let qText = lines[0];
-                    let options = [];
-                    let optionLines = lines.slice(1);
-                    
-                    optionLines.forEach(line => {
-                        let cleaned = line.replace(/^[A-Da-d][\.\)]\s*/, '').trim();
-                        if (cleaned.length > 0 && options.length < 4) {
-                            options.push(cleaned);
-                        }
-                    });
+                    let options = lines.slice(1, 5);
 
                     while (options.length < 4) {
                         options.push(`Option ${String.fromCharCode(65 + options.length)}`);
@@ -105,42 +101,61 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `Source: ${mockTitle}`
+                            exp: `Parsed from HTML: ${mockTitle}`
                         },
                         hi: {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `स्रोत: ${mockTitle}`
+                            exp: `HTML से पार्स किया गया: ${mockTitle}`
                         },
-                        pyq: "Custom Upload"
+                        pyq: "Custom HTML Upload"
                     });
-                }
-            });
+                });
+            }
         }
 
-        // Fallback sentence chunking if standard split didn't find clear question blocks
+        // --- FALLBACK / PDF CLEAN TEXT PARSING ---
         if (extractedQuestions.length === 0) {
-            let sentences = cleanContent.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+/g) || [cleanContent];
+            let cleanContent = fileText
+                .replace(/<[^>]*>?/gm, '\n')
+                .replace(/\r/g, '');
+
+            let rawBlocks = cleanContent.split(/(?:Q\.?\s*\d+|Question\s*\d+|\b\d{1,3}\[?[\.\)]\s+)/i);
+            
+            if (rawBlocks.length > 1) {
+                rawBlocks.forEach((block, idx) => {
+                    if (idx === 0) return;
+                    let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length > 0) {
+                        let qText = lines[0];
+                        let options = lines.slice(1, 5);
+                        while (options.length < 4) {
+                            options.push(`Option ${String.fromCharCode(65 + options.length)}`);
+                        }
+                        extractedQuestions.push({
+                            id: extractedQuestions.length + 1,
+                            en: { q: qText, options: options.slice(0, 4), ans: 0, exp: `Source: ${mockTitle}` },
+                            hi: { q: qText, options: options.slice(0, 4), ans: 0, exp: `स्रोत: ${mockTitle}` },
+                            pyq: "Document Upload"
+                        });
+                    }
+                });
+            }
+        }
+
+        // Final fallback text chunking if nothing else matched
+        if (extractedQuestions.length === 0) {
+            let cleanRaw = fileText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+            let sentences = cleanRaw.match(/[^.!?]+[.!?]+/g) || [cleanRaw];
             for (let i = 0; i < sentences.length && extractedQuestions.length < 100; i += 2) {
                 let qText = sentences[i].trim();
-                let optHint = sentences[i+1] ? sentences[i+1].trim() : "Option details";
-                
-                if (qText.length > 4) {
+                let optHint = sentences[i+1] ? sentences[i+1].trim() : "Standard option";
+                if (qText.length > 5) {
                     extractedQuestions.push({
                         id: extractedQuestions.length + 1,
-                        en: {
-                            q: qText,
-                            options: [optHint.substring(0, 50), "Option B", "Option C", "Option D"],
-                            ans: 0,
-                            exp: `Parsed from ${mockTitle}`
-                        },
-                        hi: {
-                            q: qText,
-                            options: [optHint.substring(0, 50), "विकल्प बी", "विकल्प सी", "विकल्प डी"],
-                            ans: 0,
-                            exp: `${mockTitle} से पार्स किया गया`
-                        },
+                        en: { q: qText, options: [optHint.substring(0, 50), "Option B", "Option C", "Option D"], ans: 0, exp: `Extracted from ${mockTitle}` },
+                        hi: { q: qText, options: [optHint.substring(0, 50), "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: `${mockTitle} से निकाला गया` },
                         pyq: "Custom File"
                     });
                 }
@@ -151,8 +166,8 @@ app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
     if (extractedQuestions.length === 0) {
         extractedQuestions.push({
             id: 1,
-            en: { q: `Mock Test loaded: ${mockTitle}`, options: ["A", "B", "C", "D"], ans: 0, exp: "Ready." },
-            hi: { q: `मॉक टेस्ट लोड हुआ: ${mockTitle}`, options: ["A", "B", "C", "D"], ans: 0, exp: "तैयार है।" },
+            en: { q: `Mock file uploaded: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Loaded." },
+            hi: { q: `मॉक फ़ाइल अपलोड की गई: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "लोड किया गया।" },
             pyq: "Custom"
         });
     }
