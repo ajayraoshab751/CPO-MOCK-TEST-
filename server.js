@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
+const pdfParse = require('pdf-parse');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
@@ -25,89 +26,108 @@ app.get('/api/mocks', (req, res) => {
     res.json(customMocks);
 });
 
-app.post('/api/admin/upload-mock', upload.single('file'), (req, res) => {
+app.post('/api/admin/upload-mock', upload.single('file'), async (req, res) => {
     const { section, title } = req.body;
     const mockTitle = title || (req.file ? req.file.originalname : "Uploaded Mock");
     
     let extractedQuestions = [];
+    let fileText = "";
 
     if (req.file) {
-        const fileContent = req.file.buffer.toString('utf8');
+        if (req.file.mimetype === 'application/pdf' || req.file.originalname.endsWith('.pdf')) {
+            try {
+                const pdfData = await pdfParse(req.file.buffer);
+                fileText = pdfData.text;
+            } catch (err) {
+                console.error("PDF Parse Error:", err);
+                fileText = req.file.buffer.toString('utf8');
+            }
+        } else {
+            fileText = req.file.buffer.toString('utf8');
+        }
+
+        // Clean HTML tags if it's an HTML file
+        let cleanContent = fileText.replace(/<[^>]*>?/gm, '\n');
         
-        // Advanced Regex Parser to extract real questions, options, and text from uploaded HTML/Text/PDF string dumps
-        // Looks for question markers like Q1, Q., or HTML question paragraphs
-        let questionBlocks = fileContent.split(/(?=Q\d+\.|Question\s*\d+|<div[^>]*class="question"[^>]*>)/i);
+        // Intelligent Question Splitter: looks for Q1., Q. 1, Question 1, or numbers followed by question symbols
+        let rawBlocks = cleanContent.split(/(?:Q\.?\s*\d+|Question\s*\d+|\b\d{1,3}\[?[\.\)]\s+)/i);
         
-        if (questionBlocks.length > 1) {
-            questionBlocks.forEach((block, idx) => {
-                if (idx === 0) return; // skip header
+        if (rawBlocks.length > 1) {
+            rawBlocks.forEach((block, idx) => {
+                if (idx === 0) return; // Skip preamble/intro text
                 
-                // Clean HTML tags if it's an HTML file
-                let cleanText = block.replace(/<[^>]*>?/gm, ' ').trim();
-                let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                
+                let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 if (lines.length > 0) {
                     let qText = lines[0];
-                    let options = lines.slice(1, 5);
+                    // Look for options in subsequent lines (e.g. starting with A., B., C., D. or brackets)
+                    let options = [];
+                    let optionLines = lines.slice(1);
+                    
+                    optionLines.forEach(line => {
+                        if (/^[A-Da-d][\.\)]/.test(line) || options.length < 4) {
+                            options.push(line.replace(/^[A-Da-d][\.\)]\s*/, ''));
+                        }
+                    });
+
+                    // Ensure we always have 4 choices
                     while (options.length < 4) {
                         options.push(`Option ${String.fromCharCode(65 + options.length)}`);
                     }
-                    
+
                     extractedQuestions.push({
                         id: extractedQuestions.length + 1,
                         en: {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `Extracted directly from file: ${mockTitle}`
+                            exp: `Parsed from document: ${mockTitle}`
                         },
                         hi: {
                             q: qText,
                             options: options.slice(0, 4),
                             ans: 0,
-                            exp: `फ़ाइल से निकाला गया: ${mockTitle}`
+                            exp: `दस्तावेज़ से पार्स किया गया: ${mockTitle}`
                         },
-                        pyq: "Custom File Upload"
+                        pyq: "Uploaded Document"
                     });
                 }
             });
         }
-        
-        // Fallback: If regex splits didn't find structured blocks, chunk the raw text into limitless clean questions
+
+        // Fallback Paragraph/Sentence Chunking if specific question markers weren't matched
         if (extractedQuestions.length === 0) {
-            let cleanRawText = fileContent.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
-            let chunkedSentences = cleanRawText.match(/[^.!?]+[.!?]+/g) || [cleanRawText];
-            
-            for (let i = 0; i < chunkedSentences.length; i += 2) {
-                let qText = chunkedSentences[i] || `Question ${extractedQuestions.length + 1}`;
-                let detail = chunkedSentences[i+1] || "Core concept from document.";
+            let sentences = cleanContent.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+/g) || [cleanContent];
+            for (let i = 0; i < sentences.length && extractedQuestions.length < 50; i += 2) {
+                let questionText = sentences[i].trim();
+                let optionHint = sentences[i+1] ? sentences[i+1].trim() : "Detailed context statement";
                 
-                extractedQuestions.push({
-                    id: extractedQuestions.length + 1,
-                    en: {
-                        q: qText.trim(),
-                        options: [detail.substring(0, 50), "Standard Option B", "Standard Option C", "Standard Option D"],
-                        ans: 0,
-                        exp: `Auto-parsed interpretation from ${mockTitle}`
-                    },
-                    hi: {
-                        q: qText.trim(),
-                        options: [detail.substring(0, 50), "मानक विकल्प बी", "मानक विकल्प सी", "मानक विकल्प डी"],
-                        ans: 0,
-                        exp: `${mockTitle} से स्वतः पारst किया गया`
-                    },
-                    pyq: "AI Parsed Document"
-                });
+                if (questionText.length > 5) {
+                    extractedQuestions.push({
+                        id: extractedQuestions.length + 1,
+                        en: {
+                            q: questionText,
+                            options: [optionHint.substring(0, 60), "Alternative Choice B", "Alternative Choice C", "Alternative Choice D"],
+                            ans: 0,
+                            exp: `Auto-extracted content from ${mockTitle}`
+                        },
+                        hi: {
+                            q: questionText,
+                            options: [optionHint.substring(0, 60), "वैकल्पिक विकल्प बी", "वैकल्पिक विकल्प सी", "वैकल्पिक विकल्प डी"],
+                            ans: 0,
+                            exp: `${mockTitle} से स्वतः निकाली गई सामग्री`
+                        },
+                        pyq: "Custom File"
+                    });
+                }
             }
         }
     }
 
-    // Safety fallback if file is empty
     if (extractedQuestions.length === 0) {
         extractedQuestions.push({
             id: 1,
-            en: { q: `Contents from ${mockTitle}`, options: ["A", "B", "C", "D"], ans: 0, exp: "Parsed successfully." },
-            hi: { q: `${mockTitle} से सामग्री`, options: ["A", "B", "C", "D"], ans: 0, exp: "सफलतापूर्वक पार्स किया गया।" },
+            en: { q: `File uploaded successfully: ${mockTitle}`, options: ["Option A", "Option B", "Option C", "Option D"], ans: 0, exp: "Parsed content." },
+            hi: { q: `फ़ाइल सफलतापूर्वक अपलोड हुई: ${mockTitle}`, options: ["विकल्प ए", "विकल्प बी", "विकल्प सी", "विकल्प डी"], ans: 0, exp: "पार्स की गई सामग्री।" },
             pyq: "Custom"
         });
     }
