@@ -1,119 +1,78 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Enable CORS & payload parsing
 app.use(cors());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
-// Optional MongoDB Connection (falls back to persistent file/in-memory state if URI not provided)
-const MONGO_URI = process.env.MONGO_URI || "";
-if (MONGO_URI) {
-    mongoose.connect(MONGO_URI)
-        .then(() => console.log('MongoDB Connected Successfully'))
-        .catch(err => console.error('MongoDB Connection Error:', err));
+if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
 }
 
-// Schemas for Persistent Database Storage
-const targetSchema = new mongoose.Schema({
-    text: { type: String, default: "Target: Score 160+ in CPO Tier-1 Mock Tests!" },
-    imageUrl: { type: String, default: "" }
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, './uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
+const upload = multer({ storage: storage });
 
-const questionBankSchema = new mongoose.Schema({
-    section: String,
-    question: String,
-    options: [String],
-    correctAnswer: Number
-});
-
-const Target = mongoose.models.Target || mongoose.model('Target', targetSchema);
-const CustomQuestion = mongoose.models.CustomQuestion || mongoose.model('CustomQuestion', questionBankSchema);
-
-// In-Memory Backup State
-let globalTargetData = {
-    text: "Target: Score 160+ in CPO Tier-1 Mock Tests!",
-    imageUrl: ""
+let db = {
+    users: [],
+    registrations: 0,
+    targets: [{ text: "Target: Score 160+ in CPO Tier-1 Mock Tests!", date: new Date().toISOString() }],
+    targetHistory: [],
+    mocks: [],
+    videos: [],
+    challenges: {}
 };
-let globalCustomQuestions = {};
 
-// Fast Auth Endpoint
-app.post('/api/login', async (req, res) => {
-    return res.json({ success: true, message: "Auth processed" });
+// Admin & User Login
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    db.registrations++;
+    if (email === 'ajayraoshab751@gmail.com' && password === 'sunitadevi') {
+        res.json({ success: true, role: 'admin', email });
+    } else {
+        res.json({ success: true, role: 'student', email });
+    }
 });
 
-// Admin Broadcast Endpoint (Update Target & Target Image)
-app.post('/api/admin/update-target', async (req, res) => {
-    const { username, password, targetText, imageUrl } = req.body;
-    
-    // Strict Admin Verification
-    if (username !== 'ajayraoshab751@gmail.com' || password !== 'sunitadevi') {
-        return res.status(403).json({ success: false, error: 'Unauthorized Admin Access' });
-    }
-
-    globalTargetData.text = targetText || globalTargetData.text;
-    if (imageUrl !== undefined) globalTargetData.imageUrl = imageUrl;
-
-    if (MONGO_URI) {
-        await Target.deleteMany({});
-        await Target.create({ text: globalTargetData.text, imageUrl: globalTargetData.imageUrl });
-    }
-
-    return res.json({ success: true, targetData: globalTargetData });
+// Admin Target Broadcast
+app.post('/api/admin/target', (req, res) => {
+    const { text } = req.body;
+    db.targetHistory.push(db.targets[0]);
+    db.targets[0] = { text, date: new Date().toISOString() };
+    res.json({ success: true, targets: db.targets });
 });
 
-// Get Live Target Broadcast
-app.get('/api/target', async (req, res) => {
-    if (MONGO_URI) {
-        const saved = await Target.findOne();
-        if (saved) {
-            globalTargetData.text = saved.text;
-            globalTargetData.imageUrl = saved.imageUrl;
+app.get('/api/targets', (req, res) => {
+    res.json({ current: db.targets[0], history: db.targetHistory });
+});
+
+// Upload Mock Test (PDF / HTML / Limitless AI simulation)
+app.post('/api/admin/upload-mock', upload.single('file'), (req, res) => {
+    const { section, chapter, title } = req.body;
+    const sampleQuestions = [
+        {
+            id: 1,
+            en: { q: "Sample Question for " + chapter, options: ["A", "B", "C", "D"], ans: 0, exp: "Detailed explanation..." },
+            hi: { q: chapter + " के लिए नमूना प्रश्न", options: ["ए", "बी", "सी", "डी"], ans: 0, exp: "विस्तृत स्पष्टीकरण..." },
+            pyq: "SSC CPO 2024"
         }
-    }
-    return res.json({ success: true, targetData: globalTargetData });
+    ];
+    const newMock = { id: Date.now(), section, chapter, title, questions: sampleQuestions };
+    db.mocks.push(newMock);
+    res.json({ success: true, mock: newMock });
 });
 
-// Admin Store Uploaded HTML Questions Permanently
-app.post('/api/admin/add-questions', async (req, res) => {
-    const { username, password, section, questions } = req.body;
-
-    if (username !== 'ajayraoshab751@gmail.com' || password !== 'sunitadevi') {
-        return res.status(403).json({ success: false, error: 'Unauthorized Admin Access' });
-    }
-
-    if (!globalCustomQuestions[section]) globalCustomQuestions[section] = [];
-    globalCustomQuestions[section].push(...questions);
-
-    if (MONGO_URI) {
-        const docs = questions.map(q => ({ section, question: q.question, options: q.options, correctAnswer: q.correctAnswer }));
-        await CustomQuestion.insertMany(docs);
-    }
-
-    return res.json({ success: true, count: questions.length });
+app.get('/api/mocks', (req, res) => {
+    res.json(db.mocks);
 });
 
-// Get All Custom Uploaded Questions
-app.get('/api/questions', async (req, res) => {
-    if (MONGO_URI) {
-        const dbQs = await CustomQuestion.find();
-        const formatted = {};
-        dbQs.forEach(q => {
-            if (!formatted[q.section]) formatted[q.section] = [];
-            formatted[q.section].push({ question: q.question, options: q.options, correctAnswer: q.correctAnswer });
-        });
-        return res.json({ success: true, questions: formatted });
-    }
-    return res.json({ success: true, questions: globalCustomQuestions });
-});
-
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`CPO AIR 1 Server running on port ${PORT}`));

@@ -9,39 +9,94 @@
 <body>
     <header class="app-header">
         <div class="brand-title">CPO AIR 1</div>
-        <div class="uniform-subtitle">Delhi Police Sub Inspector Uniform Mission</div>
+        <div class="uniform-subtitle">🛡️ Delhi Police Sub Inspector Uniform Mission 🛡️</div>
         <div class="top-right-controls">
-            <button id="langToggleBtn" onclick="toggleLanguage()">🌐 EN / HI</button>
-            <button id="themeToggleBtn" onclick="toggleTheme()">🌓 Theme</button>
-            <button id="readingModeBtn" onclick="toggleReadingMode()">📖 Read Mode</button>
+            <button onclick="toggleLanguage()" id="langBtn">🌐 EN / HI</button>
+            <button onclick="toggleTheme()">🌓 Theme</button>
+            <button onclick="toggleReadingMode()">📖 Read Mode</button>
         </div>
     </header>
 
     <main id="appBody">
+        <!-- Auth View -->
         <section id="authView" class="view active">
-            <h2>Candidate & Admin Portal Login</h2>
-            <input type="email" id="loginEmail" placeholder="Enter Gmail ID">
-            <input type="password" id="loginPassword" placeholder="Enter Password">
-            <button onclick="handleLogin()">Login / Stay Logged In</button>
+            <div class="auth-card">
+                <h2>Candidate & Admin Login</h2>
+                <input type="email" id="loginEmail" placeholder="Enter Gmail ID">
+                <input type="password" id="loginPassword" placeholder="Enter Password">
+                <button onclick="handleLogin()">Login / Stay Logged In</button>
+            </div>
         </section>
 
+        <!-- Main Dashboard View -->
         <section id="dashboardView" class="view">
-            <div id="adminPanel" style="display:none;" class="admin-box">
-                <h3>Admin Control Center</h3>
-                <input type="email" id="adminEmailCheck" value="ajayraoshab751@gmail.com" readonly>
-                <select id="mockSectionSelect">
-                    <option value="Math">Math Chapters</option>
-                    <option value="Reasoning">Reasoning Chapters</option>
-                    <option value="GKGS">GK/GS Chapters</option>
-                    <option value="English">English Chapters</option>
-                </select>
-                <input type="text" id="mockTitleInput" placeholder="Mock Test Title">
-                <input type="file" id="mockFileInput">
-                <button onclick="uploadMockTest()">Upload & Convert Mock via AI (Limitless)</button>
+            <!-- Admin Panel (Visible only to Admin) -->
+            <div id="adminPanel" class="admin-box" style="display:none;">
+                <h3>👑 Admin Control Center</h3>
+                <button onclick="showAdminProfile()">1. Profile & Registrations</button>
+                <div class="admin-section-group">
+                    <h4>2. Post Target</h4>
+                    <textarea id="adminTargetInput" placeholder="Write daily target..."></textarea>
+                    <button onclick="postAdminTarget()">Publish Target</button>
+                </div>
+                <div class="admin-section-group">
+                    <h4>3 & 6. Upload Mock (PDF / HTML - Limitless)</h4>
+                    <select id="mockSection">
+                        <option value="Math">Math (Arithmetic & Advanced)</option>
+                        <option value="Reasoning">Reasoning (Verbal & Non-Verbal)</option>
+                        <option value="GKGS">GK/GS (History, Polity, Geo, Science, Static)</option>
+                        <option value="English">English (Grammar, Vocab, Comprehension)</option>
+                    </select>
+                    <input type="text" id="mockTitle" placeholder="Mock Test Title">
+                    <input type="file" id="mockFile">
+                    <button onclick="uploadMock()">Upload & Convert via AI</button>
+                </div>
+            </div>
+
+            <!-- TAB 1: TEST SECTION (Chapters & Full Mocks) -->
+            <div id="tab-test" class="tab-content active">
+                <h2>📚 SSC CPO Chapter-Wise & Full Mock Tests</h2>
+                <div id="chapterContainer"></div>
+            </div>
+
+            <!-- TAB 2: PERFORMANCE -->
+            <div id="tab-performance" class="tab-content">
+                <h2>🏆 Performance & Leaderboard</h2>
+                <div id="leaderboardBox"></div>
+            </div>
+
+            <!-- TAB 3: CHALLENGE -->
+            <div id="tab-challenge" class="tab-content">
+                <h2>🎯 100 / 75 / 60 / 30 Day Challenges</h2>
+                <div class="challenge-controls">
+                    <button onclick="setChallengeDays(100)">100 Days</button>
+                    <button onclick="setChallengeDays(75)">75 Days</button>
+                    <button onclick="setChallengeDays(60)">60 Days</button>
+                    <button onclick="setChallengeDays(30)">30 Days</button>
+                </div>
+                <div id="attendanceGrid"></div>
+            </div>
+
+            <!-- TAB 4: ASK DOUBT -->
+            <div id="tab-doubt" class="tab-content">
+                <h2>🤖 AI Doubt Solver</h2>
+                <textarea id="doubtText" placeholder="Type your doubt here..."></textarea>
+                <input type="file" id="doubtPhoto">
+                <button onclick="solveDoubt()">Ask Google AI</button>
+                <div id="doubtResult"></div>
+            </div>
+
+            <!-- TAB 5: TARGET -->
+            <div id="tab-target" class="tab-content">
+                <h2>📢 Daily Admin Targets & History</h2>
+                <div id="currentTargetBox"></div>
+                <h3>Target History</h3>
+                <div id="targetHistoryBox"></div>
             </div>
         </section>
     </main>
 
+    <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <button onclick="switchTab('test')">1. Test</button>
         <button onclick="switchTab('performance')">2. Performance</button>
