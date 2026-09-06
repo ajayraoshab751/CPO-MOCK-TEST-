@@ -30,7 +30,6 @@
 
         <!-- Main Dashboard View -->
         <section id="dashboardView" class="view">
-            <!-- Admin Panel (Visible only to Admin) -->
             <div id="adminPanel" class="admin-box" style="display:none;">
                 <h3>👑 Admin Control Center</h3>
                 <button onclick="showAdminProfile()">1. Profile & Registrations</button>
@@ -53,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- TAB 1: TEST SECTION (Chapters & Full Mocks) -->
+            <!-- TAB 1: TEST SECTION -->
             <div id="tab-test" class="tab-content active">
                 <h2>📚 SSC CPO Chapter-Wise & Full Mock Tests</h2>
                 <div id="chapterContainer"></div>
@@ -92,6 +91,44 @@
                 <div id="currentTargetBox"></div>
                 <h3>Target History</h3>
                 <div id="targetHistoryBox"></div>
+            </div>
+        </section>
+
+        <!-- CBT Test Workspace View -->
+        <section id="cbtWorkspaceView" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 10px 20px; border-radius: 6px; margin-bottom: 15px;">
+                <h3 id="cbtTestTitle">Mock Test Title</h3>
+                <div>
+                    <span id="globalTimer" style="font-weight: bold; font-size: 16px; margin-right: 15px;">⏱️ Time: 00:00</span>
+                    <button onclick="submitTest()" style="background: #e74c3c;">Submit Test</button>
+                </div>
+            </div>
+            <div class="cbt-container">
+                <div class="cbt-main-area">
+                    <!-- Top-Left Navigation Controls -->
+                    <div class="top-left-cbt-controls">
+                        <button onclick="prevQuestion()">⬅️ Previous</button>
+                        <button onclick="markForReview()" style="background: #9b59b6;">Mark for Review</button>
+                        <button onclick="nextQuestion()">Next ➡️</button>
+                    </div>
+                    <div id="questionContainer">
+                        <!-- Dynamic Question Loaded Here -->
+                    </div>
+                </div>
+                <div class="cbt-sidebar">
+                    <h4>Question Palette</h4>
+                    <div id="questionPalette" class="palette-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scorecard & Solution Review View -->
+        <section id="scorecardView" class="view">
+            <div class="auth-card" style="max-width: 700px; margin: auto;">
+                <h2>📊 Test Scorecard & Summary</h2>
+                <div id="scorecardDetails"></div>
+                <button onclick="openSolutionReview()">🔍 View Detailed Solutions</button>
+                <button onclick="switchTab('test')" style="background: #7f8c8d; margin-left: 10px;">Back to Tests</button>
             </div>
         </section>
     </main>

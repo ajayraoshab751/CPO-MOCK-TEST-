@@ -113,3 +113,19 @@ button {
 .day-present { background-color: #2ecc71; color: white; }
 .day-absent { background-color: #e74c3c; color: white; }
 .day-unmarked { background-color: #bdc3c7; color: black; }
+
+/* CBT Test Interface Styles */
+.cbt-container { display: flex; flex-wrap: wrap; gap: 20px; padding: 10px; }
+.cbt-main-area { flex: 3; min-width: 300px; background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.cbt-sidebar { flex: 1; min-width: 220px; background: var(--card-bg); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.top-left-cbt-controls { margin-bottom: 15px; display: flex; gap: 8px; }
+.top-left-cbt-controls button { padding: 6px 12px; font-size: 13px; }
+.question-box { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+.option-label { display: block; background: var(--bg-color); padding: 10px; margin: 8px 0; border-radius: 4px; cursor: pointer; border: 1px solid #ccc; }
+.option-label input { margin-right: 10px; width: auto; }
+.palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+.palette-btn { padding: 8px; text-align: center; font-weight: bold; border-radius: 4px; cursor: border; border: none; }
+.status-not-visited { background: #e0e0e0; color: #333; }
+.status-answered { background: #2ecc71; color: white; }
+.status-marked { background: #9b59b6; color: white; }
+.status-not-answered { background: #e74c3c; color: white; }

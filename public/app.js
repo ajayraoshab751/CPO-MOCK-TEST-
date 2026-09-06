@@ -1,6 +1,16 @@
 let currentLang = 'en';
 let currentUser = JSON.parse(localStorage.getItem('cpo_user')) || null;
 
+// CBT Test State
+let activeQuestions = [];
+let currentQIndex = 0;
+let userResponses = {}; // stores answers: { qIndex: optionIndex }
+let questionStatus = {}; // 'not-visited', 'not-answered', 'answered', 'marked'
+let questionTimes = {}; // tracks seconds per question
+let globalTimerSeconds = 0;
+let timerInterval = null;
+let qTimerInterval = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     if (currentUser) {
         document.getElementById('authView').classList.remove('active');
@@ -16,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function toggleLanguage() {
     currentLang = currentLang === 'en' ? 'hi' : 'en';
     alert("Language switched to: " + currentLang.toUpperCase());
+    if (document.getElementById('cbtWorkspaceView').classList.contains('active')) {
+        renderQuestion();
+    }
 }
 
 function toggleTheme() {
@@ -53,6 +66,8 @@ async function handleLogin() {
 }
 
 function switchTab(tabName) {
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById('dashboardView').classList.add('active');
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
     if (tabName === 'challenge') renderAttendance(30);
@@ -77,9 +92,214 @@ function loadChapters() {
     document.getElementById('chapterContainer').innerHTML = html;
 }
 
+// --- CBT MOCK ENGINE START ---
 function startChapterMock(section, chapter) {
-    alert("Starting Chapter Mock Test for: " + chapter + " (" + section + ")");
+    // Generate 5 sample limitless questions for demonstration
+    activeQuestions = [];
+    for (let i = 1; i <= 5; i++) {
+        activeQuestions.push({
+            id: i,
+            en: {
+                q: `[${chapter}] Sample Question ${i} for SSC CPO Exam?`,
+                options: ["Option A (Correct)", "Option B", "Option C", "Option D"],
+                ans: 0,
+                exp: `Detailed explanation for Question ${i}: The correct choice is Option A based on standard SSC CPO guidelines.`
+            },
+            hi: {
+                q: `[${chapter}] एसएससी सीपीओ परीक्षा के लिए नमूना प्रश्न ${i}?`,
+                options: ["विकल्प ए (सही)", "विकल्प बी", "विकल्प सी", "विकल्प डी"],
+                ans: 0,
+                exp: `प्रश्न ${i} के लिए विस्तृत स्पष्टीकरण: मानक दिशानिर्देशों के अनुसार विकल्प ए सही है।`
+            },
+            pyq: "SSC CPO 2024 (Tier-1)"
+        });
+    }
+
+    currentQIndex = 0;
+    userResponses = {};
+    questionStatus = {};
+    questionTimes = {};
+    activeQuestions.forEach((_, idx) => {
+        questionStatus[idx] = 'not-visited';
+        questionTimes[idx] = 0;
+    });
+
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById('cbtWorkspaceView').classList.add('active');
+    document.getElementById('cbtTestTitle').innerText = `${section} - ${chapter} Mock Test`;
+
+    startGlobalTimer();
+    renderQuestion();
+    renderPalette();
 }
+
+function startGlobalTimer() {
+    globalTimerSeconds = 0;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        globalTimerSeconds++;
+        let mins = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
+        let secs = (globalTimerSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('globalTimer').innerText = `⏱️ Time: ${mins}:${secs}`;
+    }, 1000);
+
+    if (qTimerInterval) clearInterval(qTimerInterval);
+    qTimerInterval = setInterval(() => {
+        if (questionTimes[currentQIndex] !== undefined) {
+            questionTimes[currentQIndex]++;
+        }
+    }, 1000);
+}
+
+function renderQuestion() {
+    if (questionStatus[currentQIndex] === 'not-visited') {
+        questionStatus[currentQIndex] = 'not-answered';
+    }
+
+    const qData = activeQuestions[currentQIndex][currentLang];
+    let html = `
+        <div class="question-box">
+            <span style="font-size:12px; color:#e67e22; background:#fef5e7; padding:3px 6px; border-radius:4px;">📌 PYQ: ${activeQuestions[currentQIndex].pyq}</span>
+            <p>Q.${currentQIndex + 1} ${qData.q}</p>
+        </div>
+        <div class="options-group">
+    `;
+
+    qData.options.forEach((opt, oIdx) => {
+        let checked = userResponses[currentQIndex] === oIdx ? 'checked' : '';
+        html += `
+            <label class="option-label">
+                <input type="radio" name="qOpt" value="${oIdx}" ${checked} onchange="selectOption(${oIdx})">
+                ${String.fromCharCode(65 + oIdx)}. ${opt}
+            </label>
+        `;
+    });
+
+    html += `</div>`;
+    document.getElementById('questionContainer').innerHTML = html;
+    renderPalette();
+}
+
+function selectOption(oIdx) {
+    userResponses[currentQIndex] = oIdx;
+    questionStatus[currentQIndex] = 'answered';
+    renderPalette();
+}
+
+function nextQuestion() {
+    if (currentQIndex < activeQuestions.length - 1) {
+        currentQIndex++;
+        renderQuestion();
+    }
+}
+
+function prevQuestion() {
+    if (currentQIndex > 0) {
+        currentQIndex--;
+        renderQuestion();
+    }
+}
+
+function markForReview() {
+    questionStatus[currentQIndex] = 'marked';
+    renderPalette();
+    nextQuestion();
+}
+
+function jumpToQuestion(idx) {
+    currentQIndex = idx;
+    renderQuestion();
+}
+
+function renderPalette() {
+    let html = '';
+    activeQuestions.forEach((_, idx) => {
+        let statusClass = 'status-not-visited';
+        let st = questionStatus[idx];
+        if (st === 'answered') statusClass = 'status-answered';
+        else if (st === 'marked') statusClass = 'status-marked';
+        else if (st === 'not-answered') statusClass = 'status-not-answered';
+
+        html += `<button class="palette-btn ${statusClass}" onclick="jumpToQuestion(${idx})">${idx + 1}</button>`;
+    });
+    document.getElementById('questionPalette').innerHTML = html;
+}
+
+function submitTest() {
+    if (confirm("Are you sure you want to submit the test?")) {
+        clearInterval(timerInterval);
+        clearInterval(qTimerInterval);
+
+        let correct = 0;
+        let incorrect = 0;
+        let unattempted = 0;
+
+        activeQuestions.forEach((q, idx) => {
+            let userAns = userResponses[idx];
+            if (userAns === undefined) {
+                unattempted++;
+            } else if (userAns === q.en.ans) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        });
+
+        let totalScore = (correct * 2) - (incorrect * 0.5); // CPO marking scheme example
+        let percentage = ((correct / activeQuestions.length) * 100).toFixed(2);
+        let mins = Math.floor(globalTimerSeconds / 60);
+        let secs = globalTimerSeconds % 60;
+
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById('scorecardView').classList.add('active');
+
+        document.getElementById('scorecardDetails').innerHTML = `
+            <p><strong>Total Correct:</strong> <span style="color:green;">${correct}</span></p>
+            <p><strong>Total Incorrect:</strong> <span style="color:red;">${incorrect}</span></p>
+            <p><strong>Total Unattempted:</strong> ${unattempted}</p>
+            <p><strong>Total Time Taken:</strong> ${mins}m ${secs}s</p>
+            <p><strong>Final Score / Percentage:</strong> ${percentage}%</p>
+        `;
+    }
+}
+
+function openSolutionReview() {
+    currentQIndex = 0;
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById('cbtWorkspaceView').classList.add('active');
+    document.getElementById('cbtTestTitle').innerText = "Detailed Solutions & Review Mode";
+    renderReviewQuestion();
+}
+
+function renderReviewQuestion() {
+    const q = activeQuestions[currentQIndex];
+    const qData = q[currentLang];
+    let userAns = userResponses[currentQIndex];
+
+    let html = `
+        <div class="question-box">
+            <span style="font-size:12px; color:#e67e22;">⏱️ Time spent on this Q: ${questionTimes[currentQIndex]}s | PYQ: ${q.pyq}</span>
+            <p>Q.${currentQIndex + 1} ${qData.q}</p>
+        </div>
+        <div class="options-group">
+    `;
+
+    qData.options.forEach((opt, oIdx) => {
+        let style = "";
+        if (oIdx === qData.ans) style = "background: #d4edda; border-color: #28a745; font-weight: bold;";
+        else if (oIdx === userAns) style = "background: #f8d7da; border-color: #dc3545;";
+
+        html += `<div class="option-label" style="${style}">${String.fromCharCode(65 + oIdx)}. ${opt}</div>`;
+    });
+
+    html += `</div><div style="margin-top: 15px; background: #e8f4f8; padding: 12px; border-radius: 6px;">
+        <strong>💡 Explanation:</strong> ${qData.exp}
+    </div>`;
+
+    document.getElementById('questionContainer').innerHTML = html;
+    renderPalette();
+}
+// --- CBT MOCK ENGINE END ---
 
 async function postAdminTarget() {
     const text = document.getElementById('adminTargetInput').value;
