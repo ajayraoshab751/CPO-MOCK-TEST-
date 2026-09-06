@@ -14,57 +14,62 @@
             <button onclick="toggleLanguage()" id="langBtn">🌐 EN / HI</button>
             <button onclick="toggleTheme()">🌓 Theme</button>
             <button onclick="toggleReadingMode()">📖 Read Mode</button>
+            <button id="logoutBtn" onclick="handleLogout()" style="display:none; background:#e74c3c;">Logout</button>
         </div>
     </header>
 
     <main id="appBody">
-        <!-- Auth View -->
+        <!-- Auth View (Visible when logged out) -->
         <section id="authView" class="view active">
-            <div class="auth-card">
+            <div class="auth-card" style="max-width: 400px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <h2>Candidate & Admin Login</h2>
+                <p><small>Admin: ajayraoshab751@gmail.com / sunitadevi</small></p>
                 <input type="email" id="loginEmail" placeholder="Enter Gmail ID">
                 <input type="password" id="loginPassword" placeholder="Enter Password">
-                <button onclick="handleLogin()">Login / Stay Logged In</button>
+                <button onclick="handleLogin()" style="width: 100%; margin-top: 10px;">Login / Stay Logged In</button>
             </div>
         </section>
 
         <!-- Main Dashboard View -->
         <section id="dashboardView" class="view">
-            <div id="adminPanel" class="admin-box" style="display:none;">
-                <h3>👑 Admin Control Center</h3>
-                <button onclick="showAdminProfile()">1. Profile & Registrations</button>
-                <div class="admin-section-group">
-                    <h4>2. Post Target</h4>
-                    <textarea id="adminTargetInput" placeholder="Write daily target..."></textarea>
-                    <button onclick="postAdminTarget()">Publish Target</button>
-                </div>
-                <div class="admin-section-group">
-                    <h4>3 & 6. Upload Mock (PDF / HTML - Limitless)</h4>
-                    <select id="mockSection">
-                        <option value="Math">Math (Arithmetic & Advanced)</option>
-                        <option value="Reasoning">Reasoning (Verbal & Non-Verbal)</option>
-                        <option value="GKGS">GK/GS (History, Polity, Geo, Science, Static)</option>
-                        <option value="English">English (Grammar, Vocab, Comprehension)</option>
-                    </select>
-                    <input type="text" id="mockTitle" placeholder="Mock Test Title">
-                    <input type="file" id="mockFile">
-                    <button onclick="uploadMock()">Upload & Convert via AI</button>
+            <!-- TAB 1: ADMIN CONTROL PANEL (Visible only for admin) -->
+            <div id="tab-admin" class="tab-content">
+                <h2>👑 Admin Control Center</h2>
+                <div class="admin-box">
+                    <button onclick="showAdminProfile()">1. Profile & Registrations</button>
+                    <div class="admin-section-group" style="margin-top: 15px;">
+                        <h4>2. Target Manager</h4>
+                        <textarea id="adminTargetInput" placeholder="Write daily target..."></textarea>
+                        <button onclick="postAdminTarget()">Publish Target</button>
+                    </div>
+                    <div class="admin-section-group" style="margin-top: 15px;">
+                        <h4>3 & 6. Upload Mock (PDF / HTML - Limitless)</h4>
+                        <select id="mockSection">
+                            <option value="Math">Math (Arithmetic & Advanced)</option>
+                            <option value="Reasoning">Reasoning (Verbal & Non-Verbal)</option>
+                            <option value="GKGS">GK/GS (History, Polity, Geo, Science, Static)</option>
+                            <option value="English">English (Grammar, Vocab, Comprehension)</option>
+                        </select>
+                        <input type="text" id="mockTitle" placeholder="Mock Test Title">
+                        <input type="file" id="mockFile">
+                        <button onclick="uploadMock()">Upload & Convert via AI</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- TAB 1: TEST SECTION -->
+            <!-- TAB 2: TEST SECTION -->
             <div id="tab-test" class="tab-content active">
                 <h2>📚 SSC CPO Chapter-Wise & Full Mock Tests</h2>
                 <div id="chapterContainer"></div>
             </div>
 
-            <!-- TAB 2: PERFORMANCE -->
+            <!-- TAB 3: PERFORMANCE -->
             <div id="tab-performance" class="tab-content">
                 <h2>🏆 Performance & Leaderboard</h2>
                 <div id="leaderboardBox"></div>
             </div>
 
-            <!-- TAB 3: CHALLENGE -->
+            <!-- TAB 4: CHALLENGE -->
             <div id="tab-challenge" class="tab-content">
                 <h2>🎯 100 / 75 / 60 / 30 Day Challenges</h2>
                 <div class="challenge-controls">
@@ -76,7 +81,7 @@
                 <div id="attendanceGrid"></div>
             </div>
 
-            <!-- TAB 4: ASK DOUBT -->
+            <!-- TAB 5: ASK DOUBT -->
             <div id="tab-doubt" class="tab-content">
                 <h2>🤖 AI Doubt Solver</h2>
                 <textarea id="doubtText" placeholder="Type your doubt here..."></textarea>
@@ -85,7 +90,7 @@
                 <div id="doubtResult"></div>
             </div>
 
-            <!-- TAB 5: TARGET -->
+            <!-- TAB 6: TARGET -->
             <div id="tab-target" class="tab-content">
                 <h2>📢 Daily Admin Targets & History</h2>
                 <div id="currentTargetBox"></div>
@@ -105,15 +110,12 @@
             </div>
             <div class="cbt-container">
                 <div class="cbt-main-area">
-                    <!-- Top-Left Navigation Controls -->
                     <div class="top-left-cbt-controls">
                         <button onclick="prevQuestion()">⬅️ Previous</button>
                         <button onclick="markForReview()" style="background: #9b59b6;">Mark for Review</button>
                         <button onclick="nextQuestion()">Next ➡️</button>
                     </div>
-                    <div id="questionContainer">
-                        <!-- Dynamic Question Loaded Here -->
-                    </div>
+                    <div id="questionContainer"></div>
                 </div>
                 <div class="cbt-sidebar">
                     <h4>Question Palette</h4>
@@ -135,11 +137,12 @@
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <button onclick="switchTab('test')">1. Test</button>
-        <button onclick="switchTab('performance')">2. Performance</button>
-        <button onclick="switchTab('challenge')">3. Challenge</button>
-        <button onclick="switchTab('doubt')">4. Ask Doubt</button>
-        <button onclick="switchTab('target')">5. Target</button>
+        <button id="navAdminBtn" onclick="switchTab('admin')" style="display:none; color: #e67e22;">👑 Admin</button>
+        <button onclick="switchTab('test')">📚 Test</button>
+        <button onclick="switchTab('performance')">🏆 Performance</button>
+        <button onclick="switchTab('challenge')">🎯 Challenge</button>
+        <button onclick="switchTab('doubt')">🤖 Doubt</button>
+        <button onclick="switchTab('target')">📢 Target</button>
     </nav>
 
     <script src="app.js"></script>

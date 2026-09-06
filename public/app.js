@@ -4,24 +4,35 @@ let currentUser = JSON.parse(localStorage.getItem('cpo_user')) || null;
 // CBT Test State
 let activeQuestions = [];
 let currentQIndex = 0;
-let userResponses = {}; // stores answers: { qIndex: optionIndex }
-let questionStatus = {}; // 'not-visited', 'not-answered', 'answered', 'marked'
-let questionTimes = {}; // tracks seconds per question
+let userResponses = {};
+let questionStatus = {};
+let questionTimes = {};
 let globalTimerSeconds = 0;
 let timerInterval = null;
 let qTimerInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (currentUser) {
+    checkAuthState();
+    loadChapters();
+    loadTargets();
+});
+
+function checkAuthState() {
+    if (currentUser && currentUser.email) {
         document.getElementById('authView').classList.remove('active');
         document.getElementById('dashboardView').classList.add('active');
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        
         if (currentUser.role === 'admin') {
-            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('navAdminBtn').style.display = 'block';
         }
-        loadChapters();
-        loadTargets();
+    } else {
+        document.getElementById('authView').classList.add('active');
+        document.getElementById('dashboardView').classList.remove('active');
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('navAdminBtn').style.display = 'none';
     }
-});
+}
 
 function toggleLanguage() {
     currentLang = currentLang === 'en' ? 'hi' : 'en';
@@ -47,6 +58,11 @@ async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
+    if (!email || !password) {
+        alert("Please enter both email and password!");
+        return;
+    }
+
     const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,13 +72,16 @@ async function handleLogin() {
     currentUser = data;
     localStorage.setItem('cpo_user', JSON.stringify(data));
 
-    document.getElementById('authView').classList.remove('active');
-    document.getElementById('dashboardView').classList.add('active');
-    if (data.role === 'admin') {
-        document.getElementById('adminPanel').style.display = 'block';
-    }
-    loadChapters();
-    loadTargets();
+    alert(data.role === 'admin' ? "Admin Logged In Successfully!" : "Student Logged In Successfully!");
+    checkAuthState();
+    switchTab('test');
+}
+
+function handleLogout() {
+    localStorage.removeItem('cpo_user');
+    currentUser = null;
+    checkAuthState();
+    alert("Logged out successfully!");
 }
 
 function switchTab(tabName) {
@@ -92,9 +111,8 @@ function loadChapters() {
     document.getElementById('chapterContainer').innerHTML = html;
 }
 
-// --- CBT MOCK ENGINE START ---
+// --- CBT MOCK ENGINE ---
 function startChapterMock(section, chapter) {
-    // Generate 5 sample limitless questions for demonstration
     activeQuestions = [];
     for (let i = 1; i <= 5; i++) {
         activeQuestions.push({
@@ -236,16 +254,11 @@ function submitTest() {
 
         activeQuestions.forEach((q, idx) => {
             let userAns = userResponses[idx];
-            if (userAns === undefined) {
-                unattempted++;
-            } else if (userAns === q.en.ans) {
-                correct++;
-            } else {
-                incorrect++;
-            }
+            if (userAns === undefined) unattempted++;
+            else if (userAns === q.en.ans) correct++;
+            else incorrect++;
         });
 
-        let totalScore = (correct * 2) - (incorrect * 0.5); // CPO marking scheme example
         let percentage = ((correct / activeQuestions.length) * 100).toFixed(2);
         let mins = Math.floor(globalTimerSeconds / 60);
         let secs = globalTimerSeconds % 60;
@@ -299,7 +312,6 @@ function renderReviewQuestion() {
     document.getElementById('questionContainer').innerHTML = html;
     renderPalette();
 }
-// --- CBT MOCK ENGINE END ---
 
 async function postAdminTarget() {
     const text = document.getElementById('adminTargetInput').value;
