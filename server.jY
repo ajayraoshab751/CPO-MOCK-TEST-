@@ -15,7 +15,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Optional MongoDB Connection (falls back to persistent file/in-memory state if URI not provided)
 const MONGO_URI = process.env.MONGO_URI || "";
 if (MONGO_URI) {
-    mongoose.connect(MONGO_URI)
+O    mongoose.connect(MONGO_URI)
         .then(() => console.log('MongoDB Connected Successfully'))
         .catch(err => console.error('MongoDB Connection Error:', err));
 }

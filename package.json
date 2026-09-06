@@ -1,16 +1,19 @@
 {
   "name": "cpo-mock-test",
   "version": "1.0.0",
-  "description": "CPO AIR 1 CBT Platform",
+  "description": "CPO Mock Portal",
   "main": "server.js",
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "mongoose": "^8.3.1"
-  }
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "mongoose": "^9.9.5",
+    "multer": "^2.3.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }
